@@ -1,0 +1,51 @@
+digraph G {
+  node [fontname = "Arial"];
+
+  subgraph cluster_filtering {
+    style="rounded"
+    color=grey
+    filt[label="1. Filtering", style=filled, fillcolor=lightgrey, fontsize=17]
+    { 
+      pcCells[label="Proportion of\ncells lost?", shape=none]
+     biased[label="Bias towards\ncertain\npopulations?", shape=none]
+    }
+  }
+  norm[label="2. Normalization", style=filled, fillcolor=lightgrey, fontsize=17]
+  subgraph cluster_selection {
+    style="rounded"
+    color=grey    
+    sel[label="3. Feature\nselection", style=filled, fillcolor=lightgrey, fontsize=17]
+    sel1[label="Does the selection track\ngenes whose variance is mostly\nbetween real populations?", shape=none]
+  }
+  subgraph cluster_dimred {
+    style="rounded"
+    color=grey    
+    DR[label="4. Dimensionality\nreduction", style=filled, fillcolor=lightgrey, fontsize=17]
+    dr1[label="Are the first\ncomponents\ncorrelated to\nlibrary sizes?", shape=none]
+    dr2[label="Are the real\npopulations\nwell separated?", shape=none]
+  }
+  subgraph cluster_clust {
+    style="rounded"
+    color=grey    
+    clust[label="5. Clustering", style=filled, fillcolor=lightgrey, fontsize=17]
+    clust1[label="Do the clusters\nmatch real populations?", shape=none]
+  }
+
+  edge [penwidth=6]
+  filt->norm->sel->DR->clust
+  
+  edge [penwidth=1.5, dir=back, color=blue]
+  filt->pcCells 
+  filt->biased
+  sel -> sel1
+  DR-> { dr1 dr2 }
+  clust -> clust1
+  norm -> dr1
+  
+  edge [dir=forward, style=dotted]
+  clust1 -> DR
+  dr2 -> norm
+  clust1 -> filt
+  clust1 -> norm
+  
+}

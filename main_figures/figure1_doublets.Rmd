@@ -1,0 +1,36 @@
+---
+title: "Figure 1 doublets"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: true
+
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(SingleCellExperiment)
+  library(ROCit)
+  library(cowplot)
+})
+# we load the dataset
+sce <- readRDS("../datasets/mixology10x5cl.SCE.rds")
+CD <- as.data.frame(colData(sce))
+```
+
+```{r}
+truth <- factor(CD$demuxlet_cls, c("SNG","DBL"))
+roclist <- lapply( list(plDoubletFinder=CD$pldf.ratio,
+                        DoubletFinder.p=CD$doubletFinder.pANN_0.25_0.02_82,
+                        scran.score=CD$scran.doubletscore,
+                        scds.hybrid=CD$hybrid_score), 
+                   class=truth, FUN=rocit)
+colors <- c("blue","red","black","pink")
+plot(roclist[[1]], lwd=2, col=c(colors[[1]], "grey"), legend=FALSE, YIndex=FALSE, main="mixology10x5cl")
+for(i in 2:length(roclist)){
+  lines(roclist[[i]]$FPR, roclist[[i]]$TPR, lwd=2, col=colors[[i]])
+}
+legend("bottomright", fill=colors, legend=names(roclist))
+```
+

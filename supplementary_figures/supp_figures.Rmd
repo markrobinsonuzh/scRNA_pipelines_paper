@@ -1,0 +1,30 @@
+---
+title: "Supplementary Figures"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+geometry: margin=1.5cm
+output:
+  pdf_document:
+    keep_tex: true
+    toc: true
+    fig_width: 8
+    fig_height: 6
+    citation_package: natbib
+bibliography: ../bmc_article.bib
+---
+
+```{r setup, include=FALSE}
+# comment this out to print code
+knitr::opts_chunk$set(echo=FALSE)
+FIG_NB <- 0
+getFigNb <- function(increment=FALSE){
+  if(increment) FIG_NB <<- FIG_NB + 1
+  FIG_NB
+}
+```
+
+\newpage
+
+```{r child='supp1_dataset_description.Rmd'}
+```
+
