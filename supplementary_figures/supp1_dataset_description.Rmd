@@ -49,6 +49,8 @@ plot_grid(plotlist=lapply(1:length(vars), FUN=function(x){
 }), nrow=1)
 ```
 
+
+
 ### Supplementary Figure `r getFigNb()`
 Distribution across cells of various control properties in the different datasets. The 
 lines indicate respectively 2 and 5 median absolute deviations (MADs).
@@ -59,9 +61,10 @@ lines indicate respectively 2 and 5 median absolute deviations (MADs).
 # Supplementary Figure `r getFigNb(TRUE)`
 
 ```{r mixology_doublet_featcount, fig.height=4}
+theme_set(theme_cowplot(font_size = 13))
 plotDoublets <- function(sce, title="", mads=c(2,2.5,3), vars=c("log10_total_features", "log10_total_counts")){
   cd <- as.data.frame(colData(sce))
-  p <- ggplot(cd, aes_string(x=vars[1], y=vars[2], colour="demuxlet_cls")) + geom_point()
+  p <- ggplot(cd, aes_string(x=vars[1], y=vars[2], colour="demuxlet_cls")) + geom_point() + theme(legend.position="none")
   p <- p + geom_point(data=cd[which(cd$demuxlet_cls=="DBL"),], size=3)
   lt <- c("solid","dashed","dotted","dotdash")
   for(i in 1:length(mads)){
@@ -77,19 +80,13 @@ pl <- list( plotDoublets(SCEs$mixology10x3cl) + ggtitle("mixology10x3cl"),
 plot_grid(plotlist=pl, labels=LETTERS[1:2])
 ```
 
+
+
 ### Supplementary Figure `r getFigNb()`
-The total counts and total features per cell of doublets versus other cells. We used the demuxlet annotation of doublets (based on SNPs) made available through CellBench. While doublets tend to have a higher total count and especially number of detected features, these features alone are not always sufficient for their identification.
+The total counts and total features per cell of doublets (red) versus other cells. We used the demuxlet annotation of doublets (based on SNPs) made available through CellBench. The lines indicate, respectively, 2, 2.5, and 3 median absolute deviations. While doublets tend to have a higher total count and especially number of detected features, these features alone are not always sufficient for their identification.
 
 
 \newpage
-
-# Supplementary Figure `r getFigNb(TRUE)`
-[to come]
-### Supplementary Figure `r getFigNb()`
-Doublets that cannot be identified by our method show lower signs of being doublets.
-
-\newpage
-
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
@@ -101,6 +98,84 @@ d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)),
 ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_point() + facet_wrap(~dataset, scale="free") + scale_colour_gradient2(limits=c(-0.2,0.2))
 ```
 
+
+
 ### Supplementary Figure `r getFigNb()`
 There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` datasets), between the total counts of a cell and its number of detected features. We therefore include, among control variables, deviation from this ratio.
+
+\newpage
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r cellprops_cor, fig.width=7.5, fig.height=7}
+d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
+                 pct_counts_Mt=unlist(lapply(SCEs,FUN=function(x) x$pct_counts_Mt)),
+                 pct_top_50=unlist(lapply(SCEs,FUN=function(x) x$pct_counts_in_top_50_features)),
+                 log10_features=unlist(lapply(SCEs,FUN=function(x) x$log10_total_features)))
+plot_grid( ggplot(d, aes(x=pct_top_50, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
+           ggplot(d, aes(x=log10_features, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
+           labels=LETTERS[1:2], nrow=2 )
+
+ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_point() + facet_wrap(~dataset, scale="free") + scale_colour_gradient2(limits=c(-0.2,0.2))
+```
+
+
+
+### Supplementary Figure `r getFigNb()`
+There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` datasets), between the total counts of a cell and its number of detected features. We therefore include, among control variables, deviation from this ratio.
+
+\newpage
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r misclass, fig.height=4}
+theme_set(theme_cowplot(font_size = 11))
+mis <- readRDS("../data/misclassification.rds")
+pdb <- function(x, ...){
+  n <- names(mis)[x]
+  plotBadCells(SCEs[[n]], mis[[n]], name=n, ...)
+}
+pdb(2, labels=c("A",rep("",6)))
+```
+\vfill
+```{r, fig.height=4}
+pdb(3, labels=c("B",rep("",6)))
+```
+
+
+
+### Supplementary Figure `r getFigNb()`
+Relationship between various cellular properties and the frequency of cluster mis-assignment for the mixology10x3cl (A) and mixology10x5cl (B) datasets. The percentage of misclassification refers to the frequency with which a given cell is assigned the wrong cluster (using the Hungarian algorithm for cluster matching) across several hundred clustering runs with varying parameters. Since some subpopulations tend to be more misclassified than others, the adjusted rate of misclassification (`adj_mis`) is substracted for the subpopulation median misclassification rate.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.height=4}
+pdb(4, labels=c("A",rep("",6)))
+```
+\vfill
+```{r, fig.height=4}
+pdb(5, labels=c("B",rep("",6)))
+```
+
+
+
+### Supplementary Figure `r getFigNb()`
+Relationship between various cellular properties and the frequency of cluster mis-assignment for the Zheng equal (A) or unequal (B) mixtures of four cell types. See Supplementary Figure `r getFigNb()-1` for more information. The only clear pattern is that cells with a high number of reads or features tend to have a higher misclassification rate.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.height=4}
+pdb(6)
+```
+
+
+
+### Supplementary Figure `r getFigNb()`
+Relationship between various cellular properties and the frequency of cluster mis-assignment for the Zheng mixture of 8 cell types. See Supplementary Figure `r getFigNb()-2` for more information.
+
+\newpage
 

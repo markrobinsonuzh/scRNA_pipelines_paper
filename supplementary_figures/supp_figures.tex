@@ -84,7 +84,7 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{09 Mai, 2019}
+    \date{12 Mai, 2019}
 
 
 \begin{document}
@@ -99,7 +99,9 @@
 \hypertarget{supplementary-figure-1}{%
 \section{Supplementary Figure 1}\label{supplementary-figure-1}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-4-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/dist_cell_properties-1.pdf}
+
+\vfill
 
 \hypertarget{supplementary-figure-1-1}{%
 \subsubsection{Supplementary Figure 1}\label{supplementary-figure-1-1}}
@@ -113,39 +115,98 @@ deviations (MADs).
 \hypertarget{supplementary-figure-2}{%
 \section{Supplementary Figure 2}\label{supplementary-figure-2}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/mixology_doublet_featcount-1.pdf}
+
+\vfill
 
 \hypertarget{supplementary-figure-2-1}{%
 \subsubsection{Supplementary Figure 2}\label{supplementary-figure-2-1}}
 
-The total counts and total features per cell of doublets versus other
-cells. We used the demuxlet annotation of doublets (based on SNPs) made
-available through CellBench. While doublets tend to have a higher total
-count and especially number of detected features, these features alone
-are not always sufficient for their identification.
+The total counts and total features per cell of doublets (red) versus
+other cells. We used the demuxlet annotation of doublets (based on SNPs)
+made available through CellBench. The lines indicate, respectively, 2,
+2.5, and 3 median absolute deviations. While doublets tend to have a
+higher total count and especially number of detected features, these
+features alone are not always sufficient for their identification.
 
 \newpage
 
 \hypertarget{supplementary-figure-3}{%
 \section{Supplementary Figure 3}\label{supplementary-figure-3}}
 
-{[}to come{]} \#\#\# Supplementary Figure 3 Doublets that cannot be
-identified by our method show lower signs of being doublets.
+\includegraphics{supp_figures_files/figure-latex/featcount_ratio-1.pdf}
+
+\vfill
+
+\hypertarget{supplementary-figure-3-1}{%
+\subsubsection{Supplementary Figure 3}\label{supplementary-figure-3-1}}
+
+There is a tight relationship, in 10x datasets (i.e.~not the
+\texttt{Koh} and \texttt{Kumar} datasets), between the total counts of a
+cell and its number of detected features. We therefore include, among
+control variables, deviation from this ratio.
 
 \newpage
 
 \hypertarget{supplementary-figure-4}{%
 \section{Supplementary Figure 4}\label{supplementary-figure-4}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-6-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/misclass-1.pdf}
+\vspace{1cm}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\vfill
 
 \hypertarget{supplementary-figure-4-1}{%
 \subsubsection{Supplementary Figure 4}\label{supplementary-figure-4-1}}
 
-There is a tight relationship, in 10x datasets (i.e.~not the
-\texttt{Koh} and \texttt{Kumar} datasets), between the total counts of a
-cell and its number of detected features. We therefore include, among
-control variables, deviation from this ratio.
+Relationship between various cellular properties and the frequency of
+cluster mis-assignment for the mixology10x3cl (A) and mixology10x5cl (B)
+datasets. The percentage of misclassification refers to the frequency
+with which a given cell is assigned the wrong cluster (using the
+Hungarian algorithm for cluster matching) across several hundred
+clustering runs with varying parameters. Since some subpopulations tend
+to be more misclassified than others, the adjusted rate of
+misclassification (\texttt{adj\_mis}) is substracted for the
+subpopulation median misclassification rate.
+
+\newpage
+
+\hypertarget{supplementary-figure-5}{%
+\section{Supplementary Figure 5}\label{supplementary-figure-5}}
+
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-5-1.pdf}
+\vspace{1cm}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\vfill
+
+\hypertarget{supplementary-figure-5-1}{%
+\subsubsection{Supplementary Figure 5}\label{supplementary-figure-5-1}}
+
+Relationship between various cellular properties and the frequency of
+cluster mis-assignment for the Zheng equal (A) or unequal (B) mixtures
+of four cell types. See Supplementary Figure 4 for more information. The
+only clear pattern is that cells with a high number of reads or features
+tend to have a higher misclassification rate.
+
+\newpage
+
+\hypertarget{supplementary-figure-6}{%
+\section{Supplementary Figure 6}\label{supplementary-figure-6}}
+
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\vfill
+
+\hypertarget{supplementary-figure-6-1}{%
+\subsubsection{Supplementary Figure 6}\label{supplementary-figure-6-1}}
+
+Relationship between various cellular properties and the frequency of
+cluster mis-assignment for the Zheng mixture of 8 cell types. See
+Supplementary Figure 4 for more information.
+
+\newpage
 
 \bibliography{../bmc\_article.bib}
 
