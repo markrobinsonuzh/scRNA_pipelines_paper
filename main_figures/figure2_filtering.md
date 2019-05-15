@@ -1,7 +1,7 @@
 ---
 title: "Figure 2 filtering"
 author: "Pierre-Luc Germain"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "15 Mai, 2019"
 output:
   html_document:
     keep_md: true
@@ -9,7 +9,8 @@ output:
 ---
 
 
-```{r}
+
+```r
 suppressPackageStartupMessages({
   library(ComplexHeatmap)
 })
@@ -18,7 +19,8 @@ source("../misc_functions.R")
 data(datasets)
 ```
 
-```{r figure2, fig.width=8.5, fig.height=4}
+
+```r
 res.f <- readRDS("../../resNew/filtering_endSummary.rds")
 
 res.f$pcCells <- 100-100*res.f$nbCells/datasets[as.character(res.f$dataset),"nbCells"]
@@ -33,3 +35,5 @@ aris.2 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seuratvst")),], formu
 pc <- cast2(res.f, formula=method~dataset, value.var="pcCells")
 chm(list("ARI (standard norm)"=aris.1, "ARI (sctransform)"=aris.2, "% cells out"=pc), scale=c("column","column","none"), value_format=c("%.2f"), cluster_columns=FALSE, cluster_rows=FALSE)
 ```
+
+![](figure2_filtering_files/figure-html/figure2-1.png)<!-- -->

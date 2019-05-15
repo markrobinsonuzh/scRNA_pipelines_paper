@@ -1,7 +1,7 @@
 ---
 title: "Figure 1 doublets"
 author: "Pierre-Luc Germain"
-date: "12 Mai, 2019"
+date: "15 Mai, 2019"
 output:
   html_document:
     keep_md: true
@@ -84,6 +84,6 @@ plot_grid( plot_grid(p1, p2, nrow=1, labels=LETTERS[1:2]), plot_grid(p3, p4, nro
 ## Warning: Removed 1 rows containing missing values (position_stack).
 ```
 
-![](figure1_doublets_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](figure1_doublets_files/figure-html/figure1-1.png)<!-- -->
 
 **A-B** Receiver operating characteristic (ROC) curves of the tested doublet detection methods for the mixology10x3l (**A**) and mixology10x5cl (**B**) datasets. DoubletFinder failed due to an error on the mixology10x3cl dataset. **C:** Running time of the different methods. **D:** Cell called as doublets by scDblFinder tend to be more often misclassified, i.e. assigned a wrong cluster. The corrected percentage of misclassification is the proportion of times a given cell is misclassified across hundreds of clustering pipelines with various parameters, minus the median misclassification rate of the cell's subpopulation.

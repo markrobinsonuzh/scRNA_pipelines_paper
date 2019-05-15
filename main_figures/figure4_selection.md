@@ -1,0 +1,68 @@
+---
+title: "Figure 4 selection"
+author: "Pierre-Luc Germain"
+date: "15 Mai, 2019"
+output:
+  html_document:
+    keep_md: true
+---
+
+
+```r
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+})
+source("../misc_functions.R")
+suppressMessages(devtools::load_all("../../pipComp/"))
+data(datasets)
+theme_set(theme_cowplot(font_size = 12))
+```
+
+
+```r
+GI <- readRDS("../data/GI.rds")
+get_auc <- function(preds,ve.var="vst.R2",n=1000){
+    preds2 <- list( deviance=preds$deviance,
+                   seurat.disp=preds$seurat.dispersion,
+                   seurat.disp.std=preds$seurat.dispersion.scaled,
+                   seurat.var=preds$seurat.variance,
+                   "seurat.var.std*"=preds$seurat.variance.standardized,
+                   sctransform=preds$seurat.res.var,
+                   expression=preds$total_counts
+                   )
+    preds2 <- lapply(preds2, as.numeric)
+    vesum <- sum(sort(preds[[ve.var]],decreasing=T)[1:n],na.rm=T)
+    sapply(preds2, ve=preds[[ve.var]], FUN=function(x, ve) sum(ve[order(x, decreasing=T)[1:n]],na.rm=T))/vesum
+}
+# aucs1 <- melt(sapply(GI,FUN=get_auc))
+# colnames(aucs1) <- c("method", "dataset", "varExplained")
+# p1 <- noXlegWith(ggplot(aucs1, aes(x=method, y=varExplained, fill=method)) + geom_col())
+# p1 <- p1 + ylab("Proportion of the explained variance") + facet_wrap(~dataset, scale="free",dir="v")
+# plot_grid( p1, p2, labels=LETTERS[1:2], nrow=2)
+
+aucs1 <- sapply(GI,FUN=get_auc)
+aucs2 <- sapply(GI,ve.var="devianceExplained", FUN=get_auc)
+p1 <- grid.grabExpr(draw(chm(list("Variance explained"=aucs1, "Deviance explained"=aucs2), sameScale=TRUE, scaleTitle="Proportion", cluster_columns=FALSE)))
+```
+
+
+```r
+res <- readRDS("../../resNew/sel_endSummary.rds")
+res <- res[grep("devianceExplained|varExp", res$sel, invert=TRUE),]
+res$selection <- paste(res$sel, res$selnb)
+res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=0),]
+ll <- lapply( split(res2, res2$norm), FUN=function(x){
+  cast2(x, formula=selection~dataset, value.var="ARI")
+})
+names(ll) <- c("scran.noscale","standard norm", "sctransform")
+p2 <- grid.grabExpr(draw(chm(ll[-1], sameScale=TRUE, scaleTitle="ARI", cluster_rows=FALSE, cluster_columns=FALSE)))
+
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=1:2)
+```
+
+![](figure4_selection_files/figure-html/figure4-1.png)<!-- -->
+
+**A:** Estimating different methods of ranking genes based on their ability to capture genes with a high proportion of variance (left) or deviance (right) explained. 
+**B: ** Accuracy of clusterings (at the right number of clusters) based on the given clustering methods and number of genes selected.

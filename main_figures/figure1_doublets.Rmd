@@ -71,7 +71,7 @@ d <- as.data.frame(data.table::rbindlist(dbl, idcol="dataset"))
 p4 <- ggplot(d, aes(pldf.class, pct_misclassified_cor, fill=pldf.class)) + geom_violin() + facet_wrap(~dataset) + ggtitle("Cluster mis-assignment") + theme(axis.title.x=element_blank(), legend.position="none") + ylab("Corrected % misclassification") + stat_summary(fun.y="mean", geom="point")
 ```
 
-```{r, fig.height=6, fig.width=7}
+```{r figure1, fig.height=6, fig.width=7}
 plot_grid( plot_grid(p1, p2, nrow=1, labels=LETTERS[1:2]), plot_grid(p3, p4, nrow=1, labels=LETTERS[3:4], rel_widths=c(2,3)), nrow=2)
 ```
 
