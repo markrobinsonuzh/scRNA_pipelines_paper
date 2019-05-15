@@ -97,7 +97,7 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{A sample article title}
+\title{scRNAseq benchmark in want of a title}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
@@ -171,7 +171,7 @@ Text for this section.
 \parttitle{Results} %if any
 Text for this section.
 \parttitle{Conclusions}
-We offer 
+Text for this section.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,9 +231,9 @@ We offer
 %%
 \section*{Background}
 
-Single-cell RNA-sequencing (scRNAseq) and the set of attached analysis methods are evolving fast, and while a number of good comparison/benchmark studies can inform analytical decisions (\citealp{duoClustering2018}, etc) they need constant updating and often leave open many details of an analysis. Here, we go in more detail on the various steps of analysis leading from an initial count matrix to a cluster assignment, which are critical steps in a wide range of applications. We harness datasets of known cell composition (Table \ref{tab:table1}) to investigate the impact of various parameters and variations around a core pipeline on various multilevel evaluation metrics.
+Single-cell RNA-sequencing (scRNAseq) and the set of attached analysis methods are evolving fast, and while a number of good comparison/benchmark studies can inform analytical decisions (\citealp{duoClustering2018}, etc) they need constant updating and often leave open many details of an analysis. Here, we go in more detail on the various steps of analysis leading from an initial count matrix to a cluster assignment, which are critical steps in a wide range of applications. We harness real datasets of known cell composition (Table \ref{tab:table1}) and develop new evaluation metrics to investigate in a multilevel fashion the impact of various parameters and variations around a core scRNAseq pipeline.
 
-Although we use some datasets based on other protocols, we focus especially on the 10X datasets and on methods that do not require exogenous control RNA, i.e. spike-ins (see Table \ref{tab:table1} and Supplementary Figure 1 for a description of the datasets). As Seurat [REF] was previously shown to outperform other clustering approaches \cite{duoClustering2018,tianMixology2018}, we used the Seurat pipeline as the starting framework to perform an integrated investigation of 1) doublet identification, 2) cell filtering, 3) normalization, 4) feature selection, 5) dimensional reduction, 6) clustering. We compare not only competing approaches, but also more fine-grained parameter variations on common methods. Importantly, the success of methods at a certain analytical step might be dependent on choices at other steps. Therefore, instead of evaluating each step in isolation, we developed a general framework for evaluating nested variations on a pipeline, and suggest a multilevel panel of metrics. Finally, we evaluate several recent methods and provide concrete recommendations.
+Although we use some datasets based on other protocols, our focus is especially on 10X datasets and on methods that do not include exogenous control RNA, i.e. spike-ins (see Table \ref{tab:table1} and Supplementary Figure 1 for a description of the datasets). As Seurat \cite{satijaSeurat2015} was previously shown to outperform other clustering approaches \cite{duoClustering2018,tianMixology2018}, we used the Seurat pipeline as the starting point to perform an integrated investigation of 1) doublet identification, 2) cell filtering, 3) normalization, 4) feature selection, 5) dimensional reduction, 6) clustering. We compare not only competing approaches, but also more fine-grained parameter and variations on common methods. Importantly, the success of methods at a certain analytical step might be dependent on choices at other steps. Therefore, instead of evaluating each step in isolation, we developed a general framework for evaluating nested variations on a pipeline, and suggest a multilevel panel of metrics. Finally, we evaluate several recent methods and provide concrete recommendations.
 
 \section*{Results}
 
@@ -335,6 +335,29 @@ For research articles this section should discuss the implications of the findin
 This should state clearly the main conclusions and provide an explanation of the importance and relevance of the study to the field.
 
 \section*{Methods}
+
+All analyses were performed through the \url[pipComp]{https://github.com/plger/pipComp} R package, which implements the pipeline framework described here, and all code to reproduce each figure is available in the \url[https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper]{https://github.com/markrobinsonuzh/scRNA_pipelines_paper} repository, which also includes the basic datasets with a standardized annotation.
+
+\subsection*{How the data was obtained}
+(to come)
+
+\subsection*{Software and package versions}
+(to come)
+
+\subsection*{Default pipeline parameters}
+(to come)
+
+\subsection*{Doublet detection method}
+Our new doublet detection method is available at \url{https://github.com/plger/plDoubletFinder}. We first cluster the cells using scran's \textit{quickCluster} method, favouring overclustering, and reduce the dataset to the union of 1500 most expressed genes of each cluster. We then create 75\% of the artifical doublets by sampling the two cells specifically from different clusters, and 25\% by entirely random sampling in case the clustering was erroneous, and summing their counts. We also create meta-cells from each cluster, and use them to create additional doublets and triplets. We then combine them with the real cells, convert the counts to scaled column ranks, and build a graph of the \textit{k} (default 10) nearest neighbors using scran. We then calculate, for each cell, the proportion of its neighbors that are artificial doublets. This ratio serves as a doublet score, which is then thresholded by simultaneously minimizing the error in classifying real vs artificial doublets and the deviation from the distribution of expected doublet rate (accounting for homotypic doublets as done by DoubletFinder). For the pipeline comparison, the expected doublet rate was set to 2.1\% (with a 1\% standard deviation) on the basis of the mixology datasets.
+
+\subsection*{Filter sets}
+Lenient, default, and stringent sets of filters...
+
+\subsection*{Variance and deviance explained}
+
+Unless specified otherwise, the variance in gene expression explained by subpopulations was calculated on the data normalized and transfored through sctransform. For each gene, we fitted a linear model using the subpopulation as only independent variable (\textasciitilde subpopulation), and used the R-squared as a measure of the variance explained. The same method was used for principal components.
+
+The deviance explained by subpopulations was calculated directly on counts using the \textit{pipComp::getDevianceExplained} function. The function uses edgeR to fit two models, a full \textasciitilde librarySize+subpopulation model and a reduced \textasciitilde librarySize model. For each gene, the deviance explained is then the difference between the deviance of each models, divided by the deviance of the reduced model. In the rare cases where this resulted in a negative deviance explained, it was set to zero.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
