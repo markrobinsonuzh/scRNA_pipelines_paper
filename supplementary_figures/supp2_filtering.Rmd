@@ -1,0 +1,138 @@
+---
+title: "Supplementary Figures relative to filtering"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r, include=FALSE}
+if(!exists('FIG_NB')){
+  FIG_NB <- 0
+  getFigNb <- function(increment=FALSE){
+    if(increment) FIG_NB <<- FIG_NB + 1
+    FIG_NB
+  }
+}
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(SingleCellExperiment)
+  library(reshape2)
+  library(ComplexHeatmap)
+  library(knitr)
+})
+suppressMessages(devtools::load_all("../../pipComp/"))
+source("../misc_functions.R")
+data(datasets)
+
+# we load the datasets
+lf <- list.files("../datasets/", full.names=TRUE)
+names(lf) <- gsub(".SCE.rds", "", basename(lf), fixed=TRUE)
+SCEs <- lapply(lf, readRDS)
+```
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r filt_more_ari, fig.width=8, fig.height=8.5}
+res <- readRDS("../data/filtering_old.rds")
+res$pcCells <- round(100*res$nbCells/datasets[as.character(res$dataset),"nbCells"],2)
+# we restrict to analyses that gave a number of clusters close to reality:
+res2 <- res[which(abs(res$nbClusters-datasets[as.character(res$dataset), "subpopulations"])<=1),]
+p1 <- ggplot(res2, aes(x=pcCells, y=ARI, colour=norm)) + geom_point() + facet_wrap(~dataset, scale="free")
+
+fres <- readRDS("../../resNew/filtering_intermediateSummary.rds")
+pc <- fres$filtering$pcCells
+pc <- pc[grep("doublet",row.names(pc),invert=T),]
+row.names(pc) <- reduceMethodNames(row.names(pc),2)
+ha <- HeatmapAnnotation(dataset=reduceMethodNames(colnames(pc),1))
+shortDSNames <- c("mixology10x3cl"="mix3cl", "mixology10x5cl"="mix5cl", "Zhengmix4eq"="Zh4eq", "Zhengmix4uneq"="Zh4uneq", "Zhengmix8eq"="Zh8eq")
+colnames(pc) <- paste(shortDSNames[reduceMethodNames(colnames(pc),1)], reduceMethodNames(colnames(pc),2))
+p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha)))
+
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2)
+```
+
+### Supplementary Figure `r getFigNb()`
+**A:** Adjusted rand index (ARI) of various clustering pipelines using various combinations of filtering criteria. Only clustering analyses with a number of clusters +/-1 from the real number of clusters were considered. In general, filtering more does not result in more accurate clustering. **B:** Percentage of cells filtered out per subpopulation, using various combination of filters (see methods).
+
+\newpage
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.height=4}
+res$filt.times <- sapply(strsplit(res$filt,"_"), FUN=function(x){ if(length(x)<3) return(1); as.numeric(x[[3]])})
+res$filt.MADs <- sapply(strsplit(res$filt,"_"), FUN=function(x){ as.numeric(x[[2]]) })
+filt.vars <- strsplit(sapply(strsplit(res$filt,"_"), FUN=function(x) x[[1]]),";")
+fv <- unique(unlist(filt.vars))
+for(f in fv[grep("both",fv,invert=TRUE)]){
+  f2 <- gsub("lower$|higher$","both",f)
+  res[[f]] <- sapply(filt.vars, FUN=function(x){ any(c(f,f2) %in% x) })
+}
+form <- paste0("~nbClusters*dataset+norm+",paste(grep(".",colnames(res),fixed=TRUE,value=TRUE),collapse="+"))
+form <- gsub("filt.MADs","factor(filt.MADs)",form,fixed=T)
+form <- gsub("filt.times","factor(filt.times)",form,fixed=T)
+form <- paste0("ARI",form)
+message(strwrap(paste("lm(", form, ")")))
+mod <- lm(as.formula(form), data=res)
+mod <- coef(summary(mod))[grep(".",row.names(coef(summary(mod))),fixed=T),]
+colnames(mod)[4] <- "p value"
+kable(mod)
+```
+
+### Supplementary Figure `r getFigNb()`
+Linear regression analysis of ARI on various filtering criteria, correcting for the effect of the number of clusters. Increasing the number of distributions on which a cell must deviate in order to be excluded (`filt.times`) tended to be positively associated with ARI, while increasing the number of median absolute deviations required to be an outlier (`filt.MADs`) was associated with a decrease in ARI.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r}
+sw <- fres$dimreduction$clust.avg.silwidth[[1]]
+sw <- sw[,grep("doublet",colnames(sw))]
+w <- grep("seuratvst",colnames(sw))
+colnames(sw) <- reduceMethodNames(colnames(sw),2)
+
+chm(list("standard Seurat norm"=sw[,-w], "sctransform"=sw[,w]), scale="row", scaleTitle="z-score", row_ann=data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1)), show_row_names=FALSE)
+```
+
+```{r fig.height=3}
+r <- fres$dimreduction$PC.R2[which(fres$dimreduction$PC.R2$dim<=10),]
+r <- r[grep("doublet",r$method),]
+r <- r[grep("clust",r$method, invert=T),]
+r <- aggregate(r$value, by=r[,c(1,3)], FUN=mean)
+r <- t(cast2(r, dataset~method, value.var="x", fun.aggregate=mean))
+w <- grep("seuratvst", row.names(r))
+row.names(r) <- reduceMethodNames(row.names(r), 2)
+chm(list("standard Seurat norm"=t(r[-w,]), "sctransform"=t(r[w,])), sameScale=TRUE, 
+    scale="row", scaleTitle="z-score", value_format="%.2f")
+```
+
+### Supplementary Figure `r getFigNb()`
+Impact of the set of filters on the average silhouette width of the subpopulations (top) and on the proportion of variance in the first components explained by clusters (bottom).
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+
+```{r}
+res <- readRDS("../data/selection_old.rds")
+res <- res[grep("2000$",res$sel),]
+res <- res[grep("deviance|seurat.variance.standardized",res$sel),]
+res$filt <- as.factor(res$filt)
+levels(res$filt) <- c("coding only", "no mitochondrial", "no ribosomal", "all")
+res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1),]
+ll <- lapply(split(res2, res2$norm), FUN=function(x){
+  m2 <- cast2(x, formula=filt~dataset, fun.aggregate=median, value.var="ARI")
+})
+chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x){ median(x,na.rm=T) }, cluster_columns=FALSE)
+```
+
+### Supplementary Figure `r getFigNb()`
+
+Impact of restricting the type of features used on the ARI of the clustering.
+\newpage

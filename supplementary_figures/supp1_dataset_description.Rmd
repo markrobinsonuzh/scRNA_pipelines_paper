@@ -104,18 +104,19 @@ ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_p
 There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` datasets), between the total counts of a cell and its number of detected features. We therefore include, among control variables, deviation from this ratio.
 
 \newpage
+
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r cellprops_cor, fig.width=7.5, fig.height=7}
+```{r cellprops_cor, fig.width=7, fig.height=8}
 d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
+                 featcount_dist=unlist(lapply(SCEs,FUN=function(x) x$featcount_dist)),
+                 log10_counts=unlist(lapply(SCEs,FUN=function(x) x$log10_total_counts)),
                  pct_counts_Mt=unlist(lapply(SCEs,FUN=function(x) x$pct_counts_Mt)),
                  pct_top_50=unlist(lapply(SCEs,FUN=function(x) x$pct_counts_in_top_50_features)),
                  log10_features=unlist(lapply(SCEs,FUN=function(x) x$log10_total_features)))
 plot_grid( ggplot(d, aes(x=pct_top_50, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
            ggplot(d, aes(x=log10_features, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
            labels=LETTERS[1:2], nrow=2 )
-
-ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_point() + facet_wrap(~dataset, scale="free") + scale_colour_gradient2(limits=c(-0.2,0.2))
 ```
 
 

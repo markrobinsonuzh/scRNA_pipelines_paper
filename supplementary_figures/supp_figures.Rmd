@@ -28,3 +28,12 @@ getFigNb <- function(increment=FALSE){
 ```{r child='supp1_dataset_description.Rmd'}
 ```
 
+```{r child='supp2_filtering.Rmd'}
+```
+
+```{r child='supp3_normalization.Rmd'}
+```
+
+```{r child='supp4_selection.Rmd'}
+```
+
