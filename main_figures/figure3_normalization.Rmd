@@ -20,7 +20,7 @@ theme_set(theme_cowplot(font_size = 11))
 ```
 
 ```{r}
-res <- readRDS("../../resNew/norm_intermediateSummary.rds")
+res <- readRDS("../../resNew/norm2_intermediateSummary.rds")
 ```
 
 
@@ -31,7 +31,7 @@ r2 <- r2[which(r2$dim <= 5),]
 r2$R.on.Clusters <- sqrt(r2$value)
 r3 <- cast2(r2, formula=norm~dataset, value.var="R.on.Clusters")
 
-res.n <- readRDS("../../resNew/norm_endSummary.rds")
+res.n <- readRDS("../../resNew/norm2_endSummary.rds")
 res.n <- res.n[which(res.n$norm != "norm.edgeR"),]
 res.n$norm <- relevel(factor(res.n$norm), "norm.seurat")
 levels(res.n$norm) <- gsub("norm.","",levels(res.n$norm),fixed=T)
