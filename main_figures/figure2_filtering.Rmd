@@ -18,7 +18,7 @@ source("../misc_functions.R")
 data(datasets)
 ```
 
-```{r figure2, fig.width=8.5, fig.height=4}
+```{r figure2, fig.width=9, fig.height=4}
 res.f <- readRDS("../../resNew/filtering_endSummary.rds")
 
 res.f$pcCells <- 100-100*res.f$nbCells/datasets[as.character(res.f$dataset),"nbCells"]
@@ -31,5 +31,5 @@ w <- which(abs(res.f$nbClusters-datasets[as.character(res.f$dataset),"subpopulat
 aris.1 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seurat")),], formula=method~dataset, value.var="ARI")
 aris.2 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seuratvst")),], formula=method~dataset, value.var="ARI")
 pc <- cast2(res.f, formula=method~dataset, value.var="pcCells")
-chm(list("ARI (standard norm)"=aris.1, "ARI (sctransform)"=aris.2, "% cells out"=pc), scale=c("column","column","none"), value_format=c("%.2f"), cluster_columns=FALSE, cluster_rows=FALSE)
+chm(list("ARI (standard norm)"=aris.1, "ARI (sctransform)"=aris.2, "% cells out"=pc), scale=c("column","column","none"), value_format=c("%#.2f","%#.2f","%#.1f"), cluster_columns=FALSE, cluster_rows=FALSE, scaleVar=FALSE)
 ```
