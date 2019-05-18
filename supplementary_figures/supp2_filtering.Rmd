@@ -23,20 +23,16 @@ suppressPackageStartupMessages({
   library(reshape2)
   library(ComplexHeatmap)
   library(knitr)
+  library(circlize)
 })
 suppressMessages(devtools::load_all("../../pipComp/"))
 source("../misc_functions.R")
 data(datasets)
-
-# we load the datasets
-lf <- list.files("../datasets/", full.names=TRUE)
-names(lf) <- gsub(".SCE.rds", "", basename(lf), fixed=TRUE)
-SCEs <- lapply(lf, readRDS)
 ```
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r filt_more_ari, fig.width=8, fig.height=8.5}
+```{r filt_more_ari, fig.width=8, fig.height=6.5}
 res <- readRDS("../data/filtering_old.rds")
 res$pcCells <- round(100*res$nbCells/datasets[as.character(res$dataset),"nbCells"],2)
 # we restrict to analyses that gave a number of clusters close to reality:
@@ -48,11 +44,14 @@ pc <- fres$filtering$pcCells
 pc <- pc[grep("doublet",row.names(pc),invert=T),]
 row.names(pc) <- reduceMethodNames(row.names(pc),2)
 ha <- HeatmapAnnotation(dataset=reduceMethodNames(colnames(pc),1))
-shortDSNames <- c("mixology10x3cl"="mix3cl", "mixology10x5cl"="mix5cl", "Zhengmix4eq"="Zh4eq", "Zhengmix4uneq"="Zh4uneq", "Zhengmix8eq"="Zh8eq")
-colnames(pc) <- paste(shortDSNames[reduceMethodNames(colnames(pc),1)], reduceMethodNames(colnames(pc),2))
-p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha)))
+# shortDSNames <- c("mixology10x3cl"="mix3cl", "mixology10x5cl"="mix5cl", "Zhengmix4eq"="Zh4eq", "Zhengmix4uneq"="Zh4uneq", "Zhengmix8eq"="Zh8eq")
+# colnames(pc) <- paste(shortDSNames[reduceMethodNames(colnames(pc),1)], reduceMethodNames(colnames(pc),2))
+# p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha)))
 
-plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2)
+pal <- colorRamp2(c(0,1,5,20,max(pc)),c("#0000FFFF", "#B38BFFFF", "#FFFFFFFF", "#FF9E81FF", "#FF0000FF"))
+p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha, col=pal, cluster_columns=FALSE, show_column_names=FALSE)))
+
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=c(3,2))
 ```
 
 ### Supplementary Figure `r getFigNb()`
@@ -90,16 +89,17 @@ Linear regression analysis of ARI on various filtering criteria, correcting for 
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r}
+```{r, fig.height=5}
 sw <- fres$dimreduction$clust.avg.silwidth[[1]]
 sw <- sw[,grep("doublet",colnames(sw))]
 w <- grep("seuratvst",colnames(sw))
 colnames(sw) <- reduceMethodNames(colnames(sw),2)
-
-chm(list("standard Seurat norm"=sw[,-w], "sctransform"=sw[,w]), scale="row", scaleTitle="z-score", row_ann=data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1)), show_row_names=FALSE)
+sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)),]
+ra <- data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1))
+chm(list("standard Seurat norm"=sw[,-w], "sctransform"=sw[,w]), scale="row", scaleVar=FALSE, scaleTitle="meanSilWidth\ndifference", sameScale=TRUE, row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE)
 ```
 
-```{r fig.height=3}
+```{r fig.height=3.5, fig.width=6}
 r <- fres$dimreduction$PC.R2[which(fres$dimreduction$PC.R2$dim<=10),]
 r <- r[grep("doublet",r$method),]
 r <- r[grep("clust",r$method, invert=T),]
@@ -121,7 +121,6 @@ Impact of the set of filters on the average silhouette width of the subpopulatio
 
 ```{r}
 res <- readRDS("../data/selection_old.rds")
-res <- res[grep("2000$",res$sel),]
 res <- res[grep("deviance|seurat.variance.standardized",res$sel),]
 res$filt <- as.factor(res$filt)
 levels(res$filt) <- c("coding only", "no mitochondrial", "no ribosomal", "all")
