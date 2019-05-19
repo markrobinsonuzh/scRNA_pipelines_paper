@@ -12,6 +12,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
+  library(matrixStats)
 })
 source("../misc_functions.R")
 suppressMessages(devtools::load_all("../../pipComp/"))
@@ -22,12 +23,16 @@ theme_set(theme_cowplot(font_size = 12))
 ```{r}
 GI <- readRDS("../data/GI.rds")
 get_auc <- function(preds,ve.var="vst.R2",n=1000){
+    preds$vst.Gini <- -1*preds$vst.Gini
+    p2 <- as.matrix(preds[,c("seurat.variance", "seurat.variance.standardized", "seurat.res.var", "deviance")])
     preds2 <- list( deviance=preds$deviance,
                    seurat.disp=preds$seurat.dispersion,
                    seurat.disp.std=preds$seurat.dispersion.scaled,
                    seurat.var=preds$seurat.variance,
                    "seurat.var.std*"=preds$seurat.variance.standardized,
                    sctransform=preds$seurat.res.var,
+                   rankMean=colMeans(colRanks(p2)),
+                   rankMax=colMaxs(colRanks(p2)),
                    expression=preds$total_counts
                    )
     preds2 <- lapply(preds2, as.numeric)
@@ -45,19 +50,21 @@ aucs2 <- sapply(GI,ve.var="devianceExplained", FUN=get_auc)
 p1 <- grid.grabExpr(draw(chm(list("Variance explained"=aucs1, "Deviance explained"=aucs2), sameScale=TRUE, scaleTitle="Proportion", cluster_columns=FALSE)))
 ```
 
-```{r figure4, fig.width=6, fig.height=9}
+```{r figure4, fig.width=6, fig.height=10}
 res <- readRDS("../../resNew/sel_endSummary.rds")
 res <- res[grep("devianceExplained|varExp", res$sel, invert=TRUE),]
 res$selection <- paste(res$sel, res$selnb)
-res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=0),]
+nbClusDiff <- abs(res$nbClusters-datasets[res$dataset,"subpopulations"])
+#res2 <- res[which(nbClusDiff==0),]
+res2 <- res[which(nbClusDiff==0 | (nbClusDiff<=1 & res$dataset=="mixology10x3cl")),]
 ll <- lapply( split(res2, res2$norm), FUN=function(x){
   cast2(x, formula=selection~dataset, value.var="ARI")
 })
 names(ll) <- c("scran.noscale","standard norm", "sctransform")
 p2 <- grid.grabExpr(draw(chm(ll[-1], sameScale=TRUE, scaleTitle="ARI", cluster_rows=FALSE, cluster_columns=FALSE)))
 
-plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=1:2)
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=c(6,10))
 ```
 
-**A:** Estimating different methods of ranking genes based on their ability to capture genes with a high proportion of variance (left) or deviance (right) explained. 
+**A:** Estimating different methods of ranking genes based on their ability to capture genes with a high proportion of variance (left) or deviance (right) explained. rankMean and rankMax refer to, respectively, the mean rank and the maximum rank in the following metrics: variance, standardized variance, sctransform, deviance.
 **B: ** Accuracy of clusterings (at the right number of clusters) based on the given clustering methods and number of genes selected.
