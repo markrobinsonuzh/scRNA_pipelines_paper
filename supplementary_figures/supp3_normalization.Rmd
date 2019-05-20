@@ -63,10 +63,17 @@ plot_grid(p2, p1, labels=LETTERS[1:2], nrow=2)
 ```{r norm_silwidth, fig.width=8, fig.height=7}
 res <- readRDS("../../resNew/norm2_intermediateSummary.rds")
 sw <- res$dimreduction$clust.avg.silwidth[[1]]
-colnames(sw) <- gsub("norm.","",reduceMethodNames(colnames(sw), 3),fixed=T)
-sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)),]
+colnames(sw) <- gsub("norm.","",reduceMethodNames(colnames(sw), 2:3),fixed=T)
+filter <- factor(reduceMethodNames(colnames(sw),1), levels=c("lenientfilter", "clustFilterStringent", "deffilter", "stringentfilter"))
+levels(filter) <- c("lenient", "stringent cluster-wise", "default", "stringent")
+o <- order(reduceMethodNames(colnames(sw),2), filter)
+filter <- filter[o]
+sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)), o]
 ra <- data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1))
-chm(list("Cluster mean silhouette width"=sw), scaleTitle="row z-score", scale="row", row_ann=ra, show_row_names=FALSE, col_sortFn=mean, cluster_rows=FALSE)
+colnames(sw) <- reduceMethodNames(colnames(sw),2)
+w <- 4*1:(ncol(sw)/4)-2
+colnames(sw)[-w] <- ""
+chm(list("Cluster mean silhouette width"=sw), scaleTitle="row z-score", scale="row", row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter))
 ```
 
 ### Supplementary Figure `r getFigNb()`
