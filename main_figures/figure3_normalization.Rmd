@@ -43,6 +43,6 @@ ll <- list("Var in PCs 1-5 explained"=r3,
            "median ARI"=m,
            "ARI at true number of clusters"=m2)
 chm(ll, scale="column", scaleTitle="z-score", value_format="%.2f", 
-            sameScale=T, row_sortFn=function(x){ mean(x,na.rm=T) }, cluster_columns=FALSE)
+            sameScale=TRUE, row_sortFn=function(x){ mean(x,na.rm=T) }, cluster_columns=FALSE)
 ```
 
