@@ -323,7 +323,7 @@ The main observations were reflected in the ARI of the resulting clustering (Fig
 
 \subsection*{Dimensionality reduction}
 
-
+We next investigated the step of dimensionality reduction, comparing in particular Seurat's PCA, GLM-PCA \citep{townesGlmpca2019}, and a two-step PCA. Seurat's default PCA weighs the cell embeddings by the variance of each component,+
 
 \section*{Discussion}
 
@@ -359,7 +359,7 @@ Unless specified otherwise, the variance in gene expression explained by subpopu
 
 The deviance explained by subpopulations was calculated directly on counts using the \textit{pipComp::getDevianceExplained} function. The function uses edgeR to fit two models, a full \textasciitilde librarySize+subpopulation model and a reduced \textasciitilde librarySize model. For each gene, the deviance explained is then the difference between the deviance of each models, divided by the deviance of the reduced model. In the rare cases where this resulted in a negative deviance explained, it was set to zero.
 
-To estimate the correlation between the first principal components and covariates such as library size, we first fitted a linear model on the subpopulations, and correlated the residuals of this model with the covariate of interest.
+To estimate the correlation between the principal components and covariates such as library size, we first fitted a linear model on the subpopulations, and correlated the residuals of this model with the covariate of interest.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
