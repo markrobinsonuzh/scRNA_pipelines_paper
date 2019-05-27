@@ -20,6 +20,8 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
+  library(reshape2)
+  library(dplyr)
 })
 theme_set(theme_cowplot(font_size = 13))
 suppressMessages(devtools::load_all("../../pipComp/"))
@@ -100,8 +102,8 @@ library(viridis)
 res <- readRDS("../data/clust_endSummary.rds")
 res2 <- res[which(res$clust=="clust.seurat" & res$k==20 & res$dims>2),]
 res2 <- res2[which(res2$dr=="seurat.pca" & res2$dataset!="Kumar"),]
-
-res3 <- aggregate(res2[,"nbClusters"], by=res2[,c("dataset","dims","resolution")], FUN=mean)
+res2$diff.nbClusters <- res2$nbClusters-datasets[res2$dataset,"subpopulations"]
+res3 <- aggregate(res2[,"diff.nbClusters"], by=res2[,c("dataset","dims","resolution")], FUN=mean)
 colnames(res3)[4] <- "nb"
 ll <- lapply(split(res3, res3$dataset), FUN=function(x){
   ggplot(x, aes(factor(dims), factor(resolution), fill=nb)) + stat_bin2d() + 
@@ -113,6 +115,28 @@ plot_grid(plotlist = ll, nrow=3)
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Mean number of clusters detected depending on the resolution and number of dimensions used. Increasing the number of dimensions tends to decrease the number of identified clusters, especially at resolutions around the default value.
+Mean difference between the number of detected clusters and the number of real subpopulations, depending on the resolution and number of dimensions used. Based on sctransform and seurat PCA. Increasing the number of dimensions tends to decrease the number of identified clusters, especially at resolutions around the default value.
 
 \newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+
+```{r, fig.width=8, fig.height=8.5}
+library(viridis)
+res <- readRDS("../data/clust_endSummary.rds")
+res2 <- res[which(res$clust=="clust.seurat" & res$k==20 & res$dims>2 & res$resolution > 0.05 & res$resolution <= 1),]
+res2 <- res2[which(res2$dr=="seurat.pca" & res2$dataset!="Kumar"),]
+res3 <- aggregate(res2[,"ARI"], by=res2[,c("dataset","dims","resolution")], FUN=mean)
+ll <- lapply(split(res3, res3$dataset), FUN=function(x){
+  ggplot(x, aes(factor(dims), factor(resolution), fill=ARI)) + stat_bin2d() + 
+    scale_fill_viridis() + ylab("Resolution") + xlab("Number of dimensions") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+})
+for(i in names(ll)) ll[[i]] <- ll[[i]] + ggtitle(i)
+plot_grid(plotlist = ll, nrow=3)
+```
+
+### Supplementary Figure `r getFigNb()`
+Adjusted Rand Index of clustering depending on the resolution and number of dimensions used. Based on sctransform and seurat PCA.
+

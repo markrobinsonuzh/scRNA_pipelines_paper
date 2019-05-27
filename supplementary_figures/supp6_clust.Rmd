@@ -1,0 +1,53 @@
+---
+title: "Supplementary Figures relative to clustering"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r, include=FALSE}
+if(!exists('FIG_NB')){
+  FIG_NB <- 0
+  getFigNb <- function(increment=FALSE){
+    if(increment) FIG_NB <<- FIG_NB + 1
+    FIG_NB
+  }
+}
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(reshape2)
+  library(dplyr)
+})
+theme_set(theme_cowplot(font_size = 13))
+suppressMessages(devtools::load_all("../../pipComp/"))
+data(datasets)
+source("../misc_functions.R")
+```
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.width=8, fig.height=8}
+res <- readRDS("../data/clust_endSummary.rds")
+res <- res[which(res$dims>2 & res$resolution %in% c(0.05, 0.15, 0.3, 0.5, 0.8, 1, 1.2)),]
+res$method <- paste0( gsub("clust.","",res$clustmethod, fixed=T), 
+                      " k=",res$k, 
+                      ifelse( res$clustmethod=="clust.seurat", paste(" res=",res$resolution), paste0(" steps=",res$steps)) )
+res$diff.nbClusters <- res$nbClusters-datasets[res$dataset,"subpopulations"]
+ll <- lapply( unique(res$dataset), FUN=function(x){
+  as.matrix(cast2(res[which(res$dataset==x),], formula=method~dims, fun.aggregate=mean, value.var="diff.nbClusters"))
+})
+names(ll) <- unique(res$dataset)
+mmax <- ceiling(max(abs(sapply(ll,FUN=range))))
+cf <- circlize::colorRamp2(c(-mmax, 0, mmax), colors=c("blue", "white", "red"))
+chm(ll, sameScale=TRUE, scaleTitle="Difference\nto real nb\nsubpopulations\n", colors=cf, cluster_columns=FALSE, cluster_rows=FALSE)
+```
+
+### Supplementary Figure `r getFigNb()`
+Difference between the number of detected clusters and the number of real subpopulations according to different numbers of dimensions and clustering paramters.
+
+\newpage

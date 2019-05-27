@@ -52,7 +52,7 @@ diffplot(gi$Zhengmix4eq, "D. Difference between the estimates (Zhengmix4eq)")
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=9, warnings=FALSE, messages=FALSE}
+```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
   cumVE2(gi[[x]], gi[[x]]$vst.R2) + xlim(0,2000) + ggtitle(x) + ylab("Cumulative var explained") + theme(legend.position="none")
 })
@@ -69,7 +69,7 @@ Proportion of the cumulative _variance_ explained by real subpulations that is r
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=9, warnings=FALSE, messages=FALSE}
+```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
   cumVE2(gi[[x]], gi[[x]]$devianceExplained) + xlim(0,2000) + ggtitle(x) + ylab("cumul deviance explained") + theme(legend.position="none")
 })

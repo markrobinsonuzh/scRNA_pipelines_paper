@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(reshape2)
   library(dplyr)
+  library(viridis)
 })
 suppressMessages(devtools::load_all("../../pipComp/"))
 data(datasets)
@@ -60,12 +61,13 @@ plot_grid(p2, p1, labels=LETTERS[1:2], nrow=2)
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r norm_silwidth, fig.width=8, fig.height=7}
+```{r norm_silwidth, fig.width=8, fig.height=4.5}
 res <- readRDS("../../resNew/norm2_intermediateSummary.rds")
 sw <- res$dimreduction$clust.avg.silwidth[[1]]
 colnames(sw) <- gsub("norm.","",reduceMethodNames(colnames(sw), 2:3),fixed=T)
 filter <- factor(reduceMethodNames(colnames(sw),1), levels=c("lenientfilter", "clustFilterStringent", "deffilter", "stringentfilter"))
 levels(filter) <- c("lenient", "stringent cluster-wise", "default", "stringent")
+filtCols <- c(default="#4477AA", lenient="#117733", "stringent cluster-wise"="#DDCC77", stringent="#CC6677")
 o <- order(reduceMethodNames(colnames(sw),2), filter)
 filter <- filter[o]
 sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)), o]
@@ -73,11 +75,50 @@ ra <- data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(
 colnames(sw) <- reduceMethodNames(colnames(sw),2)
 w <- 4*1:(ncol(sw)/4)-2
 colnames(sw)[-w] <- ""
-chm(list("Cluster mean silhouette width"=sw), scaleTitle="row z-score", scale="row", row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter))
+chm(list("Cluster mean silhouette width"=sw), scaleTitle="row z-score", scale="row", row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter, col=list(Filter=filtCols)))
+```
+
+```{r norm_silwidth2, fig.width=8, fig.height=4}
+w <- order(ra$meanSilWidth)[1:10]
+sw2 <- sw[w,]
+chm(list("Cluster mean silhouette width"=sw2), scaleTitle="Mean\nSilhouette\nWidth", show_row_names=TRUE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter, col=list(Filter=filtCols)))
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Mean silhouette width of true subpopulations across the first 10 components with different normalization and scaling approaches.
+Mean silhouette width of true subpopulations across the first 10 components with different normalization and scaling approaches. Above the silhouette widths are scaled for each subpopulation; below the subpopulations with the lowest mean silhouette width are represented.
 
 \newpage
 
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r norm_nbClusters, fig.width=8, fig.height=8.5}
+res <- readRDS("../data/norm2_endSummary.rds")
+res2 <- res[which(res$filt=="deffilter" & res$norm %in% c("norm.scran", "norm.scran.noscale", "norm.seurat", "norm.seuratvst", "norm.stableGsum")),]
+res2$diff.nbClusters <- res2$nbClusters-datasets[res2$dataset,"subpopulations"]
+res3 <- aggregate(res2[,"diff.nbClusters"], by=res2[,c("dataset","dims","resolution","norm")], FUN=mean)
+colnames(res3)[5] <- "nb"
+res3$norm <- gsub("norm.","",res3$norm, fixed=T)
+# ggplot(res3, aes(factor(dims), factor(resolution), fill=nb)) + stat_bin2d() + 
+#   scale_fill_viridis() + ylab("Resolution") + xlab("Number of dimensions") +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+#   coord_flip() + facet_grid(dataset~norm)
+
+ll <- lapply(split(res3, res3$dataset), FUN=function(x){
+  ggplot(x, aes(factor(resolution), factor(dims), fill=nb)) + stat_bin2d() + 
+    scale_fill_viridis() + xlab("Resolution") + ylab("dims") +
+    facet_grid(.~norm)
+})
+for(i in names(ll)){
+  ll[[i]] <- ll[[i]] + ggtitle(i)
+  if(i==names(ll)[length(ll)]){
+    ll[[i]] <- ll[[i]] + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  }else{
+    ll[[i]] <- ll[[i]] + theme(axis.title.x=element_blank(), axis.text.x=element_blank(), axis.ticks.x=element_blank())
+  }
+}
+ll[[4]] <- ll[[4]] + ylab("Number of dimensions")
+plot_grid(plotlist = ll[-2], nrow=6, rel_heights=c(1,1,1,1,1,1.5))
+```
+
+### Supplementary Figure `r getFigNb()`
+Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected.
