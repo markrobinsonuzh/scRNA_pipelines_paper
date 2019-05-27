@@ -1,0 +1,56 @@
+---
+title: "Figure 5 dimensionality reduction"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(matrixStats)
+})
+source("../misc_functions.R")
+suppressMessages(devtools::load_all("../../pipComp/"))
+data(datasets)
+theme_set(theme_cowplot(font_size = 12))
+```
+
+```{r, fig.width=8, fig.height=4}
+res <- readRDS("../data/dr_intermediateSummary.rds")
+sw <- res$dimreduction$clust.avg.silwidth[[1]]
+sw <- sw[,grep("seuratvst",colnames(sw))]
+sw <- sw[,grep("deviance",colnames(sw))]
+colnames(sw) <- reduceMethodNames(colnames(sw),6)
+sw <- matrix(unlist(sw),ncol=ncol(sw), dimnames=dimnames(sw))
+ag <- aggregate(sw, by=list(reduceMethodNames(row.names(sw),1)), FUN=mean)
+row.names(ag) <- ag[,1]; ag[,1] <- NULL
+sw <- t(ag)
+
+r2 <- res$dimreduction$PC.R2
+r2 <- r2[grep("seuratvst",r2$method),]
+r2 <- r2[grep("deviance",r2$method),]
+r2$dr <- reduceMethodNames(r2$method, 6)
+r2 <- r2[which(r2$dim <= 5),]
+r3 <- cast2(r2, formula=dr~dataset, value.var="value")
+
+res <- readRDS("../data/dr_endSummary.rds")
+res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1 & 
+                    res$norm=="norm.seuratvst"),]
+m.ari <- cast2(res2, formula=dr~dataset, fun.aggregate=median, value.var="ARI")
+
+ll <- list( "mean silhouette width"=sw,
+            "PC1-5 var explained"=r3,
+            "median ARI"=m.ari)
+ll <- lapply(ll, FUN=function(x){
+  row.names(x) <- gsub(".noW weighted", "", paste(row.names(x), "weighted"), fixed=T)
+  x
+})
+chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x){ median(x,na.rm=T) }, cluster_columns=FALSE)
+```
+
+Mean of subpopulation average silhouette width (left), mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).

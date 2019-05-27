@@ -37,3 +37,8 @@ getFigNb <- function(increment=FALSE){
 ```{r child='supp4_selection.Rmd'}
 ```
 
+```{r child='supp5_dr.Rmd'}
+```
+
+```{r child='supp6_clust.Rmd'}
+```
