@@ -328,8 +328,15 @@ The main observations were reflected in the ARI of the resulting clustering (Fig
 
 We next investigated the step of dimensionality reduction, comparing in particular Seurat's PCA, GLM-PCA \citep{townesGlmpca2019}, and a two-step PCA procedure in which cells are first clustered in rough clusters according to a standard PCA, a new PCA is performed on each, and the main components of the two are put together (see methods). Seurat's default PCA weighs the cell embeddings by the variance of each component, so we also tested the impact of this weighting with each method.
 
-The impact of the dimensionality reduction method was far greater than that of normalization or feature selection (e.g. Supplementary Figure 19). Although the first components identified by GLM-PCA tended to have a higher proportion of their variance explained by real subpopulations and increase the average silhouette width of already well-defined subpopulations, overall Seurat's PCA procedure proved superior on all metrics (Figure 5 and Supplementary Figures 19-21). 
+The impact of the dimensionality reduction method was far greater than that of normalization or feature selection (e.g. Supplementary Figure 19). Although the first components identified by GLM-PCA tended to have a higher proportion of their variance explained by real subpopulations and increase the average silhouette width of already well-defined subpopulations, overall Seurat's PCA procedure proved superior on all metrics (Figure \ref{fig:figure5} and Supplementary Figures 19-21). 
 In particular, weighing the components had a strong positive impact on silhouette widths and resulting ARI.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{{main_figures/figure5_dr_files/figure-html/unnamed-chunk-2-1.png}}
+    \caption{Evaluation of the dimensionality reduction strategies.}
+    \label{fig:figure5}
+\end{figure}
 
 We next investigated the impact of the number of dimensions used on the clustering. Overall, increasing the number of dimensions robustly led to a decrease in the number of clusters, although the effect was milder with data processed through sctransform (Supplementary Figures 14 and 22). This tended to be translated to the accuracy of the clustering (Supplementary Figure 23), although in both cases (number of clusters and ARI) the resolution parameter had a much stronger impact.
 
@@ -365,11 +372,13 @@ Analyses were performed in R 3.6.0 (bioconductor 3.9), and the following package
 Our doublet detection method is available at \url{https://github.com/plger/scDblFinder}. Version 0.1 was used here. Briefly, we first cluster the cells using scran's \textit{quickCluster} method, favouring overclustering (default minimum size of 20), and reduce the dataset to the union of 1500 most expressed genes of each cluster. We then create 75\% of the artifical doublets by sampling the two cells specifically from different clusters, and 25\% by entirely random sampling (in case the clustering was erroneous), and summing the counts of each pair of cells. We also create meta-cells from each cluster, and use them to create additional doublets and triplets. We then combine them with the real cells, convert the counts to scaled column ranks, and build a graph of the \textit{k} (default 10) nearest neighbors using scran. We then calculate, for each cell, the proportion of its neighbors that are artificial doublets. This ratio serves as a doublet score, which is then thresholded by simultaneously minimizing the error in classifying real vs artificial doublets and the deviation from the distribution of expected doublet rate (accounting for homotypic doublets as done by DoubletFinder). For the pipeline comparison here, the expected doublet rate was set to 2.1\% (with a 1\% standard deviation) on the basis of the mixology datasets.
 
 \subsection*{Filter sets}
-The \textit{default} set of filters excludes cells that are outliers according to at least two of the following thresholds: log10_total_counts $>$2.5 MADs or $<$5 MADs, log10_total_features $>$2.5 MADs or $<$5 MADs, pct_counts_in_top_20_features $>$ or $<$ 5 MADs, featcount_dist (distance to expected ratio of log10 counts and features) $>$ or $<$ 5 MADs, pct_counts_Mt $>$ 2.5 MADs and $>$ 0.08.
+The \textit{default} set of filters excludes cells that are outliers according to at least two of the following thresholds: log10\_total\_counts $>$2.5 MADs or $<$5 MADs, log10\_total\_features $>$2.5 MADs or $<$5 MADs, pct\_counts\_in\_top\_20\_features $>$ or $<$ 5 MADs, featcount\_dist (distance to expected ratio of log10 counts and features) $>$ or $<$ 5 MADs, pct\_counts\_Mt $>$ 2.5 MADs and $>$ 0.08.
 
 The \textit{stringent} set of filters uses the same thresholds, but excludes a cell if it is an outlier on any single distribution. 
 
-The \textit{lenient} set of filters excludes cells that are outliers on at least two distributions by at least 5 MADs, except for pct_counts_Mt where the threshold is $>$ 3 MADs and $>$ 0.08.
+The \textit{lenient} set of filters excludes cells that are outliers on at least two distributions by at least 5 MADs, except for pct\_counts\_Mt where the threshold is $>$ 3 MADs and $>$ 0.08.
+
+For cluster-wise filters, clusters were first identified with \textit{scran::quickCluster} and the filters were then applied separately for each cluster.
 
 
 \subsection*{Variance and deviance explained}
