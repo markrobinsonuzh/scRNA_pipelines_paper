@@ -1,0 +1,124 @@
+---
+title: "Sample plots for diagram"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages({
+  library(ComplexHeatmap)
+  library(circlize)
+  library(ggplot2)
+  library(cowplot)
+  devtools::load_all("../../pipComp/")
+})
+source("../misc_functions.R")
+```
+
+# Filtering
+
+```{r, fig.width=2.6, fig.height=1.8}
+fres <- readRDS("../../resNew/filtering_intermediateSummary.rds")
+pc <- fres$filtering$pcCells
+pc <- pc[grep("doublet",row.names(pc),invert=T),]
+pc <- pc[2:4,c(-12,-13,-15,-17:-30)]
+pc[2,] <- pc[2,]/2
+pc[1,] <- pc[1,]*2
+pal <- colorRamp2(c(0,2,5,9,max(pc)),c("#0000FFFF", "#B38BFFFF", "#FFFFFFFF", "#FF9E81FF", "#FF0000FF"))
+Heatmap(pc[c(2,1,3),], name="% out", col=pal, cluster_columns=FALSE, show_column_names=FALSE, show_row_names=FALSE, cluster_rows=FALSE, row_title="Filter methods", column_title="Subpopulations")
+```
+
+# Feature selection
+
+```{r, fig.width=2.6, fig.height=1.8}
+noAx <-   theme(axis.text.x=element_blank(),
+                axis.ticks.x=element_blank(),
+                axis.text.y=element_blank(),
+                axis.ticks.y=element_blank() )
+
+gi <- readRDS("../data/GI.rds")
+gi <- gi$Zhengmix4uneq
+preds <- list( method1=gi$deviance,
+               method2=gi$seurat.variance.standardized,
+               method3=gi$seurat.variance,
+               method4=gi$seurat.dispersion.scaled)
+cumVE2(preds, gi$vst.R2) + xlim(0,400) + ylab("Cum.var.expl") + noAx + theme(legend.position="none")
+```
+
+# Reduction
+
+```{r, fig.width=5, fig.height=4.2}
+rdat <- data.frame( cluster=rep(LETTERS[1:3],c(50,80,50)) )
+rdat$x1 <- unlist(mapply(sd=c(2,2,2.5), n=c(50,80,50), mean=c(-5,5,-5), FUN=rnorm))
+rdat$y1 <- unlist(mapply(sd=c(2,2,2.5), n=c(50,80,50), mean=c(-5,0,5), FUN=rnorm))
+rdat$x2 <- unlist(mapply(sd=c(1, 1, 1.25), n=c(50,80,50), mean=c(-5,5,-5), FUN=rnorm))
+rdat$y2 <- unlist(mapply(sd=c(1, 1, 1.25), n=c(50,80,50), mean=c(-5,0,5), FUN=rnorm))
+cm.x <- sapply(unique(rdat$cluster), FUN=function(x) mean(rdat$x1[which(rdat$cluster==x)]))
+cm.y <- sapply(unique(rdat$cluster), FUN=function(x) mean(rdat$y1[which(rdat$cluster==x)]))
+ls <- jitter(rdat$x1)-cm.x[rdat$cluster]
+rdat$lib.size <- ls-min(c(0,ls))+2
+w <- which(rdat$cluster=="C")
+rdat$lib.size[w] <- rdat$lib.size[w]*1.02
+rdat$lib.size <- ceiling(rdat$lib.size)
+seg <- data.frame( x1=c(cm.x[1], cm.x[1]),
+                   y1=rep(cm.y[1],2),
+                   x2=cm.x[-1],
+                   y2=cm.y[-1]
+                    )
+p1 <-   ggplot(data=rdat, aes(x1,y1,colour=cluster)) + geom_point() + noAx + 
+    labs(x="dim1", y="dim2") + theme(legend.position="none") + ggtitle("Poorly-defined") +
+    geom_segment(data=seg, aes(x=x1, y=y1, xend=x2, yend=y2, colour=NULL), linetype="dashed") + 
+   geom_point(data=data.frame(x1=cm.x[1],y1=cm.y[1]), size=15, shape=1, colour="black")
+p2 <- ggplot(data=rdat, aes(x2,y2,colour=cluster)) + geom_point() + noAx+ labs(x="dim1", y="dim2") + theme(legend.position="none") + ggtitle("Well-defined")
+
+
+m1 <- rbind( c(120, 90, 100),
+             c(100, 80, 100),
+             c(90, 70, 90) )
+m2 <- rbind( c(90, 70, 80),
+             c(90, 75, 75),
+             c(70, 60, 75) )
+m3 <- as.matrix( c(5,3,7) )
+m1 <- jitter(m1,factor=100)
+m2 <- jitter(m2,factor=100)
+
+gp <- gpar(fontsize=12)
+h <- Heatmap(m1, cluster_rows=FALSE, cluster_columns=FALSE, show_heatmap_legend=FALSE, column_title="silhouette\nwidth", row_title="method", column_title_gp=gp) + 
+    Heatmap(cbind(rep(NA,3), m2, rep(NA,3)), cluster_columns=FALSE, show_heatmap_legend=FALSE, column_title="var expl.\nby subpop", na_col="white", column_title_gp=gp) + 
+    Heatmap(cbind(rep(NA,3),m3,rep(NA,3)), cluster_columns=FALSE, column_title="libsize\ncorr.", show_heatmap_legend=FALSE, na_col="white", column_title_gp=gp)
+h <- grid.grabExpr(draw(h))
+
+plot_grid(
+  p1,
+  ggplot(data=rdat, aes(x1,y1,colour=lib.size)) + geom_point() + noAx + theme(legend.text=element_blank()) + ggtitle("Correlation with\nlibrary size") + labs(x="dim1", y="dim2", colour="lib\nsize"),
+  p2,
+  plot_grid( h, NULL, nrow=2, rel_heights=c(9,1)),
+  rel_widths=c(2.2,3), scale=c(0.95,1,0.95,0.9)
+)
+```
+
+# Clustering
+
+```{r, fig.width=4.3, fig.height=1.8}
+rdat$pred <- rdat$cluster
+rdat$pred[sample(1:nrow(rdat), 40)] <- rdat$pred[sample(1:nrow(rdat), 40)]
+m <- sapply(LETTERS[1:3], FUN=function(x){
+  x <- which(rdat$cluster==x)
+  sapply(LETTERS[1:3], FUN=function(y){
+    y <- which(rdat$pred==y)
+    length(intersect(x,y))/length(union(x,y))
+  })
+})
+colnames(m) <- LETTERS[24:26]
+h <- Heatmap(m+matrix(rnorm(9,sd=0.1),nrow=3), cluster_columns=FALSE, cluster_rows=FALSE, row_title="real\nsubpopulation", column_title="predicted\ncluster", show_heatmap_legend=FALSE, row_title_gp=gp, column_title_gp=gp)
+h <- grid.grabExpr(draw(h))
+
+d <- data.frame(method=rep(LETTERS[1:3], 3), type=rep(c("precision","recall","ARI"), each=3), value=c(1,0.9,0.85, 0.77, 0.78, 0.65, 0.95, 0.9, 0.8))
+p <- ggplot(d, aes(x=method, y=value, fill=method)) + geom_col() + facet_grid(~type) + theme(axis.text.x=element_blank(), axis.text.y=element_blank(), axis.title.y=element_blank(), axis.ticks = element_blank(), legend.position="none", axis.line = element_blank(), strip.background = element_rect(colour="white", fill="white"))
+
+plot_grid( h, p, rel_widths=c(8,10))
+```
