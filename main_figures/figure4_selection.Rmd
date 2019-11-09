@@ -9,20 +9,23 @@ output:
 
 ```{r}
 suppressPackageStartupMessages({
+  library(SingleCellExperiment)
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipComp/"))
+suppressMessages(devtools::load_all("../../pipeComp/"))
 data(datasets)
 theme_set(theme_cowplot(font_size = 12))
 ```
 
 ```{r}
-GI <- readRDS("../data/GI.rds")
-get_auc <- function(preds,ve.var="vst.R2",n=1000){
+lf <- list.files("../datasets", "SCE", full.names=TRUE)
+names(lf) <- gsub("\\.SCE\\.rds","",basename(lf))
+GI <- lapply(lf, FUN=function(x) rowData(readRDS(x)))
+get_auc <- function(preds,ve.var="vst.varExp",n=1000){
     preds$vst.Gini <- -1*preds$vst.Gini
     p2 <- as.matrix(preds[,c("seurat.variance", "seurat.variance.standardized", "seurat.res.var", "deviance")])
     preds2 <- list( deviance=preds$deviance,
@@ -31,8 +34,8 @@ get_auc <- function(preds,ve.var="vst.R2",n=1000){
                    seurat.var=preds$seurat.variance,
                    "seurat.var.std*"=preds$seurat.variance.standardized,
                    sctransform=preds$seurat.res.var,
-                   rankMean=colMeans(colRanks(p2)),
-                   rankMax=colMaxs(colRanks(p2)),
+                   #rankMean=colMeans(colRanks(p2)),
+                   #rankMax=colMaxs(colRanks(p2)),
                    expression=preds$total_counts
                    )
     preds2 <- lapply(preds2, as.numeric)
@@ -46,25 +49,27 @@ get_auc <- function(preds,ve.var="vst.R2",n=1000){
 # plot_grid( p1, p2, labels=LETTERS[1:2], nrow=2)
 
 aucs1 <- sapply(GI,FUN=get_auc)
+h1 <- Heatmap(aucs1 , name="Proportion", cluster_columns=FALSE, 
+           bottom_annotation=.ds_anno(colnames(aucs1),TRUE), show_heatmap_legend = TRUE,
+           show_column_names = FALSE, col=viridisLite::inferno(100), column_title="Variance explained")
 aucs2 <- sapply(GI,ve.var="devianceExplained", FUN=get_auc)
-p1 <- grid.grabExpr(draw(chm(list("Variance explained"=aucs1, "Deviance explained"=aucs2), sameScale=TRUE, scaleTitle="Proportion", cluster_columns=FALSE)))
+h2 <- Heatmap( aucs2[row.names(h1@matrix),], 
+               cluster_rows=FALSE, cluster_columns=FALSE, 
+              bottom_annotation=.ds_anno(colnames(aucs2),FALSE), show_heatmap_legend = FALSE,
+              show_column_names = FALSE, col=viridisLite::inferno(100), column_title="Deviance explained")
+p1 <- grid.grabExpr(draw(h1+h2))
 ```
 
-```{r figure4, fig.width=6, fig.height=10}
-res <- readRDS("../../resNew/sel_endSummary.rds")
-res <- res[grep("devianceExplained|varExp", res$sel, invert=TRUE),]
-res$selection <- paste(res$sel, res$selnb)
-nbClusDiff <- abs(res$nbClusters-datasets[res$dataset,"subpopulations"])
-#res2 <- res[which(nbClusDiff==0),]
-res2 <- res[which(nbClusDiff==0 | (nbClusDiff<=1 & res$dataset=="mixology10x3cl")),]
-ll <- lapply( split(res2, res2$norm), FUN=function(x){
-  cast2(x, formula=selection~dataset, value.var="ARI")
-})
-names(ll) <- c("scran.noscale","standard norm", "sctransform")
-p2 <- grid.grabExpr(draw(chm(ll[-1], sameScale=TRUE, scaleTitle="ARI", cluster_rows=FALSE, cluster_columns=FALSE)))
-
-plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=c(6,10))
+```{r figure4, fig.width=7.5, fig.height=6.5}
+res <- readRDS("../data/results_selection.rds")
+cl <- res$clustering
+vst <- cl[grep("seuratvst",row.names(cl)),]
+snorm <- cl[grep("seuratvst",row.names(cl), invert=TRUE),]
+h1 <- scrna_evalPlot_clustAtTrueK(snorm[grep("=1000;",row.names(snorm)),], "ARI", scale = FALSE, title="ARI at true # clusters", anno_legend = FALSE)
+h2 <- scrna_evalPlot_clustAtTrueK(vst[grep("=1000;",row.names(vst)),], "ARI", scale = FALSE, reorder_rows=row.names(h1@matrix), title="sctransform\nARI at true # clusters", name="ARI2", anno_legend = FALSE)
+p2 <- grid.grabExpr(draw(h1+h2))
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights = c(4,5))
 ```
 
-**A:** Estimating different methods of ranking genes based on their ability to capture genes with a high proportion of variance (left) or deviance (right) explained. rankMean and rankMax refer to, respectively, the mean rank and the maximum rank in the following metrics: variance, standardized variance, sctransform, deviance.
-**B: ** Accuracy of clusterings (at the right number of clusters) based on the given clustering methods and number of genes selected.
+**A:** Estimating different methods of ranking genes based on their ability to capture genes with a high proportion of variance (left) or deviance (right) explained by the subpopulations.
+**B: ** Accuracy of clusterings (at the true number of clusters) when selecting 1000 genes using the given methods. Based on standard Seurat normalization (left) or sctransform (right). The methods "vst.varExp" and "devianceExplained" are the estimates used in **A** to evaluate the selection methods, and were included here only for validation purpose.
