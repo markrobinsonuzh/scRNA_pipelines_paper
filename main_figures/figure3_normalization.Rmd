@@ -37,7 +37,7 @@ p3 <- grid.grabExpr(draw(H))
 ```
 
 ```{r figure3, fig.width=9, fig.height=9}
-plot_grid(p1,p2,p3, nrow = 3)
+plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3])
 ```
 
-
+Evaluation of normalization procedures. **A:** Residual correlation of the first principal component with library size (left) and detection rate (right), after accounting for biological differences between subpopulations. **B:** Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the ARI at the true number of cluster (left) and by the average mutual information (MI) of the cluster assignment with true subpopulations.
