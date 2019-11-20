@@ -12,24 +12,27 @@ output:
 ```{r}
 suppressPackageStartupMessages({
   library(ComplexHeatmap)
+  library(circlize)
+  library(ggplot2)
+  library(cowplot)
 })
-suppressMessages(devtools::load_all("../../pipComp/"))
+theme_set(theme_cowplot())
+suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
 data(datasets)
 ```
 
-```{r figure2, fig.width=9, fig.height=4}
-res.f <- readRDS("../../resNew/filtering_endSummary.rds")
+```{r figure2, fig.width=9, fig.height=7}
+res <- readRDS("../../flt/summary.rds")
+m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
+m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
+m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
+                     c("nofilter","lenient","default","pca","pca2","stringent"))
+cols <- c("black",plgINS::getQualitativePalette(length(levels(m$filter))-1))
+names(cols) <- levels(m$filter)
 
-res.f$pcCells <- 100-100*res.f$nbCells/datasets[as.character(res.f$dataset),"nbCells"]
-res.f$method <- factor(paste(res.f$doubletmethod, res.f$filt))
-res.f <- res.f[grep("clust",res.f$method, invert=TRUE),]
-levels(res.f$method) <- gsub("nothingFUN ","",levels(res.f$method))
+# ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
 
-w <- which(abs(res.f$nbClusters-datasets[as.character(res.f$dataset),"subpopulations"])<=1)
-#w <- which(res.f$nbClusters==datasets[as.character(res.f$dataset),"subpopulations"])
-aris.1 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seurat")),], formula=method~dataset, value.var="ARI")
-aris.2 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seuratvst")),], formula=method~dataset, value.var="ARI")
-pc <- cast2(res.f, formula=method~dataset, value.var="pcCells")
-chm(list("ARI (standard norm)"=aris.1, "ARI (sctransform)"=aris.2, "% cells out"=pc), scale=c("column","column","none"), value_format=c("%#.2f","%#.2f","%#.1f"), cluster_columns=FALSE, cluster_rows=FALSE, scaleVar=FALSE)
+ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
 ```
+

@@ -1,7 +1,7 @@
 ---
 title: "Figure 2 filtering"
 author: "Pierre-Luc Germain"
-date: "15 Mai, 2019"
+date: "20 November, 2019"
 output:
   html_document:
     keep_md: true
@@ -13,27 +13,63 @@ output:
 ```r
 suppressPackageStartupMessages({
   library(ComplexHeatmap)
+  library(circlize)
+  library(ggplot2)
+  library(cowplot)
 })
-suppressMessages(devtools::load_all("../../pipComp/"))
+theme_set(theme_cowplot())
+suppressMessages(devtools::load_all("../../pipeComp/"))
+```
+
+```
+## Warning: replacing previous import 'SummarizedExperiment::shift' by
+## 'data.table::shift' when loading 'pipeComp'
+```
+
+```
+## Warning: replacing previous import 'SummarizedExperiment::rowRanges' by
+## 'matrixStats::rowRanges' when loading 'pipeComp'
+```
+
+```r
 source("../misc_functions.R")
 data(datasets)
 ```
 
+```
+## Warning in data(datasets): data set 'datasets' not found
+```
+
 
 ```r
-res.f <- readRDS("../../resNew/filtering_endSummary.rds")
+res <- readRDS("../../flt/summary.rds")
+m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
+m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
+m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
+                     c("nofilter","lenient","default","pca","pca2","stringent"))
+cols <- c("black",plgINS::getQualitativePalette(length(levels(m$filter))-1))
+```
 
-res.f$pcCells <- 100-100*res.f$nbCells/datasets[as.character(res.f$dataset),"nbCells"]
-res.f$method <- factor(paste(res.f$doubletmethod, res.f$filt))
-res.f <- res.f[grep("clust",res.f$method, invert=TRUE),]
-levels(res.f$method) <- gsub("nothingFUN ","",levels(res.f$method))
+```
+## Setting options('download.file.method.GEOquery'='auto')
+```
 
-w <- which(abs(res.f$nbClusters-datasets[as.character(res.f$dataset),"subpopulations"])<=1)
-#w <- which(res.f$nbClusters==datasets[as.character(res.f$dataset),"subpopulations"])
-aris.1 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seurat")),], formula=method~dataset, value.var="ARI")
-aris.2 <- cast2(res.f[intersect(w, which(res.f$norm=="norm.seuratvst")),], formula=method~dataset, value.var="ARI")
-pc <- cast2(res.f, formula=method~dataset, value.var="pcCells")
-chm(list("ARI (standard norm)"=aris.1, "ARI (sctransform)"=aris.2, "% cells out"=pc), scale=c("column","column","none"), value_format=c("%.2f"), cluster_columns=FALSE, cluster_rows=FALSE)
+```
+## Setting options('GEOquery.inmemory.gpl'=FALSE)
+```
+
+```
+## Warning: replacing previous import 'GenomicRanges::shift' by
+## 'data.table::shift' when loading 'plgINS'
+```
+
+```r
+names(cols) <- levels(m$filter)
+
+# ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
+
+ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
 ```
 
 ![](figure2_filtering_files/figure-html/figure2-1.png)<!-- -->
+
