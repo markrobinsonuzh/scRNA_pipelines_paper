@@ -1,0 +1,88 @@
+---
+title: "Dimensionality"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(matrixStats)
+})
+source("../misc_functions.R")
+suppressMessages(devtools::load_all("../../pipeComp/"))
+source("../../pipeComp/inst/extdata/scrna_alternatives.R")
+theme_set(theme_cowplot(font_size = 12))
+```
+
+```{r}
+o <- readRDS("../../ndims.RDS")
+o <- lapply(o, FUN=function(x){
+  x$nselected$elbow <- x$nselected$elbow-1
+  x
+})
+o2 <- data.table::rbindlist( lapply(o, FUN=function(x){
+  data.frame( method=names(x$nselected), 
+              nsel=unlist(x$nselected), 
+              time=x$elapsed )
+  }), idcol="dataset")
+ve <- sapply(o, FUN=function(x) x$varExplained)
+row.names(ve) <- 1:nrow(ve)
+
+cols <- getQualitativePalette(9)[-5:-6]
+names(cols) <- colnames(ve)
+p1a <- Heatmap(t(ve)[,1:15],col=c("white","black"), cluster_columns=FALSE, cluster_rows=FALSE,name="Prop.\nvar", column_title = "Variance in each PC\nexplained by subpopulations", row_title = "Dataset", right_annotation = rowAnnotation(dataset=colnames(ve), col=list(dataset=cols), show_legend=FALSE), show_row_names = FALSE)
+p1a <- grid.grabExpr(draw(p1a))
+
+ve.elbows <- apply(ve,2,FUN=farthestPoint)-1
+o2$diff <- o2$nsel-ve.elbows[as.character(o2$dataset)]
+tmp <- sapply(split(o2$time, o2$method), mean)
+mt2 <- cut(tmp, breaks=c(0,1,5,20,3000), labels=c("<1s","<5s","<20s","minutes \nto hours"))
+names(mt2) <- names(tmp)
+o2$Time <- mt2[as.character(o2$method)]
+tcols <- c("darkblue", "blue", "violet", "red")
+names(tcols) <- levels(mt2)
+o2$avgTime <- tmp[as.character(o2$method)]
+p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, group=method, fill=Time)) + geom_violin() + coord_flip() + geom_hline(yintercept=0, linetype="dashed") + ylab("Difference to 'real' number of dimensions") + scale_fill_manual(values=tcols) + theme(axis.title.y=element_blank(), legend.position=c(0.7, 0.3))
+p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
+```
+
+```{r, fig.width=8, fig.height=4}
+res <- readRDS("../data/results_dimensionality.rds")
+sw <- res$dimensionality$clust.avg.silwidth$selected
+sw <- sw[grep("=doublet",row.names(sw)),]
+n <- sapply(strsplit(row.names(sw),"="),FUN=function(x) rev(x)[1])
+w <- grep("seuratvst",row.names(sw))
+n[w] <- paste0("sctransform+",n[w])
+row.names(sw) <- n
+sw2 <- sw[order(grepl("sctransform",row.names(sw))*1000+rowMeans(sw)+apply(sw,1,probs=0.8,FUN=quantile),decreasing=TRUE),order(colMeans(sw),decreasing=TRUE)]
+h1 <- Heatmap(sw2, cluster_columns = FALSE, cluster_rows = FALSE, 
+        name="silhouette width", col=.silScale(sw2), show_column_names = FALSE,
+        column_title = "Subpopulation mean silhouette width",
+        bottom_annotation=.ds_anno(colnames(sw2)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
+p2 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
+
+res2 <- res$clustering
+res2 <- res2[grep("=doublet",row.names(res2)),]
+method <- as.character(parsePipNames(row.names(res2))$dims)
+w <- grep("seuratvst", row.names(res2))
+method[w] <- paste0("sctransform+",method[w])
+row.names(res2) <- paste0("method=",method,";",row.names(res2))
+
+h2 <- scrna_evalPlot_clust(res2, what="NMI", agg.by = c("method"), scale=TRUE, reorder_rows = TRUE, anno_legend = FALSE)
+h2 <- h2 + 
+  scrna_evalPlot_clust(res2, what="min_pr", agg.by = c("method"), reorder_rows=h2, scale=TRUE, anno_legend = FALSE) + 
+scrna_evalPlot_clustAtTrueK(res2, agg.by = c("method"), reorder_rows=h2, scale=TRUE, anno_legend = FALSE)
+p3 <- grid.grabExpr(draw(h2))
+```
+
+```{r figure6, fig.width=9, fig.height=9.5}
+plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.39,0.3,0.31), labels=c(NA,LETTERS[3:4]))
+```
+
+**A:** Estimated dimensionality using the proportion of variance in each component explained by subpopulations. **B:** Difference between `real' dimensionality (from **A**) and various dimensionality estimation methods, along with computing time. **C:** Average silhouette width per subpopulation across a selection of dimensionality estimators, using sctransform or standard seurat normalization. **D:** Clustering accuracy of across the normalization/dimensionality methods.

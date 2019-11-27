@@ -17,6 +17,13 @@ suppressPackageStartupMessages({
 suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 11))
+renameNorm <- function(x){
+  .renameHrows(x, f=function(x){
+    x <- gsub("^norm\\.", "", x)
+    x <- gsub("seuratvst","sctransform",x)
+    x <- gsub(".noscale", " (no scaling)", x)
+  })
+}
 ```
 
 ```{r}
@@ -24,16 +31,16 @@ res <- readRDS("../data/results_norm.rds")
 ```
 
 ```{r}
-p1 <- scrna_evalPlot_DR(res, "covarRes", agg.by = "norm", anno_legend=FALSE) +
-    scrna_evalPlot_DR(res, "covarRes", covar = "log10_total_features", agg.by = "norm", anno_legend=FALSE)
-p1 <- grid.grabExpr(draw(p1))
+p1 <- scrna_evalPlot_DR(res, "covarRes", agg.by = "norm", anno_legend=FALSE, reorder_rows = TRUE)
+p1 <- p1 + scrna_evalPlot_DR(res, "covarRes", covar = "log10_total_features", agg.by = "norm", anno_legend=FALSE, reorder_rows=p1)
+p1 <- grid.grabExpr(draw(renameNorm(p1)))
 
 p2 <- grid.grabExpr(draw(
-  scrna_evalPlot_DR(res, what="silhouette", agg.by = "norm", value_format = "", show_heatmap_legend = TRUE)))
+  renameNorm(scrna_evalPlot_DR(res, what="silhouette", agg.by = "norm", value_format = "", show_heatmap_legend = TRUE))))
 
 H <- scrna_evalPlot_clustAtTrueK(res, "ARI", agg.by = "norm", scale = TRUE, reorder_rows = TRUE, anno_legend=FALSE)
 H <- H + scrna_evalPlot_clust(res, "MI", agg.by = "norm", scale = TRUE, reorder_rows=row.names(H@matrix), anno_legend=FALSE)
-p3 <- grid.grabExpr(draw(H))
+p3 <- grid.grabExpr(draw(renameNorm(H)))
 ```
 
 ```{r figure3, fig.width=9, fig.height=9}

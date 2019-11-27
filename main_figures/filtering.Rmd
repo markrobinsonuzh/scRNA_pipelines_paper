@@ -23,16 +23,20 @@ data(datasets)
 ```
 
 ```{r figure2, fig.width=9, fig.height=7}
-res <- readRDS("../../flt/summary.rds")
+res <- readRDS("../data/results_filtering.rds")
 m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
 m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
 m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
-                     c("nofilter","lenient","default","pca","pca2","stringent"))
+                     c("nofilter","lenient","default","pca","pca2","stringent","veryStringent"))
 cols <- c("black",plgINS::getQualitativePalette(length(levels(m$filter))-1))
 names(cols) <- levels(m$filter)
 
 # ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
 
-ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
+ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) +
+  # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
+facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
 ```
+
+Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data.
 
