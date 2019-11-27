@@ -14,15 +14,47 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(circlize)
   library(ggplot2)
+  library(ggridges)
   library(cowplot)
+  library(SingleCellExperiment)
 })
-theme_set(theme_cowplot())
+theme_set(theme_cowplot(font_size = 12))
 suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
 data(datasets)
 ```
 
-```{r figure2, fig.width=9, fig.height=7}
+```{r}
+thresplot <- function(ds, var="log10_total_counts", title="", nmads=2.5, relh=c(1,2), xlims=range(ds[[var]])){
+  noy <- theme( axis.line.y=element_blank(), axis.text.y=element_blank(),
+                  axis.ticks.y=element_blank(), axis.title = element_text(size=11), 
+                  strip.background = element_blank(), legend.position = "none",
+                  axis.text=element_text(size=10), plot.title = element_text(size=12))
+  x <- ds[[var]]
+  xm <- median(x)
+  md <- median(abs(x-xm))
+  mads <- c(xm-nmads*md, xm+nmads*md)
+  p1 <- ggplot(ds, aes_string(x=var, y=1)) + geom_density_ridges() + noy + 
+    ylab("All") + ggtitle(title) +  
+    theme(axis.line.x=element_blank(), axis.text.x=element_blank(), 
+          axis.ticks.x=element_blank(), axis.title.x = element_blank() ) +
+    geom_vline(xintercept=mads, linetype="dashed") + xlim(xlims)
+  p2 <- ggplot(ds, aes_string(x=var, y="phenoid", fill="phenoid", colour="phenoid")) + 
+    noy + geom_density_ridges() + ylab("Subpopulations") +
+    geom_vline(xintercept=mads, linetype="dashed") + xlim(xlims)
+  plot_grid( p1, p2, nrow=2, rel_heights=relh)
+}
+
+koh <- as.data.frame(colData(readRDS("../datasets/Koh.SCE.rds")))
+zhen <- as.data.frame(colData(readRDS("../datasets/Zhengmix8eq.SCE.rds")))
+sim <- as.data.frame(colData(readRDS("../datasets/simMix1.SCE.rds")))
+
+p1 <- plot_grid( thresplot(koh, title="Koh"),
+                 thresplot(zhen, title="Zhengmix8eq", xlims=c(2.65,3.8)),
+                 thresplot(sim, title="simMix1", xlims=c(2.4, 3.82)), nrow=1)
+```
+
+```{r figure2, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/results_filtering.rds")
 m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
 m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
@@ -33,10 +65,13 @@ names(cols) <- levels(m$filter)
 
 # ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
 
-ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) +
+p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) +
   # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
-facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
+  facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + 
+  xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
+
+plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])
 ```
 
-Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data.
+**A:** Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. **B:** Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data.
 
