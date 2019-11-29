@@ -15,42 +15,33 @@ suppressPackageStartupMessages({
   library(matrixStats)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipComp/"))
-data(datasets)
-theme_set(theme_cowplot(font_size = 12))
+suppressMessages(devtools::load_all("../../pipeComp/"))
 ```
 
-```{r, fig.width=8, fig.height=4}
-res <- readRDS("../data/dr_intermediateSummary.rds")
-sw <- res$dimreduction$clust.avg.silwidth[[1]]
-sw <- sw[,grep("seuratvst",colnames(sw))]
-sw <- sw[,grep("deviance",colnames(sw))]
-colnames(sw) <- reduceMethodNames(colnames(sw),6)
-sw <- matrix(unlist(sw),ncol=ncol(sw), dimnames=dimnames(sw))
-ag <- aggregate(sw, by=list(reduceMethodNames(row.names(sw),1)), FUN=mean)
-row.names(ag) <- ag[,1]; ag[,1] <- NULL
-sw <- t(ag)
+```{r dimred, fig.width=12, fig.height=6}
+res <- readRDS("../data/results_dimred.rds")
+x <- res$dimreduction$clust.avg.silwidth
+x <- x[grep("norm\\.seurat\\.noscale.*denoise", row.names(x), invert=TRUE),]
+x <- x[order(colSums(apply(x,1,prob=c(0.05,0.5),FUN=quantile))+
+                         rowMeans(x), decreasing=TRUE),order(colMeans(x), decreasing=TRUE)]
+row.names(x) <- gsub("norm\\.","",apply(parsePipNames(row.names(x))[,c("norm","dr")],1,collapse=" + ",FUN=paste))
+row.names(x) <- gsub("seuratvst","sctransform",row.names(x))
+h1 <- Heatmap(x, cluster_columns = FALSE, cluster_rows = FALSE, 
+        name="silhouette width", col=.silScale(x), show_column_names = FALSE,
+        column_title = "Subpopulation mean silhouette width", row_names_max_width = unit(9,"cm"),
+        bottom_annotation=.ds_anno(colnames(x)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
+p1 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
 
-r2 <- res$dimreduction$PC.R2
-r2 <- r2[grep("seuratvst",r2$method),]
-r2 <- r2[grep("deviance",r2$method),]
-r2$dr <- reduceMethodNames(r2$method, 6)
-r2 <- r2[which(r2$dim <= 5),]
-r3 <- cast2(r2, formula=dr~dataset, value.var="value")
+res$clustering <- res$clustering[grep("norm\\.seurat\\.noscale.*denoise", row.names(res$clustering), invert=TRUE),]
+h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","dr"), scale=TRUE, anno_legend = FALSE)
+h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
+  scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
+  scrna_evalPlot_clustAtTrueK(res, agg.by=c("norm","dr"), reorder_rows = h, anno_legend = FALSE)
+h <- .renameHrows(h, function(x) gsub("; dr=", " + ", gsub("seuratvst", "sctransform", x)))
 
-res <- readRDS("../data/dr_endSummary.rds")
-res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1 & 
-                    res$norm=="norm.seuratvst"),]
-m.ari <- cast2(res2, formula=dr~dataset, fun.aggregate=median, value.var="ARI")
+p2 <- grid.grabExpr(draw(h))
 
-ll <- list( "mean silhouette width"=sw,
-            "PC1-5 var explained"=r3,
-            "median ARI"=m.ari)
-ll <- lapply(ll, FUN=function(x){
-  row.names(x) <- gsub(".noW weighted", "", paste(row.names(x), "weighted"), fixed=T)
-  x
-})
-chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x){ median(x,na.rm=T) }, cluster_columns=FALSE)
+plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
 ```
 
-Mean of subpopulation average silhouette width (left), mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).
+**A:** Average silhouette width per subpopulation according to various normalization and dimension reductions. **B:** Clustering accuracy , mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).
