@@ -73,5 +73,5 @@ p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletR
 plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])
 ```
 
-**A:** Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. **B:** Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data.
+**A:** Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. The dashed line indicates a threshold of 2.5 median absolute deviations (MADs) from the median of the overall population. **B:** Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data.
 
