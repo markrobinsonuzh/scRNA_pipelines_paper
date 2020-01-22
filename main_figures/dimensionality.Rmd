@@ -48,26 +48,32 @@ o2$Time <- mt2[as.character(o2$method)]
 tcols <- c("darkblue", "blue", "violet", "red")
 names(tcols) <- levels(mt2)
 o2$avgTime <- tmp[as.character(o2$method)]
-p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, group=method, fill=Time)) + geom_violin() + coord_flip() + geom_hline(yintercept=0, linetype="dashed") + ylab("Difference to 'real' number of dimensions") + scale_fill_manual(values=tcols) + theme(axis.title.y=element_blank(), legend.position=c(0.7, 0.3))
+p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, group=method, fill=Time)) + geom_violin() + coord_flip() + geom_hline(yintercept=0, linetype="dashed") + ylab("Difference to expected dimensionality") + scale_fill_manual(values=tcols) + theme(axis.title.y=element_blank(), legend.position=c(0.7, 0.3))
 p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
 ```
 
 ```{r, fig.width=8, fig.height=4}
-res <- readRDS("../data/results_dimensionality.rds")
-sw <- res$dimensionality$clust.avg.silwidth$selected
+res1 <- readRDS("../data/results_dimensionality.rds")
+res2 <- readRDS("../data/results_dimensionality2.rds")
+sw1 <- res1$dimensionality$clust.avg.silwidth$selected
+sw2 <- res2$dimensionality$clust.avg.silwidth$selected
+sw2 <- sw2[grep("Local\\.b",row.names(sw2),invert = TRUE),] # redundant
+sw <- rbind(sw1,sw2[setdiff(row.names(sw2),row.names(sw1)),])
 sw <- sw[grep("=doublet",row.names(sw)),]
 n <- sapply(strsplit(row.names(sw),"="),FUN=function(x) rev(x)[1])
 w <- grep("seuratvst",row.names(sw))
 n[w] <- paste0("sctransform+",n[w])
 row.names(sw) <- n
-sw2 <- sw[order(grepl("sctransform",row.names(sw))*1000+rowMeans(sw)+apply(sw,1,probs=0.8,FUN=quantile),decreasing=TRUE),order(colMeans(sw),decreasing=TRUE)]
+sw2 <- sw[order(grepl("sctransform",row.names(sw))*1000+rowMeans(sw)+apply(sw,1,probs=0.2,FUN=quantile),decreasing=TRUE),order(colMeans(sw),decreasing=TRUE)]
 h1 <- Heatmap(sw2, cluster_columns = FALSE, cluster_rows = FALSE, 
         name="silhouette width", col=.silScale(sw2), show_column_names = FALSE,
         column_title = "Subpopulation mean silhouette width",
         bottom_annotation=.ds_anno(colnames(sw2)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
 p2 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
 
-res2 <- res$clustering
+cl1 <- res1$clustering
+cl2 <- res2$clustering
+res2 <- rbind(cl1, cl2[setdiff(row.names(cl2),row.names(cl1)), colnames(cl1)])
 res2 <- res2[grep("=doublet",row.names(res2)),]
 method <- as.character(parsePipNames(row.names(res2))$dims)
 w <- grep("seuratvst", row.names(res2))
@@ -82,7 +88,7 @@ p3 <- grid.grabExpr(draw(h2))
 ```
 
 ```{r figure6, fig.width=9, fig.height=9.5}
-plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.39,0.3,0.31), labels=c(NA,LETTERS[3:4]))
+plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.36,0.32,0.32), labels=c(NA,LETTERS[3:4]))
 ```
 
 **A:** Estimated dimensionality using the proportion of variance in each component explained by subpopulations. **B:** Difference between `real' dimensionality (from **A**) and various dimensionality estimation methods, along with computing time. **C:** Average silhouette width per subpopulation across a selection of dimensionality estimators, using sctransform or standard seurat normalization. **D:** Clustering accuracy of across the normalization/dimensionality methods.
