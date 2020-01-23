@@ -15,6 +15,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
 })
+devtools::load_all("~/bioinfo/robinson/scDblFinder/")
 theme_set(theme_cowplot(font_size = 12))
 
 # we load the dataset
@@ -24,55 +25,65 @@ CDs <- lapply(lf, FUN=function(x){ as.data.frame(colData(readRDS(x))) })
 ```
 
 ```{r}
-colors <- c("#4477AA", "#117733", "#DDCC77", "#CC6677")
-CD <- CDs$mixology10x3cl
-truth <- factor(CD$demuxlet_cls, c("SNG","DBL"))
-roclist <- lapply( list(scDblFinder=CD$pldf.ratio,
-                        scds.hybrid=CD$hybrid_score,
-                        scran.score=CD$scran.DblScore),
-                   class=truth, FUN=rocit)
-d <- data.frame( method=rep( c("scDblFinder","scds","scran"),
-                             sapply(roclist, FUN=function(x) length(x$TPR)) ),
-                 FPR=unlist(lapply(roclist,FUN=function(x) x$FPR)),
-                 TPR=unlist(lapply(roclist,FUN=function(x) x$TPR)) )
-p1 <- ggplot(d, aes(FPR, TPR, colour=method)) + geom_line(size=1.5) + ggtitle("mixology10x3cl")
-p1 <- p1 + theme(legend.position = c(0.6, 0.3)) + scale_color_manual(values=colors[-2])
-  
-CD <- CDs$mixology10x5cl
-truth <- factor(CD$demuxlet_cls, c("SNG","DBL"))
-roclist <- lapply( list(scDblFinder=CD$pldf.ratio,
-                        DoubletFinder=CD$doubletFinder.pANN_0.25_0.02_82,
-                        scds=CD$hybrid_score,
-                        scran=CD$scran.DblScore), 
-                   class=truth, FUN=rocit)
-d <- data.frame( method=factor( rep(names(roclist), sapply(roclist, FUN=function(x) length(x$TPR))), levels=names(roclist)),
-                 FPR=unlist(lapply(roclist,FUN=function(x) x$FPR)),
-                 TPR=unlist(lapply(roclist,FUN=function(x) x$TPR)) )
-p2 <- ggplot(d, aes(FPR, TPR, colour=method)) + geom_line(size=1.5) + ggtitle("mixology10x5cl")
-p2 <- p2 + theme(legend.position = c(0.6, 0.3)) + scale_color_manual(values=colors)
+res <- dblres <- readRDS("../data/doublets.rds")
+scoresNames <- c("scran.score"="scran", "scDblFinder"="scDblFinder", "DF.score"="DoubletFinder", "hybrid_score"="scds")
+cols <- c("#4477AA", "#DDCC77", "#117733", "#CC6677")
+names(cols) <- as.character(scoresNames)
+
+pw <- function(i){
+  scores <- res[[i]][,intersect(names(scoresNames),colnames(res[[i]]))]
+  colnames(scores) <- scoresNames[colnames(scores)]
+  plotROCs(scores, factor(res[[i]]$demuxlet_cls, c("SNG","DBL"))) +
+    ylim(0,1) + scale_color_manual(values=cols)
+}
+
+p1 <- pw(1) + theme(legend.position="none")
+p2 <- pw(2) + theme(legend.position="none")
+p3 <- pw(3) + theme(legend.position=c(0.25,0.25))
 ```
 
 ```{r}
-rt <- data.frame( time=c(12.83, 41.46, 25.08, NA, 56.15, 310.24, 268.93, 722.031),
-                  method=rep(c("scds", "scran", "scDblFinder", "DoubletFinder"),2),
-                  dataset=rep(c("mixology10x3cl", "mixology10x5cl"), each=4))
-p3 <- ggplot(rt, aes(method, time, fill=method)) + geom_col() + scale_color_manual(values=colors) + facet_wrap(~dataset, scale="free", nrow=2) + coord_flip() + ylab("Wall-time, in seconds") + theme(legend.position="none", axis.title.y=element_blank(), plot.margin=unit(c(1,2,1,1),"lines"))
+rt <- data.frame(
+  method = structure(c(3L, 4L, 2L, 1L, 3L, 4L, 2L, 1L, 
+3L, 4L, 2L, 1L), .Label = c("DoubletFinder", "scDblFinder", "scds", 
+"scran"), class = "factor"),
+  dataset = structure(c(1L, 1L, 1L, 
+1L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L), .Label = c("mixology10x3cl", 
+"mixology10x5cl", "demuxlet"), class = "factor"),
+  time = c(14.52, 26.36, 7.82400000000007, NA, 42.74, 
+250.14, 21.8199999999999, 678.81, 100.05, 823.09, 54.0140000000001, 
+956.63)
+)
+
+pt <- ggplot(rt, aes(method, time, fill=method)) + geom_col() + facet_wrap(~dataset, scale="free_x") + coord_flip() + xlab("") + ylab("Running time (s)") + scale_fill_manual(values=cols) + theme(legend.position="none")
+
+# le <- get_legend(plotROCs(scores, factor(CDs[[i]]$demuxlet_cls, c("SNG","DBL"))))
 ```
+
 
 ```{r}
 mis <- readRDS("../data/misclassification.rds")
+lf <- list.files("../datasets/", full.names = TRUE)
+lf <- lf[grep("simMix",lf,invert=TRUE)]
+names(lf) <- sapply(strsplit(basename(lf),"\\."), FUN=function(x) x[1])
+CDs <- lapply(lf, FUN=function(x) colData(readRDS(x)))
 dbl <- lapply(CDs, FUN=function(x) x[,c("pldf.ratio","pldf.class")])
 dbl <- dbl[intersect(names(dbl),names(mis))]
 for(n in names(dbl)){
   dbl[[n]]$pct_misclassified_cor <- mis[[n]]$corrected_pct_mis[row.names(dbl[[n]])]
   dbl[[n]]$pct_misclassified <- mis[[n]]$pct_misclassified[row.names(dbl[[n]])]
 }
-d <- as.data.frame(data.table::rbindlist(dbl, idcol="dataset"))
-p4 <- ggplot(d, aes(pldf.class, pct_misclassified_cor, fill=pldf.class)) + geom_violin() + facet_wrap(~dataset) + ggtitle("Cluster mis-assignment") + theme(axis.title.x=element_blank(), legend.position="none") + ylab("Corrected % misclassification") + stat_summary(fun.y="mean", geom="point")
+d <- as.data.frame(data.table::rbindlist(lapply(dbl,as.data.frame), idcol="dataset"))
+d$pldf.class <- factor(d$pldf.class, c("doublet","singlet"))
+levels(d$pldf.class) <- c("DBL","SNG")
+p4 <- ggplot(d, aes(pldf.class, pct_misclassified, fill=pldf.class)) + geom_violin() + facet_wrap(~dataset, nrow = 1) + theme(axis.title.x=element_blank(), legend.position="none") + ylab("% misclassified") + stat_summary(fun.y="mean", geom="point")
 ```
+
+
 
 ```{r figure1, fig.height=6, fig.width=7}
-plot_grid( plot_grid(p1, p2, nrow=1, labels=LETTERS[1:2]), plot_grid(p3, p4, nrow=1, labels=LETTERS[3:4], rel_widths=c(2,3)), nrow=2)
+p1m <- plot_grid(p1, p2, p3, nrow=1)
+plot_grid(p1m, pt, p4, rel_heights=c(3.5,2,2), labels = LETTERS[1:3], ncol = 1, hjust=0)
 ```
 
-**A-B** Receiver operating characteristic (ROC) curves of the tested doublet detection methods for the mixology10x3l (**A**) and mixology10x5cl (**B**) datasets. DoubletFinder failed due to an error on the mixology10x3cl dataset. **C:** Running time of the different methods. **D:** Cell called as doublets by scDblFinder tend to be more often misclassified, i.e. assigned a wrong cluster. The corrected percentage of misclassification is the proportion of times a given cell is misclassified across hundreds of clustering pipelines with various parameters, minus the median misclassification rate of the cell's subpopulation.
+**A:** Receiver operating characteristic (ROC) curves of the tested doublet detection methods for three datasets with SNP-identified doublets. **B:** Running time of the different methods (DoubletFinder failed on one of the datasets). **C:** Rate of misclassification of the cells identified by scDblFinder as doublets (DBL), across a large range of clustering analysis. Even in datasets which should not have neotypic doublets, the cells identified as such tend to be misclassified.
