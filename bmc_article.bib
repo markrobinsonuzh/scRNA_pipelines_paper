@@ -350,3 +350,218 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     volume = {20},
     year = {2019}
 }
+
+
+@article{ZappiaDB2018,
+    author = {Zappia, Luke and Phipson, Belinda and Oshlack, Alicia},
+    doi = {10.1371/journal.pcbi.1006245},
+    file = {:home/anthonys/Documents/PhD/Articles/Zappia2019-scRNAseq{\_}tools{\_}database.pdf:pdf},
+    isbn = {1111111111},
+    journal = {PLoS Computational Biology},
+    number = {6},
+    pages = {1--14},
+    title = {{Exploring the single-cell RNA-seq analysis landscape with the scRNA-tools database}},
+    volume = {14},
+    year = {2018}
+}
+
+
+@article{SvenssonDB2019,
+    abstract = {Over 500 single cell transcriptomics studies have been published to date. Many of these have data available, but the links between data, study, and systems studied can be hard to identify through literature search. This manuscript describes a nearly exhaustive and manually curated database of single cell transcriptomics studies with descriptions of what kind of data and what biological systems have been studied. Additionally, based on the text in the listed papers information about analysis is included in the database, allowing analysis of trends in the field. As a particular example, it is demonstrated that the number of cell types identified in single cell RNA sequencing studies is directly proportional to the number of cells analyzed. Instructions to access the database are available at [www.nxn.se/single-cell-studies/][1].
+    
+     [1]: http://www.nxn.se/single-cell-studies/},
+    author = {Svensson, Valentine and Beltrame, Eduardo da Veiga},
+    doi = {10.1101/742304},
+    file = {:home/anthonys/Documents/PhD/Articles/Svenson2019v2-Curated{\_}database{\_}sc{\_}rna.pdf:pdf},
+    journal = {bioRxiv},
+    pages = {742304},
+    title = {{A curated database reveals trends in single cell transcriptomics}},
+    year = {2019}
+}
+
+
+@article{CrowellMuscat2019,
+    abstract = {Single-cell RNA sequencing (scRNA-seq) has quickly become an empowering technology to profile the transcriptomes of individual cells on a large scale. Many early analyses of differ- ential expression have aimed at identifying differences between subpopulations, and thus are focused on finding subpopulation markers either in a single sample or across multiple samples. More generally, such methods can compare expression levels in multiple sets of cells, thus lead- ing to cross-condition analyses. However, given the emergence of replicated multi-condition scRNA-seq datasets, an area of increasing focus is making sample-level inferences, termed here as differential state analysis. For example, one could investigate the condition-specific responses of cell subpopulations measured from patients from each condition; however, it is not clear which statistical framework best handles this situation. In this work, we surveyed the methods available to perform cross-condition differential state analyses, including cell- level mixed models and methods based on aggregated “pseudobulk” data. We developed a flexible simulation platform that mimics both single and multi-sample scRNA-seq data and provide robust tools for multi-condition analysis within the muscat R package.},
+    author = {Crowell, Helena L. and Soneson, Charlotte and Germain, Pierre-Luc and Calini, Daniela and Collin, Ludovic and Raposo, Catarina and Malhotra, Dheeraj and Robinson, Mark D.},
+    file = {:home/anthonys/Documents/PhD/Articles/Crowell2019-Population{\_}specific{\_}state{\_}transitions.pdf:pdf},
+    journal = {bioRxiv},
+    pages = {713412},
+    title = {{On the discovery of population-specific state transitions from multi-sample multi-condition single-cell RNA sequencing data}},
+    year = {2019}
+}
+
+@article{MereuCellAtlas2019,
+    abstract = {Single-cell RNA sequencing (scRNA-seq) is the leading technique for charting the molecular properties of individual cells. The latest methods are scalable to thousands of cells, enabling in-depth characterization of sample composition without prior knowledge. However, there are important differences between scRNA-seq techniques, and it remains unclear which are the most suitable protocols for drawing cell atlases of tissues, organs and organisms. We have generated benchmark datasets to systematically evaluate techniques in terms of their power to comprehensively describe cell types and states. We performed a multi-center study comparing 13 commonly used single-cell and single-nucleus RNA-seq protocols using a highly heterogeneous reference sample resource. Comparative and integrative analysis at cell type and state level revealed marked differences in protocol performance, highlighting a series of key features for cell atlas projects. These should be considered when defining guidelines and standards for international consortia, such as the Human Cell Atlas project.},
+    author = {Mereu, Elisabetta and Lafzi, Atefeh and Moutinho, Catia and Ziegenhain, Christoph and MacCarthy, Davis J. and Alvarez, Adrian and Batlle, Eduard and Sagar and Gr{\"{u}}n, Dominic and Lau, Julia K. and Boutet, St{\'{e}}phane and Sanada, Chad and Ooi, Aik and Jones, Robert C. and Kaihara, Kelly and Brampton, Chris and Talaga, Yasha and Sasagawa, Yohei and Tanaka, Kaori and Hayashi, Tetsutaro and Nikaido, Itoshi and Fischer, Cornelius and Sauer, Sascha and Trefzer, Timo and Conrad, Christian and Adiconis, Xian and Nguyen, Lan T. and Regev, Aviv and Levin, Joshua Z. and Janjic, Aleksandar and Wange, Lucas E. and Bagnoli, Johannes W. and Parekh, Swati and Enard, Wolfgang and Gut, Marta and Sandberg, Rickard and Gut, Ivo and Stegle, Oliver and Heyn, Holger},
+    doi = {10.1101/630087},
+    file = {:home/anthonys/Documents/PhD/Articles/Mereu2019-Benchmarking{\_}scRNAseq{\_}CellAtlasProjects.pdf:pdf},
+    journal = {bioRxiv},
+    pages = {630087},
+    title = {{Benchmarking Single-Cell RNA Sequencing Protocols for Cell Atlas Projects}},
+    url = {https://www.biorxiv.org/content/10.1101/630087v1},
+    year = {2019}
+}
+
+
+@article{TsuyuzakiPCA2020,
+    abstract = {Principal component analysis (PCA) is an essential method for analyzing single-cell RNA-seq (scRNA-seq) dataset but for large-scale scRNA-seq datasets, the computation consumes a long time and large memory space. In this work, we review the existing fast and memory-efficient PCA algorithms and implementations and evaluate their practical application to large-scale scRNA-seq dataset. Our benchmark showed that some PCA algorithms based on Krylov subspace and randomized singular value decomposition are fast, memory-efficient, and accurate than the other algorithms. Considering the difference of computational environment of users and developers, we also developed the guideline to select the appropriate PCA implementations. * PCA : principal component analysis scRNA-seq : single-cell RNA sequencing sci-RNA-seq : single-cell combinatorial-indexing RNA-sequencing analysis UML : unsupervised machine learning QC : quality control PC : principal component EVD : eigenvalue decomposition SVD : singular value decomposition Sklearn : scikit-learn SKL : sequential Karhunen-Loeve transform IRLBA : augmented implicitly restarted Lanczos bidiagonalization IRAM : implicitly restarted Arnoldi method GD : gradient descent SGD : stochastic gradient descent t-SNE : t-stochastic neighbor embedding FIt-SNE : fast Fourier transform-accelerated interpolation-based t-stochastic neighbor embedding oocPCA : out-of-core PCA GMM : Gaussian mixture model ARI : adjusted Rand index Zstd : Zstandard UMI : unique molecular identifier CSV : comma-separated values HDF5 : hierarchical data format 5 10X-HDF5 : HDF5 provided by 10X Genomics CSC : compressed sparse column format CSR : compressed sparse row format},
+    author = {Tsuyuzaki, Koki and Sato, Hiroyuki and Sato, Kenta and Nikaido, Itoshi},
+    doi = {10.1186/s13059-019-1900-3},
+    file = {:home/anthonys/Documents/PhD/Articles/Tsuyuzaki2020-PCA{\_}benchmarking{\_}scRNAseq.pdf:pdf},
+    journal = {Genome Biology},
+    keywords = {Cellular heterogeneity,Dimension reduction,Julia,Online/incremental algorithm,Out-of-core,Principal component analysis,Python,R,Randomized algorithm,Single-cell RNA-seq,Sparse data format,cellular heterogeneity,dimension reduction,incremental algorithm,julia,online,out-of-core,principal component analysis,python,r,randomized algorithm,single-cell rna-seq,sparse data format},
+    number = {9},
+    pages = {1--17},
+    publisher = {Genome Biology},
+    title = {{Benchmarking principal component analysis for large-scale single-cell RNA-sequencing}},
+    url = {https://www.biorxiv.org/content/10.1101/642595v1?rss=1{\&}utm{\_}source=dlvr.it{\&}utm{\_}medium=twitter},
+    volume = {21},
+    year = {2020}
+}
+
+@article{CobosDeconvolution2020,
+    author = {Cobos, Francisco Avila and Alquicira-hernandez, Jos{\'{e}} and Powell, Joseph},
+    doi = {10.1101/2020.01.10.897116. T},
+    file = {:home/anthonys/Documents/PhD/Articles/Cobos2020-Benchmarking{\_}computational{\_}deconvolution{\_}transcripotmics.pdf:pdf},
+    journal = {bioRxiv},
+    title = {{Comprehensive benchmarking of computational deconvolution of transcriptomics data}},
+    year = {2020}
+}
+
+
+@article{LunScran2016,
+    abstract = {Single-cell RNA sequencing (scRNA-seq) is widely used to profile the transcriptome of individual cells. This provides biological resolution that cannot be matched by bulk RNA sequencing, at the cost of increased technical noise and data complexity. The differences between scRNA-seq and bulk RNA-seq data mean that the analysis of the former cannot be performed by recycling bioinformatics pipelines for the latter. Rather, dedicated single-cell methods are required at various steps to exploit the cellular resolution while accounting for technical noise. This article describes a computational workflow for low-level analyses of scRNA-seq data, based primarily on software packages from the open-source Bioconductor project. It covers basic steps including quality control, data exploration and normalization, as well as more complex procedures such as cell cycle phase assignment, identification of highly variable and correlated genes, clustering into subpopulations and marker gene detection. Analyses were demonstrated on gene-level count data from several publicly available datasets involving haematopoietic stem cells, brain-derived cells, T-helper cells and mouse embryonic stem cells. This will provide a range of usage scenarios from which readers can construct their own analysis pipelines.},
+    author = {Lun, Aaron T L and Mccarthy, Davis J and Marioni, John C and Mcdavid, Andrew},
+    doi = {10.12688/f1000research.9501.2},
+    file = {:home/anthonys/Documents/PhD/Articles/Lun2016-scran{\_}workflow{\_}analysis{\_}scRNAseq{\_}bioconductor.pdf:pdf},
+    journal = {F1000Research},
+    number = {2122},
+    title = {{A step-by-step workflow for low-level analysis of single-cell RNA-seq data with Bioconductor.}},
+    volume = {5},
+    year = {2016}
+}
+
+
+@article{BaisScds2019,
+    abstract = {Motivation: Single cell RNA sequencing (scRNA-seq) technologies enable the study of transcriptional heterogeneity at the resolution of individual cells and have an increasing impact on biomedical research. Specifically, high-throughput approaches that employ micro-fluidics in combination with unique molecular identifiers (UMIs) are capable of assaying many thousands of cells per experiment and are rapidly becoming commonplace. However, it is known that these methods sometimes wrongly consider two or more cells as single cells, and that a number of so-called doublets is present in the output of such experiments. Treating doublets as single cells in downstream analyses can severely bias a study's conclusions, and therefore computational strategies for the identification of doublets are needed. Here we present single cell doublet scoring (scds), a software tool for the in silico identification of doublets in scRNA-seq data. Results: With scds, we propose two new and complementary approaches for doublet identification: Co-expression based doublet scoring (cxds) and binary classification based doublet scoring (bcds). The co-expression based approach, cxds, utilizes binarized (absence/presence) gene expression data and employs a binomial model for the co-expression of pairs of genes and yields interpretable doublet annotations. bcds, on the other hand, uses a binary classification approach to discriminate artificial doublets from the original data. We apply our methods and existing doublet identification approaches to four data sets with experimental doublet annotations and find that our methods perform at least as well as the state of the art, but at comparably little computational cost. We also find appreciable differences between methods and across data sets, that no approach dominates all others, and we believe there is room for improvement in computational doublet identification as more data with experimental annotations becomes available. In the meanwhile, scds presents a scalable, competitive approach that allows for doublet annotations in thousands of cells in a matter of seconds. Availability and Implementation: scds is implemented as an R package and freely available at https://github.com/kostkalab/scds.},
+    author = {Bais, Abha S and Kostka, Dennis},
+    doi = {10.1093/bioinformatics/btz698},
+    file = {:home/anthonys/Documents/PhD/Articles/Bais2019{\_}scds{\_}doublets{\_}scrnaseq.pdf:pdf},
+    issn = {1367-4803},
+    journal = {Bioinformatics},
+    pages = {1--9},
+    title = {{scds: computational annotation of doublets in single-cell RNA sequencing data}},
+    year = {2019}
+}
+
+
+@article{IlicicLowQual2016,
+    abstract = {Single-cell RNA sequencing (scRNA-seq) has broad applications across biomedical research. One of the key challenges is to ensure that only single, live cells are included in downstream analysis, as the inclusion of compromised cells inevitably affects data interpretation. Here, we present a generic approach for processing scRNA-seq data and detecting low quality cells, using a curated set of over 20 biological and technical features. Our approach improves classification accuracy by over 30 {\%} compared to traditional methods when tested on over 5,000 cells, including CD4+ T cells, bone marrow dendritic cells, and mouse embryonic stem cells.},
+    author = {Ilicic, Tomislav and Kim, Jong Kyoung and Kolodziejczyk, Aleksandra A. and Bagger, Frederik Otzen and McCarthy, Davis James and Marioni, John C. and Teichmann, Sarah A.},
+    doi = {10.1186/s13059-016-0888-1},
+    file = {:home/anthonys/Documents/PhD/Articles/Ilicic2016{\_}classification{\_}low{\_}quality{\_}cells{\_}scRNAseq.pdf:pdf},
+    isbn = {1305901608881},
+    issn = {1474760X},
+    journal = {Genome Biology},
+    number = {29},
+    pages = {1--15},
+    publisher = {Genome Biology},
+    title = {{Classification of low quality cells from single-cell RNA-seq data}},
+    url = {http://dx.doi.org/10.1186/s13059-016-0888-1},
+    volume = {17.1},
+    year = {2016}
+}
+
+
+@book{PapadimitriouHu1998,
+    author = {Papadimitriou, Christos H. and Steiglitz, Kenneth},
+    booktitle = {Courrier Corporation},
+    file = {:home/anthonys/Documents/PhD/Articles/Papadimitriou1998-Combinatorial{\_}optimization{\_}algorithms{\_}complexity.pdf:pdf},
+    isbn = {0486402584},
+    pages = {496},
+    title = {{Combinatorial optimization: algorithms and complexity}},
+    year = {1998}
+}
+
+
+@article{freytagComparison2018,
+    abstract = {Background: The commercially available 10x Genomics protocol to generate droplet-based single cell RNA-seq (scRNA-seq) data is enjoying growing popularity among researchers. Fundamental to the analysis of such scRNA-seq data is the ability to cluster similar or same cells into non-overlapping groups. Many competing methods have been proposed for this task, but there is currently little guidance with regards to which method to use. Methods: Here we use one gold standard 10x Genomics dataset, generated from the mixture of three cell lines, as well as multiple silver standard 10x Genomics datasets generated from peripheral blood mononuclear cells to examine not only the accuracy but also running time and robustness of a dozen methods. Results: We found that Seurat outperformed other methods, although performance seems to be dependent on many factors, including the complexity of the studied system. Furthermore, we found that solutions produced by different methods have little in common with each other. Conclusions: In light of this we conclude that the choice of clustering tool crucially determines interpretation of scRNA-seq data generated by 10x Genomics. Hence practitioners and consumers should remain vigilant about the outcome of 10x Genomics scRNA-seq analysis.},
+    author = {Freytag, Saskia and Tian, Luyi and L{\"{o}}nnstedt, Ingrid and Ng, Milica and Bahlo, Melanie},
+    doi = {10.12688/f1000research.15809.2},
+    file = {:home/anthonys/Documents/PhD/Articles/Freytag2019-Comparison{\_}clustering{\_}tools{\_}10xGenomics.pdf:pdf},
+    isbn = {2046-1402},
+    issn = {2046-1402},
+    journal = {F1000Research},
+    keywords = {10x Genomics,Benchmarking,Clustering,Single-Cell RNA-seq},
+    number = {1297},
+    pages = {1--29},
+    pmid = {30228881},
+    title = {{Comparison of clustering tools in R for medium-sized 10x Genomics single-cell RNA-sequencing data}},
+    url = {http://www.ncbi.nlm.nih.gov/pubmed/30228881{\%}0Ahttp://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=PMC6124389.2},
+    volume = {7},
+    year = {2018}
+}
+
+
+@article{haroTranslated2008,
+    abstract = {A framework for the regularized and robust estimation of non-uniform dimensionality and density in high dimensional noisy data is introduced in this work. This leads to learning stratifications, that is, mixture of manifolds representing different characteristics and complexities in the data set. The basic idea relies on modeling the high dimensional sample points as a process of translated Poisson mixtures, with regularizing restrictions, leading to a model which includes the presence of noise. The translated Poisson distribution is useful to model a noisy counting process, and it is derived from the noise-induced translation of a regular Poisson distribution. By maximizing the log-likelihood of the process counting the points falling into a local ball, we estimate the local dimension and density. We show that the sequence of all possible local countings in a point cloud formed by samples of a stratification can be modeled by a mixture of different translated Poisson distributions, thus allowing the presence of mixed dimensionality and densities in the same data set. With this statistical model, the parameters which best describe the data, estimated via expectation maximization, divide the points in different classes according to both dimensionality and density, together with an estimation of these quantities for each class. Theoretical asymptotic results for the model are presented as well. The presentation of the theoretical framework is complemented with artificial and real examples showing the importance of regularized stratification learning in high dimensional data analysis in general and computer vision and image analysis in particular.},
+    author = {Haro, Gloria and Randall, Gregory and Sapiro, Guillermo},
+    doi = {10.1007/s11263-008-0144-6},
+    file = {:home/anthonys/Documents/PhD/Articles/Haro2008-TranslatedPoissonMixtureModel.pdf:pdf},
+    journal = {Int. J. Comput. Vis.},
+    keywords = {clustering,density estimation,dimension estimation,manifold learning,mixture models,stratification learning,translated poisson},
+    pages = {358--374},
+    title = {{Translated Poisson Mixture Model for Stratification Learning}},
+    volume = {80.3},
+    year = {2008}
+}
+
+
+@article{ChungJackstraw2015,
+    abstract = {Motivation: There are a number of well-established methods such as principal component analysis (PCA) for automatically capturing systematic variation due to latent variables in large-scale genomic data. PCA and related methods may directly provide a quantitative characterization of a complex biological variable that is otherwise difficult to precisely define or model. An unsolved problem in this context is how to systematically identify the genomic variables that are drivers of systematic variation captured by PCA. Principal components (PCs) (and other estimates of systematic variation) are directly constructed from the genomic variables themselves, making measures of statistical significance artificially inflated when using conventional methods due to over-fitting. Results: We introduce a new approach called the jackstraw that allows one to accurately identify genomic variables that are statistically significantly associated with any subset or linear combination of PCs. The proposed method can greatly simplify complex significance testing problems encountered in genomics and can be used to identify the genomic variables significantly associated with latent variables. Using simulation, we demonstrate that our method attains accurate measures of statistical significance over a range of relevant scenarios. We consider yeast cell-cycle gene expression data, and show that the proposed method can be used to straightforwardly identify genes that are cell-cycle regulated with an accurate measure of statistical significance. We also analyze gene expression data from post-trauma patients, allowing the gene expression data to provide a molecularly driven phenotype. Using our method, we find a greater enrichment for inflammatory-related gene sets compared to the original analysis that uses a clinically defined, although likely imprecise, phenotype. The proposed method provides a useful bridge between large-scale quantifications of systematic variation and gene-level significance analyses.},
+    archivePrefix = {arXiv},
+    arxivId = {1308.6013},
+    author = {Chung, Neo Christopher and Storey, John D.},
+    doi = {10.1093/bioinformatics/btu674},
+    eprint = {1308.6013},
+    file = {:home/anthonys/Documents/PhD/Articles/Chung2015{\_}Jackstraw{\_}dimensions{\_}finder.pdf:pdf},
+    issn = {14602059},
+    journal = {Bioinformatics},
+    number = {4},
+    pages = {545--554},
+    title = {{Statistical significance of variables driving systematic variation in high-dimensional data}},
+    volume = {31},
+    year = {2015}
+}
+
+
+@inproceedings{AlberganteSepar2019,
+    abstract = {Modern large-scale datasets are frequently said to be high-dimensional. However, their data point clouds frequently possess structures, significantly decreasing their intrinsic dimensionality (ID) due to the presence of clusters, points being located close to low-dimensional varieties or fine-grained lumping. We introduce and test a dimensionality estimator, based on analysing the separability properties of data points, on several benchmarks and real biological datasets. We show that the introduced measure of ID has performance competitive with state-of-the-art measures, being efficient across a wide range of dimensions and performing better in the case of noisy samples. Moreover, it allows estimating the intrinsic dimension in situations where the intrinsic manifold assumption is not valid.},
+    archivePrefix = {arXiv},
+    arxivId = {arXiv:1901.06328v1},
+    author = {Albergante, Luca and Bac, Jonathan and Zinovyev, Andrei},
+    booktitle = {International Joint Conference on Neural Networks (IJCNN)},
+    doi = {10.1109/IJCNN.2019.8852450},
+    eprint = {arXiv:1901.06328v1},
+    file = {:home/anthonys/Documents/PhD/Articles/Albergante2019-EffectiveDim{\_}FisherSeparabilityAnalysis.pdf:pdf},
+    pages = {1--8},
+    publisher = {IEEE},
+    title = {{Estimating the effective dimension of large biological datasets using Fisher separability analysis}},
+    year = {2019}
+}
+
+
+@article{lin_evaluating_2018,
+	title = {Evaluating stably expressed genes in single cells},
+	copyright = {© 2018, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution-NonCommercial-NoDerivs 4.0 International), CC BY-NC-ND 4.0, as described at http://creativecommons.org/licenses/by-nc-nd/4.0/},
+	url = {https://www.biorxiv.org/content/10.1101/229815v2},
+	doi = {10.1101/229815},
+	language = {en},
+	urldate = {2019-04-21},
+	journal = {bioRxiv},
+	author = {Lin, Yingxin and Ghazanfar, Shila and Strbenac, Dario and Wang, Andy and Patrick, Ellis and Lin, Dave and Speed, Terence and Yang, Jean YH and Yang, Pengyi},
+	month = nov,
+	year = {2018},
+	pages = {229815},
+	file = {Full Text PDF:/home/pigerm/Zotero/storage/7N9W6U3G/Lin et al. - 2018 - Evaluating stably expressed genes in single cells.pdf:application/pdf;Snapshot:/home/pigerm/Zotero/storage/HBYB4N55/229815v2.html:text/html}
+}
