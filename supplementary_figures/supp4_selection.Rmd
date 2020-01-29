@@ -13,9 +13,7 @@ if(!exists('FIG_NB')){
     FIG_NB
   }
 }
-```
 
-```{r}
 suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
@@ -32,15 +30,16 @@ source("../misc_functions.R")
 gi <- readRDS("../data/GI.rds")
 
 layout(matrix(1:4,nrow=2,byrow=TRUE))
-LSD::heatscatter(gi$mixology10x3cl$vst.R2, gi$mixology10x3cl$lognorm.R2, xlab="Prop variance explained based, sctransform", ylab="Prop variance explained, standard seurat normalization", main="A. Variance explained by real subpopulations (mixology10x3cl)")
+par(mar= c(7, 4, 5, 2) + 0.1)
+LSD::heatscatter(gi$mixology10x3cl$vst.R2, gi$mixology10x3cl$lognorm.R2, xlab="Prop var explained based, sctransform", ylab="Prop var explained, lognorm", main="A. Var explained by subpopulations\n(mixology10x3cl)", cex.main=0.8)
 
-LSD::heatscatter(gi$mixology10x3cl$devianceExplained, gi$mixology10x3cl$vst.R2, xlab="Deviance explained by real subpopulations", ylab="sctransform-based variance explained", , main="B. Variance explained vs deviance explained (mixology10x3cl)")
+LSD::heatscatter(gi$mixology10x3cl$devianceExplained, gi$mixology10x3cl$vst.R2, xlab="Deviance explained by subpopulations", ylab="sctransform-based variance explained", , main="B. Var explained vs deviance explained\n(mixology10x3cl)", cex.main=0.8)
 
 diffplot <- function(x, title=""){
-  LSD::heatscatter(x$log10_mean_counts, x$devianceExplained - x$vst.R2, xlab="log10(mean counts)", ylab="Prop deviance explained - prop variance explained", main=title)
+  LSD::heatscatter(x$log10_mean_counts, x$devianceExplained - x$vst.R2, xlab="log10(mean counts)", ylab="Prop deviance explained - prop variance explained", main=title, cex.main=0.8)
 }
-diffplot(gi$mixology10x3cl, "C. Difference between the estimates (mixology10x3cl)")
-diffplot(gi$Zhengmix4eq, "D. Difference between the estimates (Zhengmix4eq)")
+diffplot(gi$mixology10x3cl, "C. Difference between the estimates\n(mixology10x3cl)")
+diffplot(gi$Zhengmix4eq, "D. Difference between the estimates\n(Zhengmix4eq)")
 ```
 
 ### Supplementary Figure `r getFigNb()`
@@ -52,12 +51,15 @@ diffplot(gi$Zhengmix4eq, "D. Difference between the estimates (Zhengmix4eq)")
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
+```{r, include=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
   cumVE2(gi[[x]], gi[[x]]$vst.R2) + xlim(0,2000) + ggtitle(x) + ylab("Cumulative var explained") + theme(legend.position="none")
 })
 #ggpubr::ggarrange(plotlist=ll, common.legend = TRUE, ncol=2, nrow=4, labels=LETTERS[1:length(ll)])
 ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
+```
+
+```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
 plot_grid(plotlist=ll, ncol=2)
 ```
 
@@ -69,11 +71,15 @@ Proportion of the cumulative _variance_ explained by real subpulations that is r
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
+```{r, include=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
   cumVE2(gi[[x]], gi[[x]]$devianceExplained) + xlim(0,2000) + ggtitle(x) + ylab("cumul deviance explained") + theme(legend.position="none")
 })
 ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
+plot_grid(plotlist=ll, ncol=2)
+```
+
+```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
 plot_grid(plotlist=ll, ncol=2)
 ```
 
@@ -85,23 +91,44 @@ Proportion of the cumulative _deviance_ explained by real subpulations that is r
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=6}
-res <- readRDS("../../resNew/sel_intermediateSummary.rds")
-r2 <- res$dimreduction$PC.R2
-r2 <- r2[grep("1000$",r2$method),]
-r2 <- r2[grep("doublet.pl deffilter",r2$method,fixed=T),]
-r2$norm <- reduceMethodNames(r2$method,3)
-r2$method <- reduceMethodNames(r2$method,4)
-r2 <- r2[which(r2$dim <= 5),]
-r2$R.on.Clusters <- sqrt(r2$value)
-r3 <- lapply(split(r2, r2$norm), FUN=function(x){ 
-  cast2(x, formula=method~dataset, value.var="R.on.Clusters")
-})
-chm(r3[-1], scale="column", scaleTitle="z-score", value_format="%.2f", row_sortFn=median, sameScale=TRUE)
+```{r, fig.width=8, fig.height=9}
+res <- readRDS("../data/results_selection.rds")
+cl <- res$clustering
+cl <- cl[grep("devianceExplained|varExp", row.names(cl), invert=TRUE),]
+vst <- cl[grep("seuratvst",row.names(cl)),]
+snorm <- cl[grep("seuratvst",row.names(cl), invert=TRUE),]
+
+ds <- sapply(strsplit(colnames(cl)," "), FUN=function(x) x[1])
+ds <- split(seq_len(ncol(cl)), ds)
+ds <- ds[grep("stepElapsed",names(ds),invert=TRUE)]
+myag <- function(cl, out="ARI", trueK=FALSE){
+  y <- lapply(ds, FUN=function(x){
+    x <- cl[,x]
+    colnames(x) <- sapply(strsplit(colnames(x)," "), FUN=function(x) x[2])
+    x <- parsePipNames(x)
+    if(!trueK) return( aggregate( x[,out], 
+                                  by=list(method=x$sel, nb=x$selnb), 
+                                  na.rm=TRUE, FUN=mean) )
+    w <- which(x$n_clus==x$true.nbClusts)
+    aggregate(x[w,out], by=list(method=x$sel[w], nb=x$selnb[w]), na.rm=TRUE, FUN=mean)
+  })
+  bind_rows(y, .id="dataset")
+}
+vst.ARIatK <- myag(vst, trueK=TRUE)
+snorm.ARIatK <- myag(snorm, trueK=TRUE)
+
+cols <- getQualitativePalette(9)
+names(cols) <- unique(vst.ARIatK$method)
+
+plot_grid( 
+  ggplot(vst.ARIatK, aes(nb, x, colour=method)) + geom_line(size=1.3) +facet_wrap(~dataset, scales="free") + scale_color_manual(values = cols) + xlab("Number of genes selected") + ylab("ARI at true # of clusters") + theme(axis.text=element_text(size=10)),
+  ggplot(snorm.ARIatK, aes(nb, x, colour=method)) + geom_line(size=1.3) +facet_wrap(~dataset, scales="free") + scale_color_manual(values = cols) + xlab("Number of genes selected") + ylab("ARI at true # of clusters") + theme(axis.text=element_text(size=10)),
+  nrow=2, labels = LETTERS[1:2]
+)
 ```
 
 ### Supplementary Figure `r getFigNb()`
 
-Proportion of the variance in the first 5 principal components that is explained by real subpopulations according to different normalization and selection procedures, selecting 1000 genes in each case.
+Clustering accuracy according to the number of genes selected using various ranking/selection methods. **A:** Based on sctransform, **B:** Based on standard Seurat normalization.
 
 \newpage

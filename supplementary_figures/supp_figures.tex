@@ -31,7 +31,6 @@
 \urlstyle{same}  % don't use monospace font for urls
 \usepackage{natbib}
 \bibliographystyle{plainnat}
-\usepackage{longtable,booktabs}
 \usepackage{graphicx,grffile}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -85,7 +84,7 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{18 Mai, 2019}
+    \date{29 Januar, 2020}
 
 
 \begin{document}
@@ -162,7 +161,7 @@ control variables, deviation from this ratio.
 \section{Supplementary Figure 5}\label{supplementary-figure-5}}
 
 \includegraphics{supp_figures_files/figure-latex/misclass-1.pdf} \vfill
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-7-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 \hypertarget{supplementary-figure-5-1}{%
 \subsubsection{Supplementary Figure 5}\label{supplementary-figure-5-1}}
@@ -182,9 +181,9 @@ subpopulation median misclassification rate.
 \hypertarget{supplementary-figure-6}{%
 \section{Supplementary Figure 6}\label{supplementary-figure-6}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-10-1.pdf}
 \vfill
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 \hypertarget{supplementary-figure-6-1}{%
 \subsubsection{Supplementary Figure 6}\label{supplementary-figure-6-1}}
@@ -200,7 +199,7 @@ tend to have a higher misclassification rate.
 \hypertarget{supplementary-figure-7}{%
 \section{Supplementary Figure 7}\label{supplementary-figure-7}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-10-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 \hypertarget{supplementary-figure-7-1}{%
 \subsubsection{Supplementary Figure 7}\label{supplementary-figure-7-1}}
@@ -214,147 +213,57 @@ Supplementary Figure 5 for more information.
 \hypertarget{supplementary-figure-8}{%
 \section{Supplementary Figure 8}\label{supplementary-figure-8}}
 
-\includegraphics{supp_figures_files/figure-latex/filt_more_ari-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/filt_more-1.pdf}
 
 \hypertarget{supplementary-figure-8-1}{%
 \subsubsection{Supplementary Figure 8}\label{supplementary-figure-8-1}}
 
-\textbf{A:} Adjusted rand index (ARI) of various clustering pipelines
-using various combinations of filtering criteria. Only clustering
-analyses with a number of clusters +/-1 from the real number of clusters
-were considered. In general, filtering more does not result in more
-accurate clustering. \textbf{B:} Percentage of cells filtered out per
-subpopulation, using various combination of filters (see methods).
+Mean clustering F1 score per subpopulation, mean F1 at true number of
+clusters, as well as maximum and median proportion of excluded cells per
+subpopulation across various filtering strategies. Doublet removal
+generally improves clustering accuracy with very mild exclusion rates,
+even in datasets that do not have heterotypic doublets. Stringent
+distribution-based filtering creates large cell type biases.
 
 \newpage
 
 \hypertarget{supplementary-figure-9}{%
 \section{Supplementary Figure 9}\label{supplementary-figure-9}}
 
-\begin{verbatim}
-## lm(ARI~nbClusters*dataset+norm+factor(filt.times)+factor(filt.MADs)+counts.lower+counts.higher+mt.higher+feat.lower+feat.higher+top50.lower+top50.higher+ratiodist.lower+ratiodist.higher)
-\end{verbatim}
-
-\begin{longtable}[]{@{}lrrrr@{}}
-\toprule
-& Estimate & Std. Error & t value & p value\tabularnewline
-\midrule
-\endhead
-normnorm.seuratvst & 0.0069338 & 0.0003104 & 22.3415248 &
-0.0000000\tabularnewline
-factor(filt.times)2 & 0.0086024 & 0.0003617 & 23.7847962 &
-0.0000000\tabularnewline
-factor(filt.times)3 & 0.0168470 & 0.0003811 & 44.2112922 &
-0.0000000\tabularnewline
-factor(filt.MADs)2.5 & -0.0040702 & 0.0004199 & -9.6944075 &
-0.0000000\tabularnewline
-factor(filt.MADs)3 & -0.0054701 & 0.0004202 & -13.0177667 &
-0.0000000\tabularnewline
-factor(filt.MADs)5 & -0.0025099 & 0.0004205 & -5.9684908 &
-0.0000000\tabularnewline
-counts.lowerTRUE & -0.0001193 & 0.0003534 & -0.3375833 &
-0.7356780\tabularnewline
-counts.higherTRUE & -0.0073031 & 0.0003552 & -20.5607582 &
-0.0000000\tabularnewline
-mt.higherTRUE & 0.0006318 & 0.0007765 & 0.8136392 &
-0.4158539\tabularnewline
-feat.lowerTRUE & 0.0002074 & 0.0003494 & 0.5934348 &
-0.5528917\tabularnewline
-feat.higherTRUE & -0.0058113 & 0.0003506 & -16.5729653 &
-0.0000000\tabularnewline
-top50.lowerTRUE & -0.0000717 & 0.0003045 & -0.2354817 &
-0.8138354\tabularnewline
-top50.higherTRUE & -0.0000717 & 0.0003045 & -0.2354817 &
-0.8138354\tabularnewline
-ratiodist.lowerTRUE & -0.0009712 & 0.0003045 & -3.1895182 &
-0.0014256\tabularnewline
-ratiodist.higherTRUE & 0.0012337 & 0.0003045 & 4.0515679 &
-0.0000509\tabularnewline
-\bottomrule
-\end{longtable}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-15-1.pdf}
 
 \hypertarget{supplementary-figure-9-1}{%
 \subsubsection{Supplementary Figure 9}\label{supplementary-figure-9-1}}
 
-Linear regression analysis of ARI on various filtering criteria,
-correcting for the effect of the number of clusters. Increasing the
-number of distributions on which a cell must deviate in order to be
-excluded (\texttt{filt.times}) tended to be positively associated with
-ARI, while increasing the number of median absolute deviations required
-to be an outlier (\texttt{filt.MADs}) was associated with a decrease in
-ARI.
-
-\newpage
+Impact of restricting the type of features used on the ARI of the
+clustering. \newpage
 
 \hypertarget{supplementary-figure-10}{%
 \section{Supplementary Figure 10}\label{supplementary-figure-10}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-14-1.pdf}
-
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-15-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/norm_nbClusters-1.pdf}
 
 \hypertarget{supplementary-figure-10-1}{%
 \subsubsection{Supplementary Figure
 10}\label{supplementary-figure-10-1}}
 
-Impact of the set of filters on the average silhouette width of the
-subpopulations (top) and on the proportion of variance in the first
-components explained by clusters (bottom).
-
-\newpage
+Mean difference between the number of detected clusters and the number
+of real subpopulations, depending on the normalization method, the
+resolution and the number of dimensions used. The Kumar dataset is not
+shown here due to a lack of variation in the number of clusters
+detected. A rough ANOVA on
+\texttt{nbClusters\textasciitilde{}dataset+norm+dims+resolution}
+suggests that seuratvst (sctransform) is associated with a higher number
+of clusters (p\textasciitilde{}0.002).
 
 \hypertarget{supplementary-figure-11}{%
 \section{Supplementary Figure 11}\label{supplementary-figure-11}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-19-1.pdf}
 
 \hypertarget{supplementary-figure-11-1}{%
 \subsubsection{Supplementary Figure
 11}\label{supplementary-figure-11-1}}
-
-Impact of restricting the type of features used on the ARI of the
-clustering. \newpage
-
-\hypertarget{supplementary-figure-12}{%
-\section{Supplementary Figure 12}\label{supplementary-figure-12}}
-
-\includegraphics{supp_figures_files/figure-latex/norm_r2-1.pdf}
-
-\hypertarget{supplementary-figure-12-1}{%
-\subsubsection{Supplementary Figure
-12}\label{supplementary-figure-12-1}}
-
-\textbf{A:} Correlation between library size (left) or the number of
-detected features (right) and the residuals of a linear regression of
-the first principal component on the subpopulation. \textbf{B:}
-Proportion of the variance in the first 10 PCA components that is
-explained by real subpopulations. The square-root of R-squared values is
-plotted for ease of visualization.
-
-\newpage
-
-\hypertarget{supplementary-figure-13}{%
-\section{Supplementary Figure 13}\label{supplementary-figure-13}}
-
-\includegraphics{supp_figures_files/figure-latex/norm_silwidth-1.pdf}
-
-\hypertarget{supplementary-figure-13-1}{%
-\subsubsection{Supplementary Figure
-13}\label{supplementary-figure-13-1}}
-
-Mean silhouette width of true subpopulations across the first 10
-components with different normalization and scaling approaches.
-
-\newpage
-
-\hypertarget{supplementary-figure-14}{%
-\section{Supplementary Figure 14}\label{supplementary-figure-14}}
-
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-21-1.pdf}
-
-\hypertarget{supplementary-figure-14-1}{%
-\subsubsection{Supplementary Figure
-14}\label{supplementary-figure-14-1}}
 
 \textbf{A:} Comparison of the gene-wise proportion of variance explained
 by real subpopulations based on Seurat's standard log normalization and
@@ -371,12 +280,10 @@ lowly-expressed ones.
 
 \newpage
 
-\hypertarget{supplementary-figure-15}{%
-\section{Supplementary Figure 15}\label{supplementary-figure-15}}
+\hypertarget{supplementary-figure-12}{%
+\section{Supplementary Figure 12}\label{supplementary-figure-12}}
 
 \begin{verbatim}
-## Warning: Removed 328867 rows containing missing values (geom_path).
-
 ## Warning: Removed 328867 rows containing missing values (geom_path).
 \end{verbatim}
 
@@ -404,11 +311,11 @@ lowly-expressed ones.
 ## Warning: Removed 96012 rows containing missing values (geom_path).
 \end{verbatim}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-22-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-21-1.pdf}
 
-\hypertarget{supplementary-figure-15-1}{%
+\hypertarget{supplementary-figure-12-1}{%
 \subsubsection{Supplementary Figure
-15}\label{supplementary-figure-15-1}}
+12}\label{supplementary-figure-12-1}}
 
 Proportion of the cumulative \emph{variance} explained by real
 subpulations that is retrieved through the selection. For each gene, we
@@ -420,12 +327,10 @@ horizontal line at 1.
 
 \newpage
 
-\hypertarget{supplementary-figure-16}{%
-\section{Supplementary Figure 16}\label{supplementary-figure-16}}
+\hypertarget{supplementary-figure-13}{%
+\section{Supplementary Figure 13}\label{supplementary-figure-13}}
 
 \begin{verbatim}
-## Warning: Removed 328867 rows containing missing values (geom_path).
-
 ## Warning: Removed 328867 rows containing missing values (geom_path).
 \end{verbatim}
 
@@ -455,29 +360,72 @@ horizontal line at 1.
 
 \includegraphics{supp_figures_files/figure-latex/unnamed-chunk-23-1.pdf}
 
-\hypertarget{supplementary-figure-16-1}{%
+\hypertarget{supplementary-figure-13-1}{%
 \subsubsection{Supplementary Figure
-16}\label{supplementary-figure-16-1}}
+13}\label{supplementary-figure-13-1}}
 
 Proportion of the cumulative \emph{deviance} explained by real
 subpulations that is retrieved through the selection. For each gene, we
 compute the proportion of the variance explained by real subpopulations.
-As for Supplementary Figure 15, except using deviance explained.
+As for Supplementary Figure 12, except using deviance explained.
 
 \newpage
+
+\hypertarget{supplementary-figure-14}{%
+\section{Supplementary Figure 14}\label{supplementary-figure-14}}
+
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+\hypertarget{supplementary-figure-14-1}{%
+\subsubsection{Supplementary Figure
+14}\label{supplementary-figure-14-1}}
+
+Clustering accuracy according to the number of genes selected using
+various ranking/selection methods. \textbf{A:} Based on sctransform,
+\textbf{B:} Based on standard Seurat normalization.
+
+\newpage
+
+\hypertarget{supplementary-figure-15}{%
+\section{Supplementary Figure 15}\label{supplementary-figure-15}}
+
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-27-1.pdf}
+
+\hypertarget{supplementary-figure-15-1}{%
+\subsubsection{Supplementary Figure
+15}\label{supplementary-figure-15-1}}
+
+Mean difference between the number of detected clusters and the number
+of real subpopulations, depending on the resolution and number of
+dimensions used. Based on sctransform and seurat PCA. Increasing the
+number of dimensions tends to decrease the number of identified
+clusters, especially at resolutions around the default value.
+
+\newpage
+
+\hypertarget{supplementary-figure-16}{%
+\section{Supplementary Figure 16}\label{supplementary-figure-16}}
+
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\hypertarget{supplementary-figure-16-1}{%
+\subsubsection{Supplementary Figure
+16}\label{supplementary-figure-16-1}}
+
+Adjusted Rand Index of clustering depending on the resolution and number
+of dimensions used. Based on sctransform and seurat PCA.
 
 \hypertarget{supplementary-figure-17}{%
 \section{Supplementary Figure 17}\label{supplementary-figure-17}}
 
-\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-24-1.pdf}
+\includegraphics{supp_figures_files/figure-latex/unnamed-chunk-31-1.pdf}
 
 \hypertarget{supplementary-figure-17-1}{%
 \subsubsection{Supplementary Figure
 17}\label{supplementary-figure-17-1}}
 
-Proportion of the variance in the first 5 principal components that is
-explained by real subpopulations according to different normalization
-and selection procedures, selecting 1000 genes in each case.
+Difference between the number of detected clusters and the number of
+real subpopulations according to different clustering paramters.
 
 \newpage
 

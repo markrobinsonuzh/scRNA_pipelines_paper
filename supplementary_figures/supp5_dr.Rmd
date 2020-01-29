@@ -31,71 +31,6 @@ source("../misc_functions.R")
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=8, fig.height=8}
-res <- readRDS("../data/dr_intermediateSummary.rds")
-sw <- res$dimreduction$clust.avg.silwidth[[1]]
-colnames(sw) <- reduceMethodNames(colnames(sw),c(3,4,6))
-colnames(sw) <- gsub("norm.","",colnames(sw),fixed=T)
-sw <- matrix(unlist(sw),ncol=ncol(sw), dimnames=dimnames(sw))
-df <- data.frame(Norm=reduceMethodNames(colnames(sw),1), Selection=reduceMethodNames(colnames(sw),2), DimRed=reduceMethodNames(colnames(sw),3), stringsAsFactors=FALSE)
-df$Norm[grep("GlmPCA", df$DimRed)] <- ""
-ag <- aggregate(t(sw), by=df, FUN=median)
-ag <- ag[order(ag[,3],ag[,1],ag[,2]),]
-sw2 <- t(ag[,-1:-3])
-colnames(sw2) <- apply(ag[,c(1,3)],1,collapse=" ",FUN=paste)
-
-# hma <- HeatmapAnnotation(df=data.frame(meanSilWidth=rowMeans(sw2), dataset=reduceMethodNames(row.names(sw),1)))
-# chm(list("Cluster mean silhouette width"=t(sw2)), scaleTitle="meanSilWidth", scale="none", show_row_names=TRUE, show_column_names=FALSE, row_ann=ag[,1:3], top_annotation=hma, cluster_rows=FALSE)
-
-hma <- HeatmapAnnotation(df=ag[,1:3])
-chm(list("Cluster mean silhouette width"=sw2), scaleTitle="meanSilWidth", scale="none", row_ann=data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1)), show_row_names=FALSE, top_annotation=hma)
-```
-
-### Supplementary Figure `r getFigNb()`
-Average silhouette width of real subpopulations when using the first 10 components of different dimensionality reductions. Weighing the components according to their variance increases the distinctiveness of the subpopulations. Nevertheless, Seurat's standard PCA appears superior to the alternatives.
-
-
-\newpage
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r, fig.width=8.5, fig.height=5}
-r2 <- res$dimreduction$PC.R2
-r2$norm <- gsub("norm.","",reduceMethodNames(r2$method,6),fixed=T)
-r2 <- r2[which(r2$dim <= 10),]
-r2$R.on.Clusters <- sqrt(r2$value)
-r3 <- cast2(r2, formula=norm~dataset, value.var="R.on.Clusters")
-r2m <- dplyr::summarise(group_by(r2,dataset), meanR=mean(R.on.Clusters))
-ggplot(r2, aes(norm, R.on.Clusters, fill=norm)) + geom_violin() + facet_wrap(~dataset, nrow=1) + coord_flip() + theme(legend.position="none") + stat_summary(fun.y="mean", geom="point") + geom_hline(data=r2m, aes(yintercept=meanR)) + ggtitle("Proportion of the top dimensions explained by subpopulations") + ylab("sqrt(R^2) of dimension ~ subpopulation") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-```
-
-### Supplementary Figure `r getFigNb()`
-
-Proportion of the variance in the first 10 principal components that is explained by real subpopulations according to different dimensionality reduction methods.
-
-\newpage
-
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-
-```{r}
-res <- readRDS("../data/dr_endSummary.rds")
-res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1),]
-ll <- lapply(split(res2, res2$norm), FUN=function(x){
-  m2 <- cast2(x, formula=dr~dataset, fun.aggregate=median, value.var="ARI")
-})
-
-chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x){ median(x,na.rm=T) }, cluster_columns=FALSE)
-```
-
-### Supplementary Figure `r getFigNb()`
-ARI of the clustering based on different normalization and dimensionality reduction procedures.
-
-\newpage
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
 
 ```{r, fig.width=8, fig.height=8.5}
 library(viridis)
@@ -127,7 +62,7 @@ library(viridis)
 res <- readRDS("../data/clust_endSummary.rds")
 res2 <- res[which(res$clust=="clust.seurat" & res$k==20 & res$dims>2 & res$resolution > 0.05 & res$resolution <= 1),]
 res2 <- res2[which(res2$dr=="seurat.pca" & res2$dataset!="Kumar"),]
-res3 <- aggregate(res2[,"ARI"], by=res2[,c("dataset","dims","resolution")], FUN=mean)
+res3 <- aggregate(res2[,"ARI",drop=FALSE], by=res2[,c("dataset","dims","resolution")], FUN=mean)
 ll <- lapply(split(res3, res3$dataset), FUN=function(x){
   ggplot(x, aes(factor(dims), factor(resolution), fill=ARI)) + stat_bin2d() + 
     scale_fill_viridis() + ylab("Resolution") + xlab("Number of dimensions") +

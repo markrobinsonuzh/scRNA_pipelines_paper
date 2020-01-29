@@ -25,10 +25,11 @@ suppressPackageStartupMessages({
   library(pheatmap)
 })
 suppressMessages(devtools::load_all("../../pipComp/"))
-
+theme_set(theme_cowplot(font_size = 12))
 # we load the datasets
 lf <- list.files("../datasets/", full.names=TRUE)
 names(lf) <- gsub(".SCE.rds", "", basename(lf), fixed=TRUE)
+lf <- lf[grep("simMix", lf, invert=TRUE)]
 SCEs <- lapply(lf, readRDS)
 ```
 
@@ -48,8 +49,6 @@ plot_grid(plotlist=lapply(1:length(vars), FUN=function(x){
              axis.text=element_text(size=11) )
 }), nrow=1)
 ```
-
-
 
 ### Supplementary Figure `r getFigNb()`
 Distribution across cells of various control properties in the different datasets. The 
@@ -130,7 +129,7 @@ There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` d
 # Supplementary Figure `r getFigNb(TRUE)`
 
 ```{r misclass, fig.height=4}
-theme_set(theme_cowplot(font_size = 11))
+theme_set(theme_cowplot(font_size = 10))
 mis <- readRDS("../data/misclassification.rds")
 pdb <- function(x, ...){
   n <- names(mis)[x]

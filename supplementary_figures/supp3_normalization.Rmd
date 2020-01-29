@@ -26,68 +26,9 @@ suppressPackageStartupMessages({
 })
 suppressMessages(devtools::load_all("../../pipComp/"))
 data(datasets)
+theme_set(theme_cowplot(font_size = 11))
 source("../misc_functions.R")
 ```
-
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r norm_r2, fig.width=8, fig.height=9}
-res <- readRDS("../../resNew/norm2_intermediateSummary.rds")
-r2 <- res$dimreduction$PC.R2
-r2$norm <- gsub("norm.","",reduceMethodNames(r2$method,3),fixed=T)
-r2 <- r2[which(r2$dim <= 10),]
-r2$R.on.Clusters <- sqrt(r2$value)
-r3 <- cast2(r2, formula=norm~dataset, value.var="R.on.Clusters")
-r2m <- dplyr::summarise(group_by(r2,dataset), meanR=mean(R.on.Clusters))
-p1 <- ggplot(r2, aes(norm, R.on.Clusters, fill=norm)) + geom_violin() + facet_wrap(~dataset, nrow=1) + coord_flip() + theme(legend.position="none") + stat_summary(fun.y="mean", geom="point") + geom_hline(data=r2m, aes(yintercept=meanR)) + ggtitle("Proportion of the top dimensions explained by real clusters") + ylab("sqrt(R^2) of dimension ~ real subpopulation")
-
-pc1.covar <- lapply( res$dimreduction$PC1.covarR[2:3], FUN=function(x){
-  x <- aggregate(x, by=list(reduceMethodNames(row.names(x), 3)), FUN=median)
-  row.names(x) <- x[,1]
-  x[,1] <- NULL
-  x
-})
-names(pc1.covar) <- c("Correlation with log10-counts", "Correlation with nb features")
-p2 <- grid.grabExpr(draw(chm(pc1.covar, sameScale=TRUE, scaleTitle="cor", value_format="%.2f", row_sortFn=median)))
-plot_grid(p2, p1, labels=LETTERS[1:2], nrow=2)
-```
-
-### Supplementary Figure `r getFigNb()`
-**A:** Correlation between library size (left) or the number of detected features (right) and the residuals of a linear regression of the first principal component on the subpopulation.
-**B:** Proportion of the variance in the first 10 PCA components that is explained by real subpopulations. The square-root of R-squared values is plotted for ease of visualization.
-
-\newpage
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r norm_silwidth, fig.width=8, fig.height=4.5}
-res <- readRDS("../../resNew/norm2_intermediateSummary.rds")
-sw <- res$dimreduction$clust.avg.silwidth[[1]]
-colnames(sw) <- gsub("norm.","",reduceMethodNames(colnames(sw), 2:3),fixed=T)
-filter <- factor(reduceMethodNames(colnames(sw),1), levels=c("lenientfilter", "clustFilterStringent", "deffilter", "stringentfilter"))
-levels(filter) <- c("lenient", "stringent cluster-wise", "default", "stringent")
-filtCols <- c(default="#4477AA", lenient="#117733", "stringent cluster-wise"="#DDCC77", stringent="#CC6677")
-o <- order(reduceMethodNames(colnames(sw),2), filter)
-filter <- filter[o]
-sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)), o]
-ra <- data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1))
-colnames(sw) <- reduceMethodNames(colnames(sw),2)
-w <- 4*1:(ncol(sw)/4)-2
-colnames(sw)[-w] <- ""
-chm(list("Cluster mean silhouette width"=sw), scaleTitle="row z-score", scale="row", row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter, col=list(Filter=filtCols)))
-```
-
-```{r norm_silwidth2, fig.width=8, fig.height=4}
-w <- order(ra$meanSilWidth)[1:10]
-sw2 <- sw[w,]
-chm(list("Cluster mean silhouette width"=sw2), scaleTitle="Mean\nSilhouette\nWidth", show_row_names=TRUE, cluster_rows=FALSE, cluster_columns=FALSE, top_annotation=HeatmapAnnotation(Filter=filter, col=list(Filter=filtCols)))
-```
-
-### Supplementary Figure `r getFigNb()`
-Mean silhouette width of true subpopulations across the first 10 components with different normalization and scaling approaches. Above the silhouette widths are scaled for each subpopulation; below the subpopulations with the lowest mean silhouette width are represented.
-
-\newpage
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
@@ -117,8 +58,10 @@ for(i in names(ll)){
   }
 }
 ll[[4]] <- ll[[4]] + ylab("Number of dimensions")
+
+mod <- summary(lm(nbClusters~dataset+norm+dims+resolution, data=res2))
 plot_grid(plotlist = ll[-2], nrow=6, rel_heights=c(1,1,1,1,1,1.5))
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected.
+Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected. A rough ANOVA on `nbClusters~dataset+norm+dims+resolution` suggests that seuratvst (sctransform) is associated with a higher number of clusters (p~`r round(mod$coefficients["normnorm.seuratvst",4],3)`).

@@ -15,7 +15,7 @@ if(!exists('FIG_NB')){
 }
 ```
 
-```{r}
+```{r, include=FALSE}
 suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
@@ -25,94 +25,77 @@ suppressPackageStartupMessages({
   library(knitr)
   library(circlize)
 })
-suppressMessages(devtools::load_all("../../pipComp/"))
+suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
-data(datasets)
+load("../../pipComp/data/datasets.RData")
 ```
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r filt_more_ari, fig.width=8, fig.height=6.5}
-res <- readRDS("../data/filtering_old.rds")
-res$pcCells <- round(100*res$nbCells/datasets[as.character(res$dataset),"nbCells"],2)
-# we restrict to analyses that gave a number of clusters close to reality:
-res2 <- res[which(abs(res$nbClusters-datasets[as.character(res$dataset), "subpopulations"])<=1),]
-p1 <- ggplot(res2, aes(x=pcCells, y=ARI, colour=norm)) + geom_point() + facet_wrap(~dataset, scale="free")
+```{r filt_more, fig.width=8, fig.height=9}
+res <- readRDS("../data/results_filtering.rds")
+m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
+m <- m[grep("veryStringent", m$method, invert=TRUE),]
 
-fres <- readRDS("../../resNew/filtering_intermediateSummary.rds")
-pc <- fres$filtering$pcCells
-pc <- pc[grep("doublet",row.names(pc),invert=T),]
-row.names(pc) <- reduceMethodNames(row.names(pc),2)
-ha <- HeatmapAnnotation(dataset=reduceMethodNames(colnames(pc),1))
-# shortDSNames <- c("mixology10x3cl"="mix3cl", "mixology10x5cl"="mix5cl", "Zhengmix4eq"="Zh4eq", "Zhengmix4uneq"="Zh4uneq", "Zhengmix8eq"="Zh8eq")
-# colnames(pc) <- paste(shortDSNames[reduceMethodNames(colnames(pc),1)], reduceMethodNames(colnames(pc),2))
-# p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha)))
+# # horizontal version
+# m <- m[grep("veryStringent", m$method, invert=TRUE),]
+# m.f1 <- reshape2::dcast(m, method~dataset, value.var="F1atK")
+# n <- sapply(strsplit(gsub("=",".",m.f1[,1]),"\\."),FUN=function(x) rev(x)[1])
+# n[grep("=doublet", m.f1[,1])] <- paste0("doubletRemoval+",n[grep("=doublet", m.f1[,1])])
+# m.pc <- reshape2::dcast(m, method~dataset, value.var="maxPCout")[,-1]
+# m.f1m <- reshape2::dcast(m, method~dataset, value.var="meanF1")[,-1]
+# m.pcm <- reshape2::dcast(m, method~dataset, value.var="medianPCout")[,-1]
+# m.f1 <- m.f1[,-1]
+# row.names(m.f1m) <- row.names(m.pcm) <- row.names(m.f1) <- row.names(m.pc) <- n
+# 
+# chm(list("mean F1"=m.f1m, "F1 at true \n# clusters"=m.f1, "max % lost per\nsubpopulation"=m.pc, "median % lost per\nsubpopulation"=m.pcm), scale = "column", colors = viridis::inferno(3), value_format = c("%.2f","%.2f","%.0f","%.0f"), scaleFn=list(scale,scale, scale2,scale2), cluster_columns = FALSE,  row_sortFn = function(x, na.rm){ sum(x[1:18],na.rm=TRUE)-median(x[19:36], na.rm=TRUE)/100})
 
-pal <- colorRamp2(c(0,1,5,20,max(pc)),c("#0000FFFF", "#B38BFFFF", "#FFFFFFFF", "#FF9E81FF", "#FF0000FF"))
-p2 <- grid.grabExpr(draw(Heatmap(pc, name="% out", bottom_annotation=ha, col=pal, cluster_columns=FALSE, show_column_names=FALSE)))
-
-plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights=c(3,2))
-```
-
-### Supplementary Figure `r getFigNb()`
-**A:** Adjusted rand index (ARI) of various clustering pipelines using various combinations of filtering criteria. Only clustering analyses with a number of clusters +/-1 from the real number of clusters were considered. In general, filtering more does not result in more accurate clustering. **B:** Percentage of cells filtered out per subpopulation, using various combination of filters (see methods).
-
-\newpage
-
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r, fig.height=4}
-res$filt.times <- sapply(strsplit(res$filt,"_"), FUN=function(x){ if(length(x)<3) return(1); as.numeric(x[[3]])})
-res$filt.MADs <- sapply(strsplit(res$filt,"_"), FUN=function(x){ as.numeric(x[[2]]) })
-filt.vars <- strsplit(sapply(strsplit(res$filt,"_"), FUN=function(x) x[[1]]),";")
-fv <- unique(unlist(filt.vars))
-for(f in fv[grep("both",fv,invert=TRUE)]){
-  f2 <- gsub("lower$|higher$","both",f)
-  res[[f]] <- sapply(filt.vars, FUN=function(x){ any(c(f,f2) %in% x) })
+mycast <- function(x, val, form=dataset~method){ 
+  x <- reshape2::dcast(x, form, value.var=val)
+  row.names(x) <- x[,1]
+  as.matrix(x[,-1])
 }
-form <- paste0("~nbClusters*dataset+norm+",paste(grep(".",colnames(res),fixed=TRUE,value=TRUE),collapse="+"))
-form <- gsub("filt.MADs","factor(filt.MADs)",form,fixed=T)
-form <- gsub("filt.times","factor(filt.times)",form,fixed=T)
-form <- paste0("ARI",form)
-message(strwrap(paste("lm(", form, ")")))
-mod <- lm(as.formula(form), data=res)
-mod <- coef(summary(mod))[grep(".",row.names(coef(summary(mod))),fixed=T),]
-colnames(mod)[4] <- "p value"
-kable(mod)
+m.f1 <- mycast(m, "F1atK")
+n <- sapply(strsplit(gsub("=",".",colnames(m.f1)),"\\."),FUN=function(x) rev(x)[1])
+n[grep("=doublet", colnames(m.f1))] <- paste0("doubletRemoval+",n[grep("=doublet", colnames(m.f1))])
+m.pc <- mycast(m, "maxPCout")
+colnames(m.f1) <- colnames(m.pc) <- n
+o <- order(colMeans(t(scale(t(m.f1))), na.rm=TRUE)*100-colMeans(t(scale(t(m.pc))), na.rm=TRUE))
+m.f1 <- m.f1[,o]
+m.pc <- m.pc[,o]
+m.f1m <- mycast(m, "meanF1")[,o]
+m.pcm <- mycast(m, "medianPCout")[,o]
+colnames(m.f1m) <- colnames(m.pcm) <- colnames(m.f1)
+
+
+names(nn) <- nn <- c("m.f1m","m.f1","m.pc","m.pcm")
+cellfns <- lapply(nn, FUN=function(mname){
+  if(grepl("f1",mname)){
+    sp <- paste0('sprintf("%.1f", 100*',mname,'[i, j])')
+  }else{
+    sp <- paste0('sprintf("%.1f", ',mname,'[i, j])')
+  }
+  eval(parse(text=paste0('function(j, i, x, y, width, height, fill){',
+      'lab <- ', sp, '; grid.text(lab, x, y, gp = gpar(fontsize = 10)) }')))
+})
+
+
+names(nn) <- c("mean F1", "F1 at true \n# clusters", "max % lost per\nsubpopulation", "median % lost per\nsubpopulation")
+hs <- lapply(seq_along(nn), FUN=function(i){
+  mat <- get(nn[[i]])
+  if(grepl("f1",nn[[i]])){
+    mat <- t(scale(t(mat)))
+  }else{
+    mat <- t(scale(t(sqrt(mat))))
+  }
+  Heatmap(mat, row_title=names(nn)[[i]], col=viridis::inferno(100), cell_fun = cellfns[[i]], show_heatmap_legend = FALSE, cluster_columns = FALSE, cluster_rows = FALSE)
+})
+
+hs[[1]] %v% hs[[2]] %v% hs[[3]] %v% hs[[4]]
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Linear regression analysis of ARI on various filtering criteria, correcting for the effect of the number of clusters. Increasing the number of distributions on which a cell must deviate in order to be excluded (`filt.times`) tended to be positively associated with ARI, while increasing the number of median absolute deviations required to be an outlier (`filt.MADs`) was associated with a decrease in ARI.
-
-\newpage
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r, fig.height=5}
-sw <- fres$dimreduction$clust.avg.silwidth[[1]]
-sw <- sw[,grep("doublet",colnames(sw))]
-w <- grep("seuratvst",colnames(sw))
-colnames(sw) <- reduceMethodNames(colnames(sw),2)
-sw <- sw[order(reduceMethodNames(row.names(sw),1), rowMeans(sw)),]
-ra <- data.frame(meanSilWidth=rowMeans(sw), dataset=reduceMethodNames(row.names(sw),1))
-chm(list("standard Seurat norm"=sw[,-w], "sctransform"=sw[,w]), scale="row", scaleVar=FALSE, scaleTitle="meanSilWidth\ndifference", sameScale=TRUE, row_ann=ra, show_row_names=FALSE, cluster_rows=FALSE)
-```
-
-```{r fig.height=3.5, fig.width=6}
-r <- fres$dimreduction$PC.R2[which(fres$dimreduction$PC.R2$dim<=10),]
-r <- r[grep("doublet",r$method),]
-r <- r[grep("clust",r$method, invert=T),]
-r <- aggregate(r$value, by=r[,c(1,3)], FUN=mean)
-r <- t(cast2(r, dataset~method, value.var="x", fun.aggregate=mean))
-w <- grep("seuratvst", row.names(r))
-row.names(r) <- reduceMethodNames(row.names(r), 2)
-chm(list("standard Seurat norm"=t(r[-w,]), "sctransform"=t(r[w,])), sameScale=TRUE, 
-    scale="row", scaleTitle="z-score", value_format="%.2f")
-```
-
-### Supplementary Figure `r getFigNb()`
-Impact of the set of filters on the average silhouette width of the subpopulations (top) and on the proportion of variance in the first components explained by clusters (bottom).
+Mean clustering F1 score per subpopulation, mean F1 at true number of clusters, as well as maximum and median proportion of excluded cells per subpopulation across various filtering strategies. Doublet removal generally improves clustering accuracy with very mild exclusion rates, even in datasets that do not have heterotypic doublets. Stringent distribution-based filtering creates large cell type biases.
 
 \newpage
 
@@ -128,7 +111,7 @@ res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1)
 ll <- lapply(split(res2, res2$norm), FUN=function(x){
   m2 <- cast2(x, formula=filt~dataset, fun.aggregate=median, value.var="ARI")
 })
-chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x){ median(x,na.rm=T) }, cluster_columns=FALSE)
+chm(ll, scale="column", scaleTitle="z-score", sameScale=TRUE, value_format="%.2f", row_sortFn=function(x,...){ median(x,...) }, cluster_columns=FALSE)
 ```
 
 ### Supplementary Figure `r getFigNb()`

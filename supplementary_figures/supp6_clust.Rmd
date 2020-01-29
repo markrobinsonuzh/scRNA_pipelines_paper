@@ -13,41 +13,58 @@ if(!exists('FIG_NB')){
     FIG_NB
   }
 }
-```
 
-```{r}
 suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
   library(reshape2)
   library(dplyr)
+  library(patchwork)
 })
-theme_set(theme_cowplot(font_size = 13))
-suppressMessages(devtools::load_all("../../pipComp/"))
-data(datasets)
+theme_set(theme_cowplot(font_size = 12))
+devtools::load_all("../../pipeComp/")
 source("../misc_functions.R")
 ```
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
+```{r, include=FALSE}
+#res <- readRDS("../data/clust_endSummary.rds")
+res <- readRDS("../data/results_clust_2.rds")
+res <- parsePipNames(res$clustering)
+res <- res[which(res$norm=="norm.seurat" & res$resolution <5),]
+x <- grep("true\\.nbClusts",colnames(res),value=TRUE)
+names(x) <- x <- sapply(strsplit(x," "),FUN=function(x) x[[1]])
+y <- cbind(res[,c("k","steps","resolution","clustmethod","dims")],sapply(x, FUN=function(x){
+  res[[paste(x,"n_clus")]] - res[[paste(x,"true.nbClusts")]]
+}))
+y$param <- ifelse( res$clustmethod=="clust.seurat", paste0(" res=",res$resolution), paste0(" steps=",res$steps))
+ag <- aggregate(y[,names(x)], by=y[,c("clustmethod", "k","param"),drop=FALSE], FUN=mean)
+agl <- cbind(ag[rep(1:nrow(ag), 9),1:3], dataset=rep(colnames(ag)[4:ncol(ag)], each=nrow(ag)), delta=as.numeric(as.matrix(ag[,4:ncol(ag)])))
+agl$k <- factor(agl$k, as.character(sort(unique(agl$k))))
+x <- sapply(unique(strsplit(ag$param, "=")), FUN=function(x) as.numeric(x[[2]]) )
+names(x) <- unique(ag$param)
+agl$param <- factor(agl$param, names(sort(x)))
+
+ssq <- trans_new("ssq", function(x) sign(x)*sqrt(abs(x)), function(x) sign(x)*x^2)
+#slg <- trans_new("slg", function(x) sign(x)*log1p(abs(x)), function(x) sign(x)*(exp(x)-1))
+pf <- function(x) ggplot(x, aes(k, param, fill=delta)) + geom_tile() + 
+  facet_wrap(~dataset, nrow = 1) + labs(x="", fill="Difference to real number of clusters") + 
+  theme(axis.text.x=element_blank(), axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_gradient2(low="darkblue", mid="white", high="red", na.value = "red", trans=ssq, limit=c(-7,20), breaks=c(-7,-2,0,2,7,20)) + 
+  theme(legend.position = "none")
+```
+
 ```{r, fig.width=8, fig.height=8}
-res <- readRDS("../data/clust_endSummary.rds")
-res <- res[which(res$dims>2 & res$resolution %in% c(0.05, 0.15, 0.3, 0.5, 0.8, 1, 1.2)),]
-res$method <- paste0( gsub("clust.","",res$clustmethod, fixed=T), 
-                      " k=",res$k, 
-                      ifelse( res$clustmethod=="clust.seurat", paste(" res=",res$resolution), paste0(" steps=",res$steps)) )
-res$diff.nbClusters <- res$nbClusters-datasets[res$dataset,"subpopulations"]
-ll <- lapply( unique(res$dataset), FUN=function(x){
-  as.matrix(cast2(res[which(res$dataset==x),], formula=method~dims, fun.aggregate=mean, value.var="diff.nbClusters"))
-})
-names(ll) <- unique(res$dataset)
-mmax <- ceiling(max(abs(sapply(ll,FUN=range))))
-cf <- circlize::colorRamp2(c(-mmax, 0, mmax), colors=c("blue", "white", "red"))
-chm(ll, sameScale=TRUE, scaleTitle="Difference\nto real nb\nsubpopulations\n", colors=cf, cluster_columns=FALSE, cluster_rows=FALSE)
+(pf(agl[which(agl$clustmethod=="clust.seurat"),]) + ylab("Seurat") + theme(legend.position = "top")) / 
+    (pf(agl[which(agl$clustmethod=="clust.scran"),]) + ylab("scran walktrap")) /
+    (pf(agl[which(agl$clustmethod=="clust.scran.fg"),]) + ylab("scran fast_greedy")) /
+    (ggplot(agl, aes(k)) + theme(axis.line.y=element_blank(), plot.margin = unit(rep(0,4),"pt"))) + 
+    plot_layout(heights = c(10,8,8,1))
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Difference between the number of detected clusters and the number of real subpopulations according to different numbers of dimensions and clustering paramters.
+Difference between the number of detected clusters and the number of real subpopulations according to different clustering paramters.
 
 \newpage
