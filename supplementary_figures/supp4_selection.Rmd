@@ -60,7 +60,7 @@ ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
 ```
 
 ```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
-plot_grid(plotlist=ll, ncol=2)
+suppressWarnings(plot_grid(plotlist=ll, ncol=2))
 ```
 
 ### Supplementary Figure `r getFigNb()`
@@ -76,11 +76,10 @@ ll <- lapply(names(gi), FUN=function(x){
   cumVE2(gi[[x]], gi[[x]]$devianceExplained) + xlim(0,2000) + ggtitle(x) + ylab("cumul deviance explained") + theme(legend.position="none")
 })
 ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
-plot_grid(plotlist=ll, ncol=2)
 ```
 
 ```{r, fig.width=8, fig.height=9, results="hide", warnings=FALSE, messages=FALSE}
-plot_grid(plotlist=ll, ncol=2)
+suppressWarnings(plot_grid(plotlist=ll, ncol=2))
 ```
 
 ### Supplementary Figure `r getFigNb()`

@@ -27,12 +27,42 @@ devtools::load_all("../../pipeComp/")
 source("../misc_functions.R")
 ```
 
+
 # Supplementary Figure `r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 #res <- readRDS("../data/clust_endSummary.rds")
 res <- readRDS("../data/results_clust_2.rds")
 res <- parsePipNames(res$clustering)
+x <- grep("true\\.nbClusts",colnames(res),value=TRUE)
+names(x) <- x <- sapply(strsplit(x," "),FUN=function(x) x[[1]])
+aris <- as.data.frame(rbindlist(lapply(x, FUN=function(x){
+  x <- res[,paste(x,"ARI"),drop=FALSE]
+  colnames(x) <- "ARI"
+  x
+}), idcol = "dataset"))
+aris$nbClusters <- unlist(lapply(x, FUN=function(x) res[,paste(x,"n_clus")]))
+aris$clust.method <- res$clustmethod
+aris$norm.method <- res$norm
+levels(aris$norm.method) <- c("norm.seurat","sctransform")
+aris <- aris[which(aris$nbClusters <= 40),]
+dd <- data.frame( dataset=names(x), k=sapply(x, FUN=function(x) res[,paste(x,"true.nbClusts")][1]))
+```
+
+```{r, fig.width=7.5, fig.height=7}
+ggplot(aris, aes(nbClusters, ARI, colour=clust.method, shape=norm.method)) + 
+  geom_point() + xlim(c(1,40)) + facet_wrap(~dataset) + xlab("Number of clusters") +
+  geom_vline(aes(xintercept=k), data=dd, linetype="dashed") + theme(legend.position="bottom") + 
+  guides(colour=guide_legend(ncol=1, title = ""), shape=guide_legend(ncol=1, title=""))
+```
+
+### Supplementary Figure `r getFigNb()`
+The number of clusters called has a much bigger impact on the Adjusted Rand Index (ARI) than differences between methods. The dashed line indicates the true number of clusters.
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, include=FALSE}
 res <- res[which(res$norm=="norm.seurat" & res$resolution <5),]
 x <- grep("true\\.nbClusts",colnames(res),value=TRUE)
 names(x) <- x <- sapply(strsplit(x," "),FUN=function(x) x[[1]])
