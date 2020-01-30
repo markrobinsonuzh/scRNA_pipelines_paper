@@ -30,10 +30,10 @@ scoresNames <- c("scran.score"="scran", "scDblFinder"="scDblFinder", "DF.score"=
 cols <- c("#4477AA", "#DDCC77", "#117733", "#CC6677")
 names(cols) <- as.character(scoresNames)
 
-pw <- function(i){
+pw <- function(i, dot.size=4, ...){
   scores <- res[[i]][,intersect(names(scoresNames),colnames(res[[i]]))]
   colnames(scores) <- scoresNames[colnames(scores)]
-  plotROCs(scores, factor(res[[i]]$demuxlet_cls, c("SNG","DBL"))) +
+  plotROCs(scores, factor(res[[i]]$demuxlet_cls, c("SNG","DBL")), dot.size=dot.size) +
     ylim(0,1) + scale_color_manual(values=cols)
 }
 

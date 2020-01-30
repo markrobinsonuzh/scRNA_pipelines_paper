@@ -68,7 +68,7 @@ names(cols) <- levels(m$filter)
 p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) +
   # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
   facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + 
-  xlab("Max proportion of subpopulation excluded") + ylab("mean F1 at true number of clusters")
+  xlab("Maximum proportion of cells excluded per subpopulation") + ylab("mean F1 at true number of clusters")
 
 plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])
 ```

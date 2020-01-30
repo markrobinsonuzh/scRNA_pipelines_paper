@@ -20,7 +20,7 @@ theme_set(theme_cowplot(font_size = 12))
 ```
 
 ```{r clustering, fig.width=12, fig.height=3}
-res <- readRDS("../data/results_clust.rds")
+res <- readRDS("../data/results_clust_2.rds")
 h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","clustmethod"), scale=TRUE, anno_legend = FALSE)
 h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
   scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +

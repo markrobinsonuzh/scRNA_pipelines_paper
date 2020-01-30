@@ -31,7 +31,7 @@ res <- readRDS("../data/results_norm.rds")
 ```
 
 ```{r}
-p1 <- scrna_evalPlot_DR(res, "covarRes", agg.by = "norm", anno_legend=FALSE, reorder_rows = TRUE)
+p1 <- scrna_evalPlot_DR(res, "covarRes", agg.by = "norm", anno_legend=FALSE, reorder_rows = )
 p1 <- p1 + scrna_evalPlot_DR(res, "covarRes", covar = "log10_total_features", agg.by = "norm", anno_legend=FALSE, reorder_rows=p1)
 p1 <- grid.grabExpr(draw(renameNorm(p1)))
 
