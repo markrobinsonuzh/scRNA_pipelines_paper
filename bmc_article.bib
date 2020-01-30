@@ -725,3 +725,82 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     volume = {21},
     year = {2020}
 }
+
+
+@article{WangDE2019,
+    abstract = {Background: The analysis of single-cell RNA sequencing (scRNAseq) data plays an important role in understanding the intrinsic and extrinsic cellular processes in biological and biomedical research. One significant effort in this area is the detection of differentially expressed (DE) genes. scRNAseq data, however, are highly heterogeneous and have a large number of zero counts, which introduces challenges in detecting DE genes. Addressing these challenges requires employing new approaches beyond the conventional ones, which are based on a nonzero difference in average expression. Several methods have been developed for differential gene expression analysis of scRNAseq data. To provide guidance on choosing an appropriate tool or developing a new one, it is necessary to evaluate and compare the performance of differential gene expression analysis methods for scRNAseq data. Results: In this study, we conducted a comprehensive evaluation of the performance of eleven differential gene expression analysis software tools, which are designed for scRNAseq data or can be applied to them. We used simulated and real data to evaluate the accuracy and precision of detection. Using simulated data, we investigated the effect of sample size on the detection accuracy of the tools. Using real data, we examined the agreement among the tools in identifying DE genes, the run time of the tools, and the biological relevance of the detected DE genes. Conclusions: In general, agreement among the tools in calling DE genes is not high. There is a trade-off between true-positive rates and the precision of calling DE genes. Methods with higher true positive rates tend to show low precision due to their introducing false positives, whereas methods with high precision show low true positive rates due to identifying few DE genes. We observed that current methods designed for scRNAseq data do not tend to show better performance compared to methods designed for bulk RNAseq data. Data multimodality and abundance of zero read counts are the main characteristics of scRNAseq data, which play important roles in the performance of differential gene expression analysis methods and need to be considered in terms of the development of new methods.},
+    author = {Wang, Tianyu and Li, Boyang and Nelson, Craig E. and Nabavi, Sheida},
+    doi = {10.1186/s12859-019-2599-6},
+    file = {:home/anthonys/Documents/PhD/Articles/Wang2019{\_}benchmark{\_}differential{\_}expresssion{\_}scrnaseq.pdf:pdf},
+    issn = {14712105},
+    journal = {BMC Bioinformatics},
+    keywords = {Comparative analysis,Differential gene expression analysis,RNAseq,Single-cell},
+    number = {40},
+    pages = {1--16},
+    publisher = {BMC Bioinformatics},
+    title = {{Comparative analysis of differential gene expression analysis tools for single-cell RNA sequencing data}},
+    volume = {20.1},
+    year = {2019}
+}
+
+
+
+@article{steinley_properties_2004,
+	title = {Properties of the {Hubert}-{Arable} {Adjusted} {Rand} {Index}.},
+	volume = {9},
+	issn = {1939-1463, 1082-989X},
+	url = {http://doi.apa.org/getdoi.cfm?doi=10.1037/1082-989X.9.3.386},
+	doi = {10.1037/1082-989X.9.3.386},
+	language = {en},
+	number = {3},
+	urldate = {2020-01-30},
+	journal = {Psychological Methods},
+	author = {Steinley, Douglas},
+	year = {2004},
+	pages = {386--396},
+	file = {Steinley - 2004 - Properties of the Hubert-Arable Adjusted Rand Inde.pdf:/home/pigerm/Zotero/storage/NBHTB87Q/Steinley - 2004 - Properties of the Hubert-Arable Adjusted Rand Inde.pdf:application/pdf}
+}
+
+@article{HeiserDimred2019,
+    abstract = {High-dimensional data, such as those generated using single-cell RNA sequencing, present challenges in interpretation and visualization. Numerical and computational methods for dimensionality reduction allow for low-dimensional representation of genome-scale expression data for downstream clustering, trajectory reconstruction, and biological interpretation. However, a comprehensive and quantitative evaluation of the performance of these techniques has not been established. We present an unbiased framework that defines metrics of global and local structure preservation in dimensionality reduction transformations. Using discrete and continuous scRNA-seq datasets, we find that input cell distribution and method parameters are largely determinant of global, local, and organizational data structure preservation by eleven published dimensionality reduction methods. Code available at github.com/KenLauLab/DR-structure-preservation allows for rapid evaluation of further datasets and methods.},
+    author = {Heiser, Cody N. and Lau, Ken S.},
+    doi = {10.1101/684340},
+    file = {:home/anthonys/Documents/PhD/Articles/Heiser2019{\_}dimension{\_}reduction{\_}benchmark{\_}framework.pdf:pdf},
+    journal = {bioRxiv},
+    pages = {684340},
+    title = {{A quantitative framework for evaluating single-cell data structure preservation by dimensionality reduction techniques.}},
+    year = {2019}
+}
+
+
+@article{YipHVGs2018,
+    abstract = {Traditional RNA sequencing (RNA-seq) allows the detection of gene expression variations between two or more cell populations through differentially expressed gene (DEG) analysis. However, genes that contribute to cell-to-cell differences are not discoverable with RNA-seq because RNA-seq samples are obtained from a mixture of cells. Single-cell RNA-seq (scRNA-seq) allows the detection of gene expression in each cell. With scRNA-seq, highly variable gene (HVG) discovery allows the detection of genes that contribute strongly to cell-to-cell variation within a homogeneous cell population, such as a population of embryonic stem cells. This analysis is implemented in many software packages. In this study, we compare seven HVG methods from six software packages, including BASiCS, Brennecke, scLVM, scran, scVEGs and Seurat. Our results demonstrate that reproducibility in HVG analysis requires a larger sample size than DEG analysis. Discrepancies between methods and potential issues in these tools are discussed and recommendations are made.},
+    author = {Yip, Shun H. and Sham, Pak Chung and Wang, Junwen},
+    doi = {10.1093/bib/bby011},
+    file = {:home/anthonys/Documents/PhD/Articles/Shun2019{\_}hvgs{\_}selection{\_}scrnaseq.pdf:pdf},
+    issn = {14774054},
+    journal = {Briefings in Bioinformatics},
+    keywords = {DEG analysis,highly variable gene,scRNA-seq,single-cell RNA seq,software},
+    number = {4},
+    pages = {1583--1589},
+    title = {{Evaluation of tools for highly variable gene discovery from single-cell RNA-seq data}},
+    volume = {20},
+    year = {2018}
+}
+
+
+@article{StuartIntegration2019,
+    abstract = {The recent maturation of single-cell RNA sequencing (scRNA-seq) technologies has coincided with transformative new methods to profile genetic, epigenetic, spatial, proteomic and lineage information in individual cells. This provides unique opportunities, alongside computational challenges, for integrative methods that can jointly learn across multiple types of data. Integrated analysis can discover relationships across cellular modalities, learn a holistic representation of the cell state, and enable the pooling of data sets produced across individuals and technologies. In this Review, we discuss the recent advances in the collection and integration of different data types at single-cell resolution with a focus on the integration of gene expression data with other types of single-cell measurement.},
+    author = {Stuart, Tim and Satija, Rahul},
+    doi = {10.1038/s41576-019-0093-7},
+    file = {:home/anthonys/Documents/PhD/Articles/Stuart2019{\_}integrative{\_}sc{\_}analysis.pdf:pdf},
+    issn = {14710064},
+    journal = {Nature Reviews Genetics},
+    number = {5},
+    pages = {257--272},
+    publisher = {Springer US},
+    title = {{Integrative single-cell analysis}},
+    url = {http://dx.doi.org/10.1038/s41576-019-0093-7},
+    volume = {20},
+    year = {2019}
+}
