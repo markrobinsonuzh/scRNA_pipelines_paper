@@ -675,3 +675,53 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	author = {Su, Shian and Tian, Luyi and Dong, Xueyi and Hickey, Peter F. and Freytag, Saskia and Ritchie, Matthew E.},
 	file = {Full Text PDF:/home/pigerm/Zotero/storage/5UN7K3I5/Su et al. - CellBench RBioconductor software for comparing s.pdf:application/pdf;Snapshot:/home/pigerm/Zotero/storage/J8ABFMEV/5645177.html:text/html}
 }
+
+
+@article{JaakkolaDE2017,
+    abstract = {We compared five statistical methods to detect differentially expressed genes between two distinct single-cell populations. Currently, it remains unclear whether differential expression methods developed originally for conventional bulk RNA-seq data can also be applied to single-cell RNA-seq data analysis. Our results in three diverse comparison settings showed marked differences between the different methods in terms of the number of detections as well as their sensitivity and specificity. They, however, did not reveal systematic benefits of the currently available single-cell-specific methods. Instead, our previously introduced reproducibility-optimization method showed good performance in all comparison settings without any single-cell-specific modifications.},
+    author = {Jaakkola, Maria K. and Seyednasrollah, Fatemeh and Mehmood, Arfa and Elo, Laura L.},
+    doi = {10.1093/bib/bbw057},
+    file = {:home/anthonys/Documents/PhD/Articles/Jaakkola2017{\_}Benchmark{\_}differential{\_}expression{\_}sc.pdf:pdf},
+    issn = {14774054},
+    journal = {Briefings in bioinformatics},
+    keywords = {RNA-seq,comparison,differential expression,reproducibility,single-cell},
+    number = {5},
+    pages = {735--743},
+    title = {{Comparison of methods to detect differentially expressed genes between single-cell populations}},
+    volume = {18},
+    year = {2017}
+}
+
+
+@article{DalMolinDE2017,
+    abstract = {The sequencing of the transcriptomes of single-cells, or single-cell RNA-sequencing, has now become the dominant technology for the identification of novel cell types and for the study of stochastic gene expression. In recent years, various tools for analyzing single-cell RNA-sequencing data have been proposed, many of them with the purpose of performing differentially expression analysis. In this work, we compare four different tools for single-cell RNA-sequencing differential expression, together with two popular methods originally developed for the analysis of bulk RNA-sequencing data, but largely applied to single-cell data. We discuss results obtained on two real and one synthetic dataset, along with considerations about the perspectives of single-cell differential expression analysis. In particular, we explore the methods performance in four different scenarios, mimicking different unimodal or bimodal distributions of the data, as characteristic of single-cell transcriptomics. We observed marked differences between the selected methods in terms of precision and recall, the number of detected differentially expressed genes and the overall performance. Globally, the results obtained in our study suggest that is difficult to identify a best performing tool and that efforts are needed to improve the methodologies for single-cell RNA-sequencing data analysis and gain better accuracy of results.},
+    author = {{Dal Molin}, Alessandra and Baruzzo, Giacomo and {Di Camillo}, Barbara},
+    doi = {10.3389/fgene.2017.00062},
+    file = {:home/anthonys/Documents/PhD/Articles/DalMolin2017{\_}scRNAseq{\_}benchmark{\_}DE.pdf:pdf},
+    issn = {16648021},
+    journal = {Frontiers in Genetics},
+    keywords = {Assessment,Benchmark,Differential distributions,Differential expression,Single-cell RNA-seq},
+    number = {62},
+    title = {{Single-cell RNA-sequencing: Assessment of differential expression analysis methods}},
+    volume = {8},
+    year = {2017}
+}
+
+
+@article{TranBatch2020,
+    abstract = {BACKGROUND Large-scale single-cell transcriptomic datasets generated using different technologies contain batch-specific systematic variations that present a challenge to batch-effect removal and data integration. With continued growth expected in scRNA-seq data, achieving effective batch integration with available computational resources is crucial. Here, we perform an in-depth benchmark study on available batch correction methods to determine the most suitable method for batch-effect removal. RESULTS We compare 14 methods in terms of computational runtime, the ability to handle large datasets, and batch-effect correction efficacy while preserving cell type purity. Five scenarios are designed for the study: identical cell types with different technologies, non-identical cell types, multiple batches, big data, and simulated data. Performance is evaluated using four benchmarking metrics including kBET, LISI, ASW, and ARI. We also investigate the use of batch-corrected data to study differential gene expression. CONCLUSION Based on our results, Harmony, LIGER, and Seurat 3 are the recommended methods for batch integration. Due to its significantly shorter runtime, Harmony is recommended as the first method to try, with the other methods as viable alternatives.},
+    author = {Tran, Hoa Thi Nhu and Ang, Kok Siong and Chevrier, Marion and Zhang, Xiaomeng and Lee, Nicole Yee Shin and Goh, Michelle and Chen, Jinmiao},
+    doi = {10.1186/s13059-019-1850-9},
+    file = {:home/anthonys/Documents/PhD/Articles/Tran2020{\_}benchmark{\_}batch-effect{\_}correction{\_}methods{\_}scrnaseq.pdf:pdf},
+    issn = {1474-760X},
+    journal = {Genome biology},
+    keywords = {Batch correction,Batch effect,Differential gene expression,Integration,Single-cell RNA-seq,batch correction,batch effect,differential gene expression,integration,single-cell rna-seq},
+    number = {1},
+    pages = {1--32},
+    pmid = {31948481},
+    publisher = {Genome Biology},
+    title = {{A benchmark of batch-effect correction methods for single-cell RNA sequencing data.}},
+    url = {http://www.ncbi.nlm.nih.gov/pubmed/31948481},
+    volume = {21},
+    year = {2020}
+}
