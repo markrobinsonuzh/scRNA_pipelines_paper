@@ -1,0 +1,76 @@
+---
+title: "Prepare citeseq data for simulation"
+author: "Pierre-Luc Germain"
+date: "10/27/2019"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(SingleCellExperiment)
+  library(scater)
+  library(muscat)
+})
+source("pipeComp/inst/extdata/scrna_alternatives.R")
+```
+
+```{r}
+download.file("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE100nnn/GSE100866/suppl/GSE100866_CBMC_8K_13AB_10X-RNA_umi.csv.gz","RNA.csv.gz")
+cbmc.rna <- as.sparse(read.csv(file = "RNA.csv.gz", sep = ",", header = TRUE, row.names = 1))
+cbmc.rna <- cbmc.rna[-grep("ERCC_|MOUSE_",row.names(cbmc.rna)),]
+sce <- SingleCellExperiment(list(counts=cbmc.rna))
+sce <- addQCPerCell(sce)
+out <- isOutlier(sce$detected, log=TRUE) | isOutlier(sce$sum, log=TRUE) | isOutlier(sce$percent_top_50)
+sce <- sce[,!out]
+cbmc.rna <- cbmc.rna[,colnames(sce)]
+
+download.file("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE100nnn/GSE100866/suppl/GSE100866_CBMC_8K_13AB_10X-ADT_umi.csv.gz", "ADT.csv.gz")
+cbmc.adt <- as.sparse(read.csv(file = "ADT.csv.gz", sep = ",", 
+    header = TRUE, row.names = 1))
+cbmc.adt <- cbmc.adt[,colnames(sce)]
+```
+
+Then we more or less follow the Seurat procedure:
+
+```{r}
+cbmc <- CreateSeuratObject(counts = cbmc.rna)
+cbmc <- NormalizeData(cbmc)
+cbmc <- FindVariableFeatures(cbmc, nfeatures=2000)
+cbmc <- ScaleData(cbmc)
+cbmc <- RunPCA(cbmc, verbose = FALSE)
+ElbowPlot(cbmc, ndims = 50)
+cbmc <- FindNeighbors(cbmc, dims = 1:9)
+cbmc <- FindClusters(cbmc, resolution = 0.8)
+cbmc[["rnaClusterID"]] <- Idents(cbmc)
+```
+
+```{r}
+cbmc[["ADT"]] <- CreateAssayObject(counts = cbmc.adt)
+cbmc <- NormalizeData(cbmc, assay = "ADT", normalization.method = "CLR")
+cbmc <- ScaleData(cbmc, assay = "ADT")
+DefaultAssay(cbmc) <- "ADT"
+adt.dist <- dist(t(GetAssayData(cbmc, slot = "data")))
+cbmc[["adt_snn"]] <- FindNeighbors(adt.dist)$snn
+cbmc <- FindClusters(cbmc, resolution = 0.2, graph.name = "adt_snn")
+(tt <- table(Idents(cbmc), cbmc$rnaClusterID))
+```
+
+We then select cells of the table (i.e. cells clustered together on both types of data) for which there are enough cells:
+```{r}
+t2 <- t(apply(tt, 1, FUN=function(x) c(which.max(x)-1, max(x))))
+t2 <- t2[order(t2[,2],decreasing=TRUE),]
+t2 <- t2[!duplicated(t2[,1]) & t2[,2] > 200,]
+to_keep <- paste(row.names(t2),t2[,1])
+sce$cluster_id <- factor(paste(Idents(cbmc),cbmc$rnaClusterID))
+sce2 <- sce[,sce$cluster_id %in% to_keep]
+sce2$cluster_id <- droplevels(sce2$cluster_id)
+levels(sce2$cluster_id) <- LETTERS[seq_along(levels(sce2$cluster_id))]
+```
+
+We prepare for simulation:
+```{r}
+sce2$sample_id <- factor(sample(LETTERS[1:2],ncol(sce2),replace=TRUE))
+sce2 <- prepSim(sce2)
+saveRDS(sce2, file="citeseq_prep4sim.SCE.rds")
+```

@@ -1,0 +1,111 @@
+---
+title: "simulation"
+author: "Pierre-Luc Germain"
+date: "9/30/2019"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(SingleCellExperiment)
+  library(muscat)
+  library(purrr)
+  library(scater)
+  library(cowplot)
+})
+source("../../pipComp/R/misc.R")
+source("../../pipComp/R/filtering.R")
+source("../../pipComp/R/selection.R")
+theme_set(theme_cowplot())
+```
+
+# Simulating dataset 1
+
+```{r}
+# see citeseq.Rmd
+sce <- readRDS("citeseq_prep4sim.SCE.rds")
+sce$sample_id <- factor("A")
+```
+
+```{r}
+sims <- list()
+set.seed(1234)
+probs <- list( set_names(c(0.8,0.1,0.1,0,0),levels(sce$cluster_id)), 1, c(1,0))
+lfcs <- set_names(c(2,3,2,1,1),levels(sce$cluster_id))
+sims$s1 <- simData(sce, nrow(sce), 1000, probs=probs, p_type=0.2, rel_lfc=lfcs)
+probs <- list( set_names(c(0.1,0.6,0,0.3,0), levels(sce$cluster_id)), 1, c(1,0))
+lfcs <- set_names(c(2,1,1,1,1), levels(sce$cluster_id))
+sims$s2 <- simData(sce, nrow(sce), 1000, probs=probs, p_type=0.05, rel_lfc=lfcs)
+probs <- list( set_names(c(0.3,0.3,0.1,0,0.3), levels(sce$cluster_id)), 1, c(1,0))
+lfcs <- set_names(rep(1,5), levels(sce$cluster_id))
+sims$s3 <- simData(sce, nrow(sce), 500, probs=probs, p_type=0.01, rel_lfc=lfcs)
+
+sim <- SingleCellExperiment(list(counts=do.call(cbind, lapply(sims,counts))))
+sim$phenoid <- paste0( rep(LETTERS[1:3],sapply(sims,ncol)),
+                       unlist(lapply(sims,FUN=function(x){
+  levels(x$cluster_id) <- as.character(seq_along(levels(x$cluster_id)))
+  x$cluster_id
+})))
+colnames(sim) <- paste0(sim$phenoid, ".c", 1:ncol(sim))
+sim <- add_meta(sim)
+sim <- compute_all_gene_info(sim)
+saveRDS(sim, file="../datasets/simMix1.SCE.rds")
+```
+
+
+# Simulating dataset 2
+
+```{r, eval=FALSE}
+sce <- readRDS("~/bioinfo/robinson/muscat-comparison/MAGL/output/MAGL-SCE.rds")
+sce$oldclusters <- sce$cluster_id
+sce$cluster_id <- as.factor(gsub("[0-9]$","",sce$cluster_id))
+tt <- table(sce$sample_id)
+sce <- sce[,which(sce$sample_id %in% names(tt)[which(tt>3000)])]
+sce$sample_id <- droplevels(sce$sample_id)
+sce <- prepSim(sce,min_size=50)
+saveRDS(sce, file="magl_sce_prepSim.rds")
+```
+```{r, include=FALSE}
+sce <- readRDS("magl_sce_prepSim.rds")
+```
+
+```{r}
+sce$offset <- sce$offset+log(2)
+```
+
+```{r}
+sims <- list()
+set.seed(1234)
+probs1 <- list( set_names(c(0.2,0.4,0.35,0.05),levels(sce$cluster_id)),
+               c(1,0), c(1,0) )
+lfcs1 <- set_names(c(2,4,1,2),levels(sce$cluster_id))
+sims$s1 <- simData(sce, nrow(sce), 1500, probs=probs1, p_type=0.1, rel_lfc=lfcs1)
+probs2 <- list( set_names(c(0.2,0.6,0.2,0),levels(sce$cluster_id)),
+               c(1,0), c(1,0) )
+lfcs2 <- set_names(c(3,2,1,1),levels(sce$cluster_id))
+sims$s2 <- simData(sce, nrow(sce), 1000, probs=probs2, p_type=0.03, rel_lfc=lfcs2)
+probs3 <- list( set_names(c(0.5,0.5,0,0),levels(sce$cluster_id)),
+               c(1,0), c(1,0) )
+lfcs3 <- set_names(c(1,1,1,1),levels(sce$cluster_id))
+sims$s3 <- simData(sce, nrow(sce), 500, probs=probs3, p_type=0.01, rel_lfc=lfcs3)
+
+sim <- SingleCellExperiment(list(counts=do.call(cbind, lapply(sims,counts))))
+sim$phenoid <- paste0( rep(LETTERS[1:3],c(1500,1000,500)),
+                       unlist(lapply(sims,FUN=function(x){
+  levels(x$cluster_id) <- as.character(seq_along(levels(x$cluster_id)))
+  x$cluster_id
+})))
+colnames(sim) <- paste0(sim$phenoid, ".c", 1:ncol(sim))
+sim <- add_meta(sim)
+sim <- compute_all_gene_info(sim)
+saveRDS(sim, file="../datasets/simMix2.SCE.rds")
+```
+
+# Overview
+
+```{r, fig.width=8.5, fig.height=3}
+ll <- c( simMix1="../datasets/simMix1.SCE.rds",
+         simMix2="../datasets/simMix2.SCE.rds" )
+devtools::load_all("../../pipeComp")
+describeDatasets(ll)
+```
