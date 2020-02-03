@@ -18,6 +18,8 @@ This repository accompanies the [pipeComp paper](https://doi.org/10.1101/2020.02
 
 ## Pipeline results
 
-* The pipelines can be run and evaluated with the [pipeComp](https://github.com/plger/pipeComp), which also includes wrappers for all methods used.
+* The pipelines can be run and evaluated with the [pipeComp package](https://github.com/plger/pipeComp), which also includes [wrappers](https://github.com/plger/pipeComp/tree/master/inst/extdata) for all methods used.
 
 * The compiled pipeline results (i.e. results of _pipeComp_) are available in the `data/` folder (their more detailed description will follow).
+
+* The wrappers for the different methods 
