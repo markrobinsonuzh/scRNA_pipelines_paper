@@ -13,8 +13,8 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
-suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 11))
 renameNorm <- function(x){

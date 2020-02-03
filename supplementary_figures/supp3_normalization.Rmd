@@ -23,9 +23,9 @@ suppressPackageStartupMessages({
   library(reshape2)
   library(dplyr)
   library(viridis)
+  library(pipeComp)
 })
 suppressMessages(devtools::load_all("../../pipComp/"))
-data(datasets)
 theme_set(theme_cowplot(font_size = 11))
 source("../misc_functions.R")
 ```
@@ -35,7 +35,7 @@ source("../misc_functions.R")
 ```{r norm_nbClusters, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/norm2_endSummary.rds")
 res2 <- res[which(res$filt=="deffilter" & res$norm %in% c("norm.scran", "norm.scran.noscale", "norm.seurat", "norm.seuratvst", "norm.stableGsum")),]
-res2$diff.nbClusters <- res2$nbClusters-datasets[res2$dataset,"subpopulations"]
+res2$diff.nbClusters <- res2$nbClusters-truek[res2$dataset]
 res3 <- aggregate(res2[,"diff.nbClusters"], by=res2[,c("dataset","dims","resolution","norm")], FUN=mean)
 colnames(res3)[5] <- "nb"
 res3$norm <- gsub("norm.","",res3$norm, fixed=T)

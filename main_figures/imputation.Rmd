@@ -13,9 +13,9 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipeComp/"))
 theme_set(theme_cowplot(font_size = 10))
 ```
 
@@ -29,7 +29,7 @@ cols <- getQualitativePalette(length(unique(ds)))
 names(cols) <- sort(unique(ds))
 dsa <- ComplexHeatmap::HeatmapAnnotation(dataset=ds, col=list(dataset=cols), show_annotation_name = FALSE, show_legend=TRUE)
 
-h1 <- Heatmap(dr, cluster_columns = FALSE, col=.silScale(dr), cluster_rows = FALSE, 
+h1 <- Heatmap(dr, cluster_columns = FALSE, col=pipeComp:::.silScale(dr), cluster_rows = FALSE, 
         bottom_annotation=dsa,
         show_column_names = FALSE, show_column_dend = FALSE, 
         name="silh.\nwidth", column_title="Mean silhouette width", 
@@ -74,7 +74,7 @@ myh <- function(k,title=k,...){
       'lab <- ', ifelse(rmLead0, paste('gsub("^0\\\\.",".",', sp,')'), sp),
       '; grid.text(lab, x, y, gp = gpar(fontsize = 10, 
       col=ifelse(ll2s[["',k,'"]][i,j]>',resmid,',"black","white"))) }')))
-  Heatmap(ll2s[[k]], col = viridis::inferno(100), show_column_names = FALSE, bottom_annotation = .ds_anno(colnames(ll2[[k]]), FALSE), cluster_columns=FALSE, cluster_rows = FALSE, show_heatmap_legend = FALSE, column_title=title, cell_fun=cellfn, ...)
+  Heatmap(ll2s[[k]], col = viridis::inferno(100), show_column_names = FALSE, bottom_annotation = pipeComp:::.ds_anno(colnames(ll2[[k]]), FALSE), cluster_columns=FALSE, cluster_rows = FALSE, show_heatmap_legend = FALSE, column_title=title, cell_fun=cellfn, ...)
 }
 
 p2 <- grid.grabExpr(draw( myh(names(ll2)[1]) + myh(names(ll2)[2]) + 

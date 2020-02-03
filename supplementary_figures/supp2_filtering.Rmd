@@ -24,10 +24,9 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(knitr)
   library(circlize)
+  library(pipeComp)
 })
-suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
-load("../../pipComp/data/datasets.RData")
 ```
 
 # Supplementary Figure `r getFigNb(TRUE)`
@@ -107,7 +106,7 @@ res <- readRDS("../data/selection_old.rds")
 res <- res[grep("deviance|seurat.variance.standardized",res$sel),]
 res$filt <- as.factor(res$filt)
 levels(res$filt) <- c("coding only", "no mitochondrial", "no ribosomal", "all")
-res2 <- res[which(abs(res$nbClusters-datasets[res$dataset,"subpopulations"])<=1),]
+res2 <- res[which(abs(res$nbClusters-truek[res$dataset])<=1),]
 ll <- lapply(split(res2, res2$norm), FUN=function(x){
   m2 <- cast2(x, formula=filt~dataset, fun.aggregate=median, value.var="ARI")
 })

@@ -1,6 +1,10 @@
 ---
-title: "Supplementary Figures"
-author: "Pierre-Luc Germain"
+title: \Large{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
+subtitle: \vspace{0.5cm}\LARGE{Supplementary Figures}\vspace{0.5cm}
+author:
+- "Pierre-Luc Germain"
+- "Anthony Sonrel"
+- "Mark D. Robinson"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 geometry: margin=1.5cm
 output:
@@ -13,6 +17,8 @@ output:
 bibliography: ../bmc_article.bib
 ---
 
+\renewcommand{\thepage}{S\arabic{page}}
+
 ```{r setup, include=FALSE}
 # comment this out to print code
 knitr::opts_chunk$set(echo=FALSE)
@@ -23,7 +29,9 @@ getFigNb <- function(increment=FALSE){
 }
 ```
 
+
 \newpage
+
 
 ```{r child='supp1_dataset_description.Rmd'}
 ```

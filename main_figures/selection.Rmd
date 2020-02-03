@@ -14,9 +14,9 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipeComp/"))
 data(datasets)
 theme_set(theme_cowplot(font_size = 12))
 ```

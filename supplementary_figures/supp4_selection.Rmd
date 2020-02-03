@@ -18,9 +18,8 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
+  library(pipeComp)
 })
-suppressMessages(devtools::load_all("../../pipComp/"))
-data(datasets)
 source("../misc_functions.R")
 ```
 

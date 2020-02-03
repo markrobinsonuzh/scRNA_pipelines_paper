@@ -12,10 +12,10 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
-  library(matrixStats)
+  library
+  library(pipeComp)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipeComp/"))
 theme_set(theme_cowplot(font_size = 12))
 ```
 

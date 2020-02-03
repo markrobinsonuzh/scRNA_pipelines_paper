@@ -13,15 +13,15 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipeComp/"))
-source("../../pipeComp/inst/extdata/scrna_alternatives.R")
+source(system.file("extdata/scrna_alternatives.R", package="pipeComp"))
 theme_set(theme_cowplot(font_size = 12))
 ```
 
 ```{r}
-o <- readRDS("../../ndims.RDS")
+o <- readRDS("../data/ndims.RDS")
 o <- lapply(o, FUN=function(x){
   x$nselected$elbow <- x$nselected$elbow-1
   x
@@ -66,9 +66,9 @@ n[w] <- paste0("sctransform+",n[w])
 row.names(sw) <- n
 sw2 <- sw[order(grepl("sctransform",row.names(sw))*1000+rowMeans(sw)+apply(sw,1,probs=0.2,FUN=quantile),decreasing=TRUE),order(colMeans(sw),decreasing=TRUE)]
 h1 <- Heatmap(sw2, cluster_columns = FALSE, cluster_rows = FALSE, 
-        name="silhouette width", col=.silScale(sw2), show_column_names = FALSE,
+        name="silhouette width", col=pipeComp:::.silScale(sw2), show_column_names = FALSE,
         column_title = "Subpopulation mean silhouette width",
-        bottom_annotation=.ds_anno(colnames(sw2)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
+        bottom_annotation=pipeComp:::.ds_anno(colnames(sw2)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
 p2 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
 
 cl1 <- res1$clustering

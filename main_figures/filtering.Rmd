@@ -17,9 +17,9 @@ suppressPackageStartupMessages({
   library(ggridges)
   library(cowplot)
   library(SingleCellExperiment)
+  library(pipeComp)
 })
 theme_set(theme_cowplot(font_size = 12))
-suppressMessages(devtools::load_all("../../pipeComp/"))
 source("../misc_functions.R")
 data(datasets)
 ```

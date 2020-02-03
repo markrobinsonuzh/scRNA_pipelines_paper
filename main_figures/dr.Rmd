@@ -13,9 +13,9 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
 source("../misc_functions.R")
-suppressMessages(devtools::load_all("../../pipeComp/"))
 ```
 
 ```{r dimred, fig.width=12, fig.height=6}
@@ -27,9 +27,9 @@ x <- x[order(colSums(apply(x,1,prob=c(0.05,0.5),FUN=quantile))+
 row.names(x) <- gsub("norm\\.","",apply(parsePipNames(row.names(x))[,c("norm","dr")],1,collapse=" + ",FUN=paste))
 row.names(x) <- gsub("seuratvst","sctransform",row.names(x))
 h1 <- Heatmap(x, cluster_columns = FALSE, cluster_rows = FALSE, 
-        name="silhouette width", col=.silScale(x), show_column_names = FALSE,
+        name="silhouette width", col=pipeComp:::.silScale(x), show_column_names = FALSE,
         column_title = "Subpopulation mean silhouette width", row_names_max_width = unit(9,"cm"),
-        bottom_annotation=.ds_anno(colnames(x)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
+        bottom_annotation=pipeComp:::.ds_anno(colnames(x)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
 p1 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
 
 res$clustering <- res$clustering[grep("norm\\.seurat\\.noscale.*denoise", row.names(res$clustering), invert=TRUE),]
@@ -37,7 +37,7 @@ h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","dr"), scale=TRUE, ann
 h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
   scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
   scrna_evalPlot_clustAtTrueK(res, agg.by=c("norm","dr"), reorder_rows = h, anno_legend = FALSE)
-h <- .renameHrows(h, function(x) gsub("; dr=", " + ", gsub("seuratvst", "sctransform", x)))
+h <- pipeComp:::.renameHrows(h, function(x) gsub("; dr=", " + ", gsub("seuratvst", "sctransform", x)))
 
 p2 <- grid.grabExpr(draw(h))
 

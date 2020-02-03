@@ -22,10 +22,10 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(reshape2)
   library(dplyr)
+  library(pipeComp)
+  library(viridis)
 })
 theme_set(theme_cowplot(font_size = 13))
-suppressMessages(devtools::load_all("../../pipComp/"))
-data(datasets)
 source("../misc_functions.R")
 ```
 
@@ -33,11 +33,10 @@ source("../misc_functions.R")
 
 
 ```{r, fig.width=8, fig.height=8.5}
-library(viridis)
 res <- readRDS("../data/clust_endSummary.rds")
 res2 <- res[which(res$clust=="clust.seurat" & res$k==20 & res$dims>2),]
 res2 <- res2[which(res2$dr=="seurat.pca" & res2$dataset!="Kumar"),]
-res2$diff.nbClusters <- res2$nbClusters-datasets[res2$dataset,"subpopulations"]
+res2$diff.nbClusters <- res2$nbClusters-truek[res2$dataset]
 res3 <- aggregate(res2[,"diff.nbClusters"], by=res2[,c("dataset","dims","resolution")], FUN=mean)
 colnames(res3)[4] <- "nb"
 ll <- lapply(split(res3, res3$dataset), FUN=function(x){

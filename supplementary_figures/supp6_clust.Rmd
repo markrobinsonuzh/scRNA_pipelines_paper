@@ -21,9 +21,9 @@ suppressPackageStartupMessages({
   library(reshape2)
   library(dplyr)
   library(patchwork)
+  library(pipeComp)
 })
 theme_set(theme_cowplot(font_size = 12))
-devtools::load_all("../../pipeComp/")
 source("../misc_functions.R")
 ```
 
