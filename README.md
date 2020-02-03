@@ -1,6 +1,6 @@
 # pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools
 
-This repository is still in preparation!
+This repository accompanies the [pipeComp paper](https://doi.org/10.1101/2020.02.02.930578). It is still in preparation, and aims to providing a record of what was done and access to compiled results, rather than easy reproducibility.
 
 ## Manuscript and figures
 
@@ -15,3 +15,9 @@ This repository is still in preparation!
 * The code for generating the simulations is in `simulations/`
 
 * The datasets themselves are not stored on github but on figshare https://doi.org/10.6084/m9.figshare.11787210.v1 . To work with the markdowns, these datasets should be placed in a `datasets/` folder at the root of the repo.
+
+## Pipeline results
+
+* The pipelines can be run and evaluated with the [pipeComp](https://github.com/plger/pipeComp), which also includes wrappers for all methods used.
+
+* The compiled pipeline results (i.e. results of _pipeComp_) are available in the `data/` folder (their more detailed description will follow).
