@@ -14,8 +14,8 @@ suppressPackageStartupMessages({
   library(ROCit)
   library(ggplot2)
   library(cowplot)
+  library(scDblFinder)
 })
-devtools::load_all("~/bioinfo/robinson/scDblFinder/")
 theme_set(theme_cowplot(font_size = 12))
 
 # we load the dataset
