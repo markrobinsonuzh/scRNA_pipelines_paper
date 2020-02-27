@@ -12,20 +12,74 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(cowplot)
   library(ComplexHeatmap)
-  library
   library(pipeComp)
 })
 source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 12))
 ```
 
-```{r clustering, fig.width=12, fig.height=3}
-res <- readRDS("../data/results_clust_2.rds")
-h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","clustmethod"), scale=TRUE, anno_legend = FALSE)
-h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
-  scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
-  scrna_evalPlot_clustAtTrueK(res, agg.by=c("norm","clustmethod"), reorder_rows = h, anno_legend = FALSE)
-h <- .renameHrows(h, function(x) gsub("seurat; clustmethod=|; clustmethod=", "", gsub("seuratvst", "sctransform + ", x)))
-h <- .renameHrows(h, function(x) gsub("clust.scran","scran (walktrap)",gsub("clust.scran.fg", "scran (fast_greedy)", x)))
-h
+```{r clustering_accuracy, fig.width=12, fig.height=3}
+# biorxiv data & figure
+# res <- readRDS("../data/results_clust_2.rds")
+# h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","clustmethod"), scale=TRUE, anno_legend = FALSE)
+# h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
+#   scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","clustmethod"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
+#   scrna_evalPlot_clustAtTrueK(res, agg.by=c("norm","clustmethod"), reorder_rows = h, anno_legend = FALSE)
+# h <- pipeComp:::.renameHrows(h, function(x) gsub("seurat; clustmethod=|; clustmethod=", "", gsub("seuratvst", "sctransform + ", x)))
+# h <- pipeComp:::.renameHrows(h, function(x) gsub("clust.scran","scran (walktrap)",gsub("clust.scran.fg", "scran (fast_greedy)", x)))
+
+res <- readRDS("../data/results_clustering2.rds")
+cl <- res$evaluation$clustering
+cl$graph <- cl$clustmethod
+levels(cl$graph) <- c(paste0("scran (",c("exact rank SNN", "Annoy rank SNN", "exact rank SNN", "exact KNN", "Annoy KNN", "exact SNN", "Annoy SNN"),")"), "Seurat SNN")
+levels(cl$clustmethod) <- c("walktrap","walktrap","fast-greedy","walktrap","walktrap","walktrap","walktrap","Seurat")
+cl$elapsed <- res$elapsed$stepwise$clustering$elapsed
+cl$nbClust.diff <- cl$n_clus-cl$true.nbClusts
+clo <- cl
+cl <- cl[cl$k<=20,]
+res$evaluation$clustering <- cl
+
+renameFn <- function(x){
+  x <- gsub("seurat; graph=|; graph=", "", gsub("seuratvst", "sctrans.+", x))
+  x <- gsub("; clustmethod=", "+", x)
+  x <- gsub("^graph=","",x)
+  x <- gsub("exact ","",x)
+  x <- gsub(" + walktrap","",x,fixed=TRUE)
+}
+
+tmp <- scale(pipeComp:::.prepRes(cl, "ARI", agg.by=c("norm","graph","clustmethod"))) + 
+  scale(pipeComp:::.prepRes(cl, "MI", agg.by=c("norm","graph","clustmethod")))
+o <- names(sort(rowMeans(tmp, na.rm=TRUE)+apply(tmp,1,na.rm=TRUE,FUN=median), decreasing = TRUE))
+o <- gsub("norm=norm\\.","",o)
+o <- c(o[grep("seuratvst",o)],o[grep("seuratvst",o,invert=TRUE)])
+h <- scrna_evalPlot_clust(cl, what="MI", agg.by=c("norm","graph","clustmethod"), agg.fn = median, scale=TRUE, anno_legend = FALSE, reorder_rows=o, row_names_max_width = unit(8, "cm"), row_names_gp = gpar(fontsize = 11)) +
+  scrna_evalPlot_clust(res, what="ARI", agg.by=c("norm","graph","clustmethod"), agg.fn = median, scale=TRUE, reorder_rows = o, anno_legend = FALSE) +
+  scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","graph","clustmethod"), agg.fn = median, scale=TRUE, reorder_rows = o, anno_legend = FALSE) +
+  scrna_evalPlot_clust(res, what="ARI", atTrueK = TRUE, agg.by=c("norm","graph","clustmethod"), agg.fn = median, reorder_rows = o, anno_legend = FALSE, row_names_max_width = unit(8, "cm"), row_names_gp = gpar(fontsize = 11))
+h <- pipeComp:::.renameHrows(h, renameFn)
+h2 <- grid.grabExpr(draw(h))
 ```
+
+
+
+```{r clustering_time}
+clo$elapsed <- res$elapsed$stepwise$clustering$elapsed
+# keep reasonable parameters for a realistic time
+res$evaluation$clustering <- clo[which(clo$steps>2 & clo$k <=20),]
+h3 <- scrna_evalPlot_clust(res, what="elapsed", agg.by=c("graph","clustmethod"),
+                           anno_legend = TRUE, scale=TRUE, value_format = "%.1f" )
+h3 <- h3 + scrna_evalPlot_clust(res, what="nbClust.diff", 
+                                agg.by=c("graph","clustmethod"), agg.fn = median,
+                                reorder_rows=h3, scale = FALSE, value_format = "%.1f", 
+                                col = circlize::colorRamp2(c(-5, 0, 5), c("red", "white", "Darkblue")),
+                                value_cols = c("black","black"), 
+                                row_names_max_width = unit(8, "cm"),
+                                row_names_gp = gpar(fontsize = 12) )
+h3 <- pipeComp:::.renameHrows(h3, renameFn)
+h3 <- grid.grabExpr(draw(h3))
+```
+
+```{r clustering, fig.width=12, fig.height=8}
+plot_grid(h2, h3, labels=LETTERS[1:2], ncol=1, rel_heights = c(7,4))
+```
+Clustering accuracy (A), computing time (B left) and mean deviation from the true number of clusters (B right). The (exact) rank-based SNN graph represents the default setting in `scran`-based clustering; however we find that the Annoy approximation to the KNN diminishes the computing costs without negatively affecting the accuracy.
