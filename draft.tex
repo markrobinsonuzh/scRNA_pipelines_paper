@@ -251,7 +251,7 @@ The last step evaluated in our pipeline was clustering. Given previous works on 
 
 Since ARI is dominated by differences in the number of clusters (Supplementary Figure 17) and no single metric is perfect, we diversified them (Figure \ref{fig:figure9}). Mutual information (MI) has the virtue of not decreasing when a true subpopulation is split into two clusters, which is arguably less problematic (and might well reflect unknown biological subgroups), but as a consequence it can be biased towards methods producing higher resolution clustering. Similarly, precision per true subpopulation is considerably more robust to differences in the number of clusters. We also tracked the mean F1 score and the ARI at the true number of clusters. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{{main_figures/clustering_files/figure-html/clustering-1.png}}
     \caption{\textbf{Evaluation of clustering methods.} Clustering accuracy of common clustering tools in combination with \textit{sctransform} and standard Seurat's normalization.}
@@ -319,7 +319,7 @@ On the basis of our findings, we can make a number of concrete analysis recommen
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.75,keepaspectratio]{main_figures/pipeComp_summary.png}
+    \includegraphics[scale=0.08,keepaspectratio]{main_figures/pipeComp_summary.png}
     \caption{\textbf{Recommendations of tools from filtering to clustering.}}
     \label{fig:figure11}
 \end{figure}
