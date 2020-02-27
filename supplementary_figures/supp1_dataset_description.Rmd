@@ -26,36 +26,12 @@ suppressPackageStartupMessages({
   library(pipeComp)
 })
 source("../misc_functions.R")
-theme_set(theme_cowplot(font_size = 12))
 # we load the datasets
 lf <- list.files("../datasets/", full.names=TRUE)
 names(lf) <- gsub(".SCE.rds", "", basename(lf), fixed=TRUE)
 lf <- lf[grep("simMix", lf, invert=TRUE)]
 SCEs <- lapply(lf, readRDS)
 ```
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r dist_cell_properties, fig.width=8.5, fig.height=8.5}
-vars <- c( "log10(features)"="log10_total_features", "log10(counts)"="log10_total_counts", 
-           "% in top 20"="pct_counts_in_top_20_features", "% mito"="pct_counts_Mt", 
-           "% ribosomal"="pct_counts_ribosomal", "% coding"="pct_counts_coding" )
-plot_grid(plotlist=lapply(1:length(vars), FUN=function(x){ 
-  p <- plotFilters(SCEs, vars[x], nmads=c(2,5), ncol=1) + xlab(names(vars)[x])
-  p <- p + scale_y_continuous(breaks=scales::pretty_breaks(2))
-  p <- p + scale_x_continuous(breaks=scales::pretty_breaks(3))
-  p + theme( axis.title.y = element_blank(), 
-             strip.text.x = element_text(size=10),
-             axis.title=element_text(size=11),
-             axis.text=element_text(size=11) )
-}), nrow=1)
-```
-
-### Supplementary Figure `r getFigNb()`
-Distribution across cells of various control properties in the different datasets. The 
-lines indicate respectively 2 and 5 median absolute deviations (MADs).
-
-\newpage
 
 
 # Supplementary Figure `r getFigNb(TRUE)`
@@ -90,18 +66,25 @@ The total counts and total features per cell of doublets (red) versus other cell
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r featcount_ratio}
-d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
-                 log10_counts=unlist(lapply(SCEs,FUN=function(x) x$log10_total_counts)),
-                 log10_features=unlist(lapply(SCEs,FUN=function(x) x$log10_total_features)),
-                 featcount_dist=unlist(lapply(SCEs,FUN=function(x) x$featcount_dist)))
-ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_point() + facet_wrap(~dataset, scale="free") + scale_colour_gradient2(limits=c(-0.2,0.2))
+```{r dist_cell_properties, fig.width=8.5, fig.height=8.5}
+theme_set(theme_cowplot(font_size = 12))
+vars <- c( "log10(features)"="log10_total_features", "log10(counts)"="log10_total_counts", 
+           "% in top 20"="pct_counts_in_top_20_features", "% mito"="pct_counts_Mt", 
+           "% ribosomal"="pct_counts_ribosomal", "% coding"="pct_counts_coding" )
+plot_grid(plotlist=lapply(1:length(vars), FUN=function(x){ 
+  p <- plotFilters(SCEs, vars[x], nmads=c(2,5), ncol=1) + xlab(names(vars)[x])
+  p <- p + scale_y_continuous(breaks=scales::pretty_breaks(2))
+  p <- p + scale_x_continuous(breaks=scales::pretty_breaks(3))
+  p + theme( axis.title.y = element_blank(), 
+             strip.text.x = element_text(size=10),
+             axis.title=element_text(size=11),
+             axis.text=element_text(size=11) )
+}), nrow=1)
 ```
 
-
-
 ### Supplementary Figure `r getFigNb()`
-There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` datasets), between the total counts of a cell and its number of detected features. We therefore include, among control variables, deviation from this ratio.
+Distribution across cells of various control properties in the different datasets. The 
+lines indicate respectively 2 and 5 median absolute deviations (MADs).
 
 \newpage
 
@@ -117,6 +100,23 @@ d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)),
 plot_grid( ggplot(d, aes(x=pct_top_50, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
            ggplot(d, aes(x=log10_features, y=pct_counts_Mt)) + geom_point() + facet_wrap(~dataset, scale="free") + geom_density_2d(),
            labels=LETTERS[1:2], nrow=2 )
+```
+
+
+
+### Supplementary Figure `r getFigNb()`
+Relationship between selected cell-level QC metrics.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r featcount_ratio}
+d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
+                 log10_counts=unlist(lapply(SCEs,FUN=function(x) x$log10_total_counts)),
+                 log10_features=unlist(lapply(SCEs,FUN=function(x) x$log10_total_features)),
+                 featcount_dist=unlist(lapply(SCEs,FUN=function(x) x$featcount_dist)))
+ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_point() + facet_wrap(~dataset, scale="free") + scale_colour_gradient2(limits=c(-0.2,0.2))
 ```
 
 

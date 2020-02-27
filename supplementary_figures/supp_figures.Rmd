@@ -32,11 +32,16 @@ getFigNb <- function(increment=FALSE){
 
 \newpage
 
+```{r child='supp1b_metrics.Rmd'}
+```
 
 ```{r child='supp1_dataset_description.Rmd'}
 ```
 
 ```{r child='supp2_filtering.Rmd'}
+```
+
+```{r child='supp3b_scVI.Rmd'}
 ```
 
 ```{r child='supp3_normalization.Rmd'}

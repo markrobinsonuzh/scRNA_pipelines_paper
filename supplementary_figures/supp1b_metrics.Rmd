@@ -1,0 +1,83 @@
+---
+title: "Supplementary Figures relative to clustering"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r, include=FALSE}
+if(!exists('FIG_NB')){
+  FIG_NB <- 0
+  getFigNb <- function(increment=FALSE){
+    if(increment) FIG_NB <<- FIG_NB + 1
+    FIG_NB
+  }
+}
+
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(reshape2)
+  library(dplyr)
+  library(patchwork)
+  library(pipeComp) # (requires `pipeComp` version >=0.99.3)
+  library(scales)
+})
+theme_set(theme_cowplot(font_size = 12))
+source("../misc_functions.R")
+```
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, include=FALSE}
+res <- readRDS("../data/results_clustering.rds")
+res <- res$evaluation$clustering
+res <- res[which(res$clustmethod %in% c("clust.seurat","clust.scran")),]
+res$norm <- gsub("norm\\.seuratvst","sctransform",res$norm)
+dd <- res[!duplicated(res[,c("dataset","true.nbClusts")]),]
+```
+
+```{r, fig.width=7.5, fig.height=7}
+ggplot(res, aes(n_clus, ARI, colour=clustmethod, shape=norm)) + 
+    geom_point() + xlim(c(1,40)) + facet_wrap(~dataset) + xlab("Number of clusters") +
+    geom_vline(aes(xintercept=k), data=dd, linetype="dashed") + theme(legend.position="bottom") + 
+    guides(colour=guide_legend(ncol=1, title = ""), shape=guide_legend(ncol=1, title=""))
+```
+
+
+### Supplementary Figure `r getFigNb()`
+The number of clusters called has a much bigger impact on the Adjusted Rand Index (ARI) than differences between methods. The dashed line indicates the true number of clusters.
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.width=8, fig.height=5}
+res <- readRDS("../data/results_clustering.rds")
+cl <- res <- res$evaluation$clustering
+cl <- cl[cl$dataset!="mixology10x3cl",]
+cl$nbClust.diff <- cl$n_clus-cl$true.nbClusts
+cl$nbClust.absDiff <- abs(cl$n_clus-cl$true.nbClusts)
+ff <- c( "mean_pr", "mean_re", "mean_F1", "RI", "ARI", "MI", "AMI", "VI", "NVI", 
+         "ID", "NID", "NMI", "min_pr", "min_re", "min_F1", "nbClust.diff",
+         "nbClust.absDiff" )
+e <- split(cl[,ff], cl$dataset, drop=TRUE)
+sp <- lapply(e, FUN=function(x) cor(x,method="spearman"))
+sp <- Reduce('+',sp)/length(sp)
+pe <- lapply(e, FUN=function(x) cor(x))
+pe <- Reduce('+',pe)/length(pe)
+h <- hclust(as.dist(1-(sp+pe)/2))
+sp <- sp[h$order,h$order]
+pe <- pe[h$order,h$order]
+cs <- circlize::colorRamp2(c(-1,0,1), c("darkblue","white","darkred"))
+Heatmap( sp, column_title = "Spearman correlation", col=cs, name="cor", 
+         cluster_columns=FALSE, cluster_rows=FALSE) + 
+  Heatmap(pe, column_title="Spearman correlation", name="pearson", col=cs,
+          cluster_columns=FALSE, cluster_rows=FALSE, show_heatmap_legend=FALSE)
+```
+
+### Supplementary Figure `r getFigNb()`
+Relationship of various metrics of clustering accuracy between each other and with variations in the number of clusters called (`nbClust.diff` and `nbClust.absDiff`). Correlations were calculated for each dataset separately across various clustering runs and averaged (the `mixology10x3cl` dataset was excluded due to insufficient variation among the results). Information distance metrics (ID, NID, VI, NVI) are highly correlated with the absolute difference between the true and called number of clusters, while the Adjusted Rand Index (ARI) and similar metrics were strongly anticorrelated to it. Precision (mean_pr) and recall (mean_re) were slightly less correlated with discrepancies in the number of clusters. Mutual information (MI) was not at all correlated with the absolute difference in number of clusters (`nbClust.absDiff`), but positively correlated with the difference (`nbClust.diff`), i.e. favouring clusterings calling a higher number of clusters. We therefore recommend using complementary metrics such as ARI and MI, and potentially mean F1 per subpopulation.
+
+\newpage

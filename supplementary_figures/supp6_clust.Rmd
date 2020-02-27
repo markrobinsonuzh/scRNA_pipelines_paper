@@ -21,60 +21,28 @@ suppressPackageStartupMessages({
   library(reshape2)
   library(dplyr)
   library(patchwork)
-  library(pipeComp)
+  library(pipeComp) # (requires `pipeComp` version >=0.99.3)
+  library(scales)
 })
 theme_set(theme_cowplot(font_size = 12))
 source("../misc_functions.R")
 ```
 
-
 # Supplementary Figure `r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
-#res <- readRDS("../data/clust_endSummary.rds")
-res <- readRDS("../data/results_clust_2.rds")
-res <- parsePipNames(res$clustering)
-x <- grep("true\\.nbClusts",colnames(res),value=TRUE)
-names(x) <- x <- sapply(strsplit(x," "),FUN=function(x) x[[1]])
-aris <- as.data.frame(rbindlist(lapply(x, FUN=function(x){
-  x <- res[,paste(x,"ARI"),drop=FALSE]
-  colnames(x) <- "ARI"
-  x
-}), idcol = "dataset"))
-aris$nbClusters <- unlist(lapply(x, FUN=function(x) res[,paste(x,"n_clus")]))
-aris$clust.method <- res$clustmethod
-aris$norm.method <- res$norm
-levels(aris$norm.method) <- c("norm.seurat","sctransform")
-aris <- aris[which(aris$nbClusters <= 40),]
-dd <- data.frame( dataset=names(x), k=sapply(x, FUN=function(x) res[,paste(x,"true.nbClusts")][1]))
-```
-
-```{r, fig.width=7.5, fig.height=7}
-ggplot(aris, aes(nbClusters, ARI, colour=clust.method, shape=norm.method)) + 
-  geom_point() + xlim(c(1,40)) + facet_wrap(~dataset) + xlab("Number of clusters") +
-  geom_vline(aes(xintercept=k), data=dd, linetype="dashed") + theme(legend.position="bottom") + 
-  guides(colour=guide_legend(ncol=1, title = ""), shape=guide_legend(ncol=1, title=""))
-```
-
-### Supplementary Figure `r getFigNb()`
-The number of clusters called has a much bigger impact on the Adjusted Rand Index (ARI) than differences between methods. The dashed line indicates the true number of clusters.
-
-
-# Supplementary Figure `r getFigNb(TRUE)`
-
-```{r, include=FALSE}
+res <- readRDS("../data/results_clustering2.rds")
+res <- res$evaluation$clustering
 res <- res[which(res$norm=="norm.seurat" & res$resolution <5),]
-x <- grep("true\\.nbClusts",colnames(res),value=TRUE)
-names(x) <- x <- sapply(strsplit(x," "),FUN=function(x) x[[1]])
-y <- cbind(res[,c("k","steps","resolution","clustmethod","dims")],sapply(x, FUN=function(x){
-  res[[paste(x,"n_clus")]] - res[[paste(x,"true.nbClusts")]]
-}))
-y$param <- ifelse( res$clustmethod=="clust.seurat", paste0(" res=",res$resolution), paste0(" steps=",res$steps))
-ag <- aggregate(y[,names(x)], by=y[,c("clustmethod", "k","param"),drop=FALSE], FUN=mean)
-agl <- cbind(ag[rep(1:nrow(ag), 9),1:3], dataset=rep(colnames(ag)[4:ncol(ag)], each=nrow(ag)), delta=as.numeric(as.matrix(ag[,4:ncol(ag)])))
+res$delta <- res$n_clus-res$true.nbClusts
+res$param <- ifelse( res$clustmethod=="clust.seurat", paste0(" res=",res$resolution), paste0(" steps=",res$steps))
+res$param[which(res$clustmethod=="clust.scran.fg")] <- "NA"
+agl <- aggregate(res[,"delta",drop=FALSE], by=res[,c("dataset","clustmethod", "k","param"),drop=FALSE], FUN=mean)
 agl$k <- factor(agl$k, as.character(sort(unique(agl$k))))
-x <- sapply(unique(strsplit(ag$param, "=")), FUN=function(x) as.numeric(x[[2]]) )
-names(x) <- unique(ag$param)
+x <- sapply(unique(strsplit(agl$param, "=")), FUN=function(x){
+  tryCatch(as.numeric(x[[2]]), error=function(e) NA_real_)
+})
+names(x) <- unique(agl$param)
 agl$param <- factor(agl$param, names(sort(x)))
 
 ssq <- trans_new("ssq", function(x) sign(x)*sqrt(abs(x)), function(x) sign(x)*x^2)
@@ -87,11 +55,14 @@ pf <- function(x) ggplot(x, aes(k, param, fill=delta)) + geom_tile() +
 ```
 
 ```{r, fig.width=8, fig.height=8}
-(pf(agl[which(agl$clustmethod=="clust.seurat"),]) + ylab("Seurat") + theme(legend.position = "top")) / 
-    (pf(agl[which(agl$clustmethod=="clust.scran"),]) + ylab("scran walktrap")) /
-    (pf(agl[which(agl$clustmethod=="clust.scran.fg"),]) + ylab("scran fast_greedy")) /
+tt <- theme(strip.background = element_blank(), strip.text.x = element_blank())
+p1 <- pf(agl[which(agl$clustmethod=="clust.seurat"),]) + ylab("Seurat") + 
+  theme(legend.position = "top", strip.text.x = element_text(size = 10, angle=60), strip.background = element_blank())
+p1 / 
+    (pf(agl[which(agl$clustmethod=="clust.scran"),]) + ylab("scran walktrap") + tt) /
+    (pf(agl[which(agl$clustmethod=="clust.scran.fg"),]) + ylab("scran fast_greedy") + tt) /
     (ggplot(agl, aes(k)) + theme(axis.line.y=element_blank(), plot.margin = unit(rep(0,4),"pt"))) + 
-    plot_layout(heights = c(10,8,8,1))
+    plot_layout(heights = c(10,6,2,1))
 ```
 
 ### Supplementary Figure `r getFigNb()`

@@ -25,7 +25,6 @@ suppressPackageStartupMessages({
   library(viridis)
   library(pipeComp)
 })
-suppressMessages(devtools::load_all("../../pipComp/"))
 theme_set(theme_cowplot(font_size = 11))
 source("../misc_functions.R")
 ```
@@ -65,3 +64,16 @@ plot_grid(plotlist = ll[-2], nrow=6, rel_heights=c(1,1,1,1,1,1.5))
 
 ### Supplementary Figure `r getFigNb()`
 Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected. A rough ANOVA on `nbClusters~dataset+norm+dims+resolution` suggests that seuratvst (sctransform) is associated with a higher number of clusters (p~`r round(mod$coefficients["normnorm.seuratvst",4],3)`).
+
+\newpage 
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r VST, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("vst.png")
+```
+
+### Supplementary Figure `r getFigNb()`
+Relationship of the variance with mean count after `sctranform`'s variance stabilizing transformation.
+
+\newpage

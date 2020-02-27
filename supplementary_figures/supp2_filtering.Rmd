@@ -33,7 +33,7 @@ source("../misc_functions.R")
 
 ```{r filt_more, fig.width=8, fig.height=9}
 res <- readRDS("../data/results_filtering.rds")
-m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
+m <- old_evalPlot_filtering(res, returnTable=TRUE)
 m <- m[grep("veryStringent", m$method, invert=TRUE),]
 
 # # horizontal version

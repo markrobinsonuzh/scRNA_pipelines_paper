@@ -110,7 +110,7 @@ myag <- function(cl, out="ARI", trueK=FALSE){
     w <- which(x$n_clus==x$true.nbClusts)
     aggregate(x[w,out], by=list(method=x$sel[w], nb=x$selnb[w]), na.rm=TRUE, FUN=mean)
   })
-  bind_rows(y, .id="dataset")
+  dplyr::bind_rows(y, .id="dataset")
 }
 vst.ARIatK <- myag(vst, trueK=TRUE)
 snorm.ARIatK <- myag(snorm, trueK=TRUE)
