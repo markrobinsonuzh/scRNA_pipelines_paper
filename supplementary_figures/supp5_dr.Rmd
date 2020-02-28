@@ -74,3 +74,66 @@ plot_grid(plotlist = ll, nrow=3)
 ### Supplementary Figure `r getFigNb()`
 Adjusted Rand Index of clustering depending on the resolution and number of dimensions used. Based on sctransform and seurat PCA.
 
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, include=FALSE, eval=FALSE}
+source(system.file("extdata", "scrna_alternatives.R", package="pipeComp"))
+suppressPackageStartupMessages({
+  library(SingleCellExperiment)
+  library(Seurat)
+  library(scater)
+  library(intrinsicDimension)
+})
+datasets <- list.files("../datasets", full.names = TRUE)
+names(datasets) <- gsub("\\..*", "", basename(datasets))
+datasets <- lapply(datasets, readRDS)
+datasets <- lapply(datasets, filt.mad)
+datasets <- lapply(datasets, norm.seurat)
+datasets <- lapply(datasets, sel.deviance)
+
+met <- c("seurat.pca", "scran.denoisePCA", "scran.runPCA")
+res <- list()
+for(i in met) {
+  res[[i]] <- list()
+  print(i)
+  a <- lapply(datasets, function(x) {
+    switch(i,
+           seurat.pca = seurat.pca(x),
+           scran.denoisePCA = scran.denoisePCA(x),
+           scran.runPCA = scran.runPCA(x))
+  })
+  x <- lapply(a, function(x) reducedDim(x, "PCA"))
+  rm(a); gc()
+  ks <- seq(5, 40, 5)
+  for (d in names(datasets)) {
+    res[[i]][[d]]$ndims <- c()
+    res[[i]][[d]]$k <- c()
+  }
+  for (k in ks) {
+    print(paste("k:", k))
+    for (d in names(datasets)) {
+      res[[i]][[d]]$ndims <- c(res[[i]][[d]]$ndims,
+                               as.numeric(maxLikGlobalDimEst(x[[d]], k=k, unbiased=TRUE)))
+      res[[i]][[d]]$k <- c(res[[i]][[d]]$k, k)
+    }
+  }
+}
+saveRDS(res, "../data/maxLikGlobal.rds")
+```
+
+```{r, fig.width=7, fig.height=5}
+res <- readRDS("../data/maxLikGlobal.rds")
+res <- dplyr::bind_rows(lapply(res$seurat.pca, as.data.frame), .id="dataset")
+cols <- pipeComp::getQualitativePalette(9)
+names(cols) <- unique(res$dataset)
+ggplot(res, aes(k, ndims, colour=dataset)) + geom_point() + geom_line() + 
+  scale_colour_manual(values=cols) + xlab("Number of nearest neighbors (k)") +
+  ylab("Estimated dimensionality") + 
+  ggtitle("intrinsicDimension::maxLikGlobalDimEst")
+```
+
+### Supplementary Figure `r getFigNb()`
+Estimates of dimensionality by the `intrinsicDimension::maxLikGlobalDimEst` method using various 'reasonable' numbers of nearest neighbors (`k` parameter).
+
