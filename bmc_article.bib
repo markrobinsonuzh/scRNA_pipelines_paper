@@ -3,11 +3,9 @@
 	title = {Estimating the frequency of multiplets in single-cell {RNA} sequencing from cell-mixing experiments},
 	volume = {6},
 	issn = {2167-8359},
-	url = {https://peerj.com/articles/5578},
 	doi = {10.7717/peerj.5578},
 	abstract = {In single-cell RNA-sequencing, it is important to know the frequency at which the sequenced transcriptomes actually derive from multiple cells. A common method to estimate this multiplet frequency is to mix two different types of cells (e.g., human and mouse), and then determine how often the transcriptomes contain transcripts from both cell types. When the two cell types are mixed in equal proportion, the calculation of the multiplet frequency from the frequency of mixed transcriptomes is straightforward. But surprisingly, there are no published descriptions of how to calculate the multiplet frequency in the general case when the cell types are mixed unequally. Here, I derive equations to analytically calculate the multiplet frequency from the numbers of observed pure and mixed transcriptomes when two cell types are mixed in arbitrary proportions, under the assumption that the loading of cells into droplets or wells is Poisson.},
 	language = {en},
-	urldate = {2019-05-13},
 	journal = {PeerJ},
 	author = {Bloom, Jesse D.},
 	month = sep,
@@ -38,29 +36,32 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 }
 
 @article{colePerformance2018,
-	title = {Performance {Assessment} and {Selection} of {Normalization} {Procedures} for {Single}-{Cell} {RNA}-seq},
-	url = {http://biorxiv.org/lookup/doi/10.1101/235382},
-	doi = {10.1101/235382},
-	abstract = {Systematic measurement biases make data normalization an essential preprocessing step in single-cell RNA sequencing (scRNA-seq) analysis. There may be multiple, competing considerations behind the assessment of normalization performance, some of them study-speciﬁc. Because normalization can have a large impact on downstream results (e.g., clustering and diﬀerential expression), it is critically important that practitioners assess the performance of competing methods.},
-	language = {en},
-	urldate = {2019-02-21},
-	journal = {bioRxiv},
-	author = {Cole, Michael B and Risso, Davide and Wagner, Allon and DeTomaso, David and Ngai, John and Purdom, Elizabeth and Dudoit, Sandrine and Yosef, Nir},
-	month = may,
-	year = {2018},
-	file = {Cole et al. - 2018 - Performance Assessment and Selection of Normalizat.pdf:/home/pigerm/Zotero/storage/PQNE3UEV/Cole et al. - 2018 - Performance Assessment and Selection of Normalizat.pdf:application/pdf}
+    abstract = {We have developed an approach for exploratory analysis and normalization of scRNA-seq data that enables execution of a wide array of normalization procedures and provides principled assessment of their performance based on a comprehensive set of data-driven performance metrics.},
+    author = {Cole, Michael B. and Risso, Davide and Wagner, Allon and DeTomaso, David and Ngai, John and Purdom, Elizabeth and Dudoit, Sandrine and Yosef, Nir},
+    doi = {10.1016/j.cels.2019.03.010},
+    file = {:home/anthonys/Documents/PhD/Articles/Cole2019{\_}Benchmark{\_}normalization.pdf:pdf},
+    issn = {24054720},
+    journal = {Cell Systems},
+    keywords = {RNA-seq,methods,normalization,preprocessing,quality control,scRNA-seq,single-cell},
+    number = {4},
+    pages = {315--328},
+    publisher = {Elsevier Inc.},
+    title = {{Performance Assessment and Selection of Normalization Procedures for Single-Cell RNA-Seq}},
+    url = {https://doi.org/10.1016/j.cels.2019.03.010},
+    volume = {8},
+    year = {2019}
 }
+
 
 @article{lunPooling2016,
 	title = {Pooling across cells to normalize single-cell {RNA} sequencing data with many zero counts},
 	volume = {17},
 	issn = {1474-760X},
-	url = {http://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-0947-7},
 	doi = {10.1186/s13059-016-0947-7},
 	abstract = {Normalization of single-cell RNA sequencing data is necessary to eliminate cell-specific biases prior to downstream analyses. However, this is not straightforward for noisy single-cell data where many counts are zero. We present a novel approach where expression values are summed across pools of cells, and the summed values are used for normalization. Pool-based size factors are then deconvolved to yield cell-based factors. Our deconvolution approach outperforms existing methods for accurate normalization of cell-specific biases in simulated data. Similar behavior is observed in real data, where deconvolution improves the relevance of results of downstream analyses.},
 	language = {en},
 	number = {1},
-	urldate = {2019-02-21},
+	pages = {75},
 	journal = {Genome Biology},
 	author = {L. Lun, Aaron T. and Bach, Karsten and Marioni, John C.},
 	month = dec,
@@ -82,7 +83,6 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 @article{tianMixology2018,
 	title = {{scRNA}-seq mixology: towards better benchmarking of single cell {RNA}-seq protocols and analysis methods},
 	shorttitle = {{scRNA}-seq mixology},
-	url = {http://biorxiv.org/lookup/doi/10.1101/433102},
 	doi = {10.1101/433102},
 	abstract = {Single cell RNA sequencing (scRNA-seq) technology has undergone rapid development in recent years, bringing with it new challenges in data processing and analysis. This has led to an explosion of tailored analysis methods for scRNA-seq to address various biological questions. However, the current lack of gold-standard benchmarking datasets makes it difficult for researchers to evaluate the performance of the many methods. Here, we designed and carried out a realistic benchmark experiment that included mixtures of single cells or ‘pseudo-cells’ created by sampling admixtures of cells or RNA from 3 distinct cancer cell lines. Altogether we generated 10 datasets using a combination of droplet and plate-based scRNA-seq protocols, with varying data quality, population heterogeneity and noise levels. Using these benchmark datasets, we compared different protocols, evaluated the spike-in standard and multiple data analysis methods for tasks ranging from normalization and imputation, to clustering, trajectory analysis and data integration. Evaluation of methods across multiple datasets revealed some that performed well in general and others that suited specific situations. Our dataset and analysis provide a comprehensive comparison framework for benchmarking most popular scRNA-seq analysis tasks.},
 	language = {en},
@@ -91,68 +91,69 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	author = {Tian, Luyi and Dong, Xueyi and Freytag, Saskia and Le Cao, Kim-Anh and Su, Shian and Amann-Zalcenstein, Daniela and Weber, Tom S and Seidi, Azadeh and Naik, Shalin and Ritchie, Matthew E},
 	month = oct,
 	year = {2018},
+	pages = {433102},
 	file = {Tian et al. - 2018 - scRNA-seq mixology towards better benchmarking of.pdf:/home/pigerm/Zotero/storage/78X44C3V/Tian et al. - 2018 - scRNA-seq mixology towards better benchmarking of.pdf:application/pdf}
 }
 
 @article{deekeStablyExpressed2018,
 	title = {Stably expressed genes in single-cell {RNA}-sequencing:},
 	shorttitle = {Stably expressed genes in single-cell {RNA}-sequencing},
-	url = {http://biorxiv.org/lookup/doi/10.1101/475426},
 	doi = {10.1101/475426},
 	abstract = {Motivation: In single-cell RNA-sequencing (scRNA-seq) experiments, RNA transcripts are extracted and measured from isolated cells to understand gene expression at the cellular level. Measurements from this technology are aﬀected by many technical artifacts, including batch eﬀects. In analogous bulk gene expression experiments, external references, e.g., synthetic gene spike-ins often from the External RNA Controls Consortium (ERCC), may be incorporated to the experimental protocol for use in adjusting measurements for technical artifacts. In scRNA-seq experiments, the use of external spike-ins is controversial due to dissimilarities with endogenous genes and uncertainty about suﬃcient precision of their introduction. Instead, endogenous genes with highly stable expression could be used as references within scRNA-seq to help normalize the data. First, however, a speciﬁc notion of stable expression at the single cell level needs to be formulated; genes could be stable in absolute expression, in proportion to cell volume, or in proportion to total gene expression. Diﬀerent types of stable genes will be useful for diﬀerent normalizations and will need diﬀerent methods for discovery.},
 	language = {en},
-	urldate = {2019-03-12},
 	journal = {bioRxiv},
 	author = {Deeke, Julie M and Gagnon-Bartsch, Johann A.},
 	month = nov,
 	year = {2018},
+	pages = {475426},
 	file = {Deeke and Gagnon-Bartsch - 2018 - Stably expressed genes in single-cell RNA-sequenci.pdf:/home/pigerm/Zotero/storage/DSZDCKAH/Deeke and Gagnon-Bartsch - 2018 - Stably expressed genes in single-cell RNA-sequenci.pdf:application/pdf}
 }
 
 @article{townesGlmpca2019,
-	title = {Feature {Selection} and {Dimension} {Reduction} for {Single} {Cell} {RNA}-{Seq} based on a {Multinomial} {Model}},
-	url = {http://biorxiv.org/lookup/doi/10.1101/574574},
-	doi = {10.1101/574574},
-	abstract = {Single cell RNA-Seq (scRNA-Seq) proﬁles gene expression of individual cells. Recent scRNA-Seq datasets have incorporated unique molecular identiﬁers (UMIs). Using negative controls, we show UMI counts follow multinomial sampling with no zero-inﬂation. Current normalization procedures such as log of counts per million and feature selection by highly variable genes produce false variability in dimension reduction. We propose simple multinomial methods, including generalized principal component analysis (GLM-PCA) for non-normal distributions, and feature selection using deviance. These methods outperform current practice in a downstream clustering assessment using ground-truth datasets.},
-	language = {en},
-	urldate = {2019-03-13},
-	journal = {bioRxiv},
-	author = {Townes, F. William and Hicks, Stephanie C. and Aryee, Martin J. and Irizarry, Rafael A.},
-	month = mar,
-	year = {2019},
-	file = {Townes et al. - 2019 - Feature Selection and Dimension Reduction for Sing.pdf:/home/pigerm/Zotero/storage/4QASCIDF/Townes et al. - 2019 - Feature Selection and Dimension Reduction for Sing.pdf:application/pdf}
+    abstract = {Single-cell RNA-Seq (scRNA-Seq) profiles gene expression of individual cells. Recent scRNA-Seq datasets have incorporated unique molecular identifiers (UMIs). Using negative controls, we show UMI counts follow multinomial sampling with no zero inflation. Current normalization procedures such as log of counts per million and feature selection by highly variable genes produce false variability in dimension reduction. We propose simple multinomial methods, including generalized principal component analysis (GLM-PCA) for non-normal distributions, and feature selection using deviance. These methods outperform the current practice in a downstream clustering assessment using ground truth datasets.},
+    author = {Townes, F. William and Hicks, Stephanie C. and Aryee, Martin J. and Irizarry, Rafael A.},
+    doi = {10.1186/s13059-019-1861-6},
+    file = {:home/anthonys/Documents/PhD/Articles/Townes2019-Feature{\_}selection{\_}dimension{\_}reduction{\_}multinomial{\_}model.pdf:pdf},
+    journal = {Genome Biology},
+    number = {295},
+    pages = {1--16},
+    title = {{Feature selection and dimension reduction for single-cell RNA-Seq based on a multinomial model.}},
+    volume = {20},
+    year = {2019}
 }
 
 @article{hafemeisterSCtransform2019,
-	title = {Normalization and variance stabilization of single-cell {RNA}-seq data using regularized negative binomial regression},
-	url = {http://biorxiv.org/lookup/doi/10.1101/576827},
-	doi = {10.1101/576827},
-	abstract = {Single-cell RNA-seq (scRNA-seq) data exhibits signiﬁcant cell-to-cell variation due to technical factors, including the number of detected molecules in each cell, which can confound biological heterogeneity with technical eﬀects. To address this, we present a modeling framework for the normalization and variance stabilization of molecular count data from scRNA-seq experiments. We propose that the Pearson residuals from ’regularized negative binomial regression’, where cellular sequencing depth is utilized as a covariate in a generalized linear model, successfully remove the inﬂuence of technical characteristics from downstream analyses while preserving biological heterogeneity. Importantly, we show that an unconstrained negative binomial model may overﬁt scRNA-seq data, and overcome this by pooling information across genes with similar abundances to obtain stable parameter estimates. Our procedure omits the need for heuristic steps including pseudocount addition or log-transformation, and improves common downstream analytical tasks including variable gene selection, dimensional reduction, and diﬀerential expression. Our procedure can be applied to any UMI-based scRNA-seq dataset and is freely available as part of the R package sctransform, with a direct interface to our single-cell toolkit Seurat.},
-	language = {en},
-	urldate = {2019-03-14},
-	journal = {bioRxiv},
-	author = {Hafemeister, Christoph and Satija, Rahul},
-	month = mar,
-	year = {2019},
-	file = {Hafemeister and Satija - 2019 - Normalization and variance stabilization of single.pdf:/home/pigerm/Zotero/storage/VRSURXZC/Hafemeister and Satija - 2019 - Normalization and variance stabilization of single.pdf:application/pdf}
+    abstract = {Single-cell RNA-seq (scRNA-seq) data exhibits significant cell-to-cell variation due to technical factors, including the number of molecules detected in each cell, which can confound biological heterogeneity with technical effects. To address this, we present a modeling framework for the normalization and variance stabilization of molecular count data from scRNA-seq experiments. We propose that the Pearson residuals from "regularized negative binomial regression," where cellular sequencing depth is utilized as a covariate in a generalized linear model, successfully remove the influence of technical characteristics from downstream analyses while preserving biological heterogeneity. Importantly, we show that an unconstrained negative binomial model may overfit scRNA-seq data, and overcome this by pooling information across genes with similar abundances to obtain stable parameter estimates. Our procedure omits the need for heuristic steps including pseudocount addition or log-transformation and improves common downstream analytical tasks such as variable gene selection, dimensional reduction, and differential expression. Our approach can be applied to any UMI-based scRNA-seq dataset and is freely available as part of the R package sctransform, with a direct interface to our single-cell toolkit Seurat.},
+    author = {Hafemeister, Christoph and Satija, Rahul},
+    doi = {10.1186/s13059-019-1874-1},
+    file = {:home/anthonys/Documents/PhD/Articles/Hafemeister2019{\_}sctransform{\_}normalization{\_}variance{\_}stabilization.pdf:pdf},
+    issn = {1474760X},
+    journal = {Genome Biology},
+    keywords = {Normalization,Single-cell RNA-seq},
+    number = {1},
+    pages = {1--15},
+    publisher = {Genome Biology},
+    title = {{Normalization and variance stabilization of single-cell RNA-seq data using regularized negative binomial regression}},
+    volume = {20},
+    year = {2019}
 }
+
+
 
 @article{viethSystematic2019,
-	title = {A {Systematic} {Evaluation} of {Single} {Cell} {RNA}-{Seq} {Analysis} {Pipelines}},
-	copyright = {© 2019, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution-NonCommercial-NoDerivs 4.0 International), CC BY-NC-ND 4.0, as described at http://creativecommons.org/licenses/by-nc-nd/4.0/},
-	url = {https://www.biorxiv.org/content/10.1101/583013v1},
-	doi = {10.1101/583013},
-	abstract = {{\textless}p{\textgreater}The recent rapid spread of single cell RNA sequencing (scRNA-seq) methods has created a large variety of experimental and computational pipelines for which best practices have not been established, yet. Here, we use simulations based on five scRNA-seq library protocols in combination with nine realistic differential expression (DE) setups to systematically evaluate three mapping, four imputation, seven normalisation and four differential expression testing approaches resulting in {\textasciitilde} 3,000 pipelines, allowing us to also assess interactions among pipeline steps. We find that choices of normalisation and library preparation protocols have the biggest impact on scRNA-seq analyses. Specifically, we find that library preparation determines the ability to detect symmetric expression differences, while normalisation dominates pipeline performance in asymmetric DE-setups. Finally, we illustrate the importance of informed choices by showing that a good scRNA-seq pipeline can have the same impact on detecting a biological signal as quadrupling the sample size.{\textless}/p{\textgreater}},
-	language = {en},
-	urldate = {2019-03-20},
-	journal = {bioRxiv},
-	author = {Vieth, Beate and Parekh, Swati and Ziegenhain, Christoph and Enard, Wolfgang and Hellmann, Ines},
-	month = mar,
-	year = {2019},
-	pages = {583013},
-	file = {Full Text PDF:/home/pigerm/Zotero/storage/WC2TU5KJ/Vieth et al. - 2019 - A Systematic Evaluation of Single Cell RNA-Seq Ana.pdf:application/pdf}
+    abstract = {The recent rapid spread of single cell RNA sequencing (scRNA-seq) methods has created a large variety of experimental and computational pipelines for which best practices have not yet been established. Here, we use simulations based on five scRNA-seq library protocols in combination with nine realistic differential expression (DE) setups to systematically evaluate three mapping, four imputation, seven normalisation and four differential expression testing approaches resulting in {\~{}}3000 pipelines, allowing us to also assess interactions among pipeline steps. We find that choices of normalisation and library preparation protocols have the biggest impact on scRNA-seq analyses. Specifically, we find that library preparation determines the ability to detect symmetric expression differences, while normalisation dominates pipeline performance in asymmetric DE-setups. Finally, we illustrate the impor- tance of informed choices by showing that a good scRNA-seq pipeline can have the same impact on detecting a biological signal as quadrupling the sample size.},
+    author = {Vieth, Beate and Parekh, Swati and Ziegenhain, Christoph and Enard, Wolfgang and Hellmann, Ines},
+    doi = {10.1038/s41467-019-12266-7},
+    issn = {2041-1723},
+    journal = {Nature Communications},
+    number = {1},
+    pages = {1--11},
+    publisher = {Springer US},
+    title = {{A systematic evaluation of single cell RNA-seq analysis pipelines}},
+    url = {http://dx.doi.org/10.1038/s41467-019-12266-7},
+    volume = {10},
+    year = {2019}
 }
-
 @article{svenssonZeroinflation2019,
 	title = {Droplet {scRNA}-seq is not zero-inflated},
 	copyright = {© 2019, Posted by Cold Spring Harbor Laboratory. The copyright holder for this pre-print is the author. All rights reserved. The material may not be redistributed, re-used or adapted without the author's permission.},
@@ -171,18 +172,17 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 
 @article{mcginnisDoubletfinder2019,
 	title = {{DoubletFinder}: {Doublet} {Detection} in {Single}-{Cell} {RNA} {Sequencing} {Data} {Using} {Artificial} {Nearest} {Neighbors}},
-	volume = {0},
+	volume = {8},
 	issn = {2405-4712},
 	shorttitle = {{DoubletFinder}},
-	url = {https://www.cell.com/cell-systems/abstract/S2405-4712(19)30073-0},
 	doi = {10.1016/j.cels.2019.03.003},
 	language = {English},
-	number = {0},
-	urldate = {2019-04-11},
+	number = {4},
 	journal = {Cell Systems},
 	author = {McGinnis, Christopher S. and Murrow, Lyndsay M. and Gartner, Zev J.},
 	month = apr,
 	year = {2019},
+	pages = {329--337},
 	pmid = {30954475},
 	keywords = {single-cell RNA sequencing, machine learning, doublet detection, quality-control},
 	file = {Full Text PDF:/home/pigerm/Zotero/storage/554HL5LG/McGinnis et al. - 2019 - DoubletFinder Doublet Detection in Single-Cell RN.pdf:application/pdf;Snapshot:/home/pigerm/Zotero/storage/JF7WYSKK/S2405-4712(19)30073-0.html:text/html}
@@ -213,20 +213,22 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 }
 
 @article{linStableGenes2018,
-	title = {Evaluating stably expressed genes in single cells},
-	copyright = {© 2018, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution-NonCommercial-NoDerivs 4.0 International), CC BY-NC-ND 4.0, as described at http://creativecommons.org/licenses/by-nc-nd/4.0/},
-	url = {https://www.biorxiv.org/content/10.1101/229815v2},
-	doi = {10.1101/229815},
-	abstract = {{\textless}p{\textgreater}Background: Single-cell RNA-seq (scRNA-seq) profiling has revealed remarkable variation in transcription, suggesting that expression of many genes at the single-cell level are intrinsically stochastic and noisy. Yet, on cell population level, a subset of genes traditionally referred to as housekeeping genes (HKGs) are found to be stably expressed in different cell and tissue types. It is therefore critical to question whether stably expressed genes (SEGs) can be identified on the single-cell level, and if so, how their expression stability can be assessed? We have developed a computational framework for ranking expression stability of genes in single cells. Here we evaluate the proposed framework and characterize SEGs derived from two scRNA-seq datasets that profile early human and mouse development. Results: Here, we show that gene expression stability indices derived from the early human and mouse development scRNA-seq datasets are highly reproducible and conserved across species. We demonstrate that SEGs identified from single cells based on their stability indices are considerably more stable than HKGs defined previously from cell populations across 10 diverse biological systems. Our analyses indicate that SEGs are inherently more stable at the single-cell level and their characteristics reminiscent of HKGs, suggesting their potential role in sustaining essential functions in individual cells. Conclusions: SEGs identified in this study have immediate utility both for understanding variation/stability of single-cell transcriptomes and for practical applications including scRNA-seq data normalization, the proposed framework can be applied to identify genes with stable expression in other scRNA-seq datasets.{\textless}/p{\textgreater}},
-	language = {en},
-	urldate = {2019-04-21},
-	journal = {bioRxiv},
-	author = {Lin, Yingxin and Ghazanfar, Shila and Strbenac, Dario and Wang, Andy and Patrick, Ellis and Lin, Dave and Speed, Terence and Yang, Jean YH and Yang, Pengyi},
-	month = nov,
-	year = {2018},
-	pages = {229815},
-	file = {Full Text PDF:/home/pigerm/Zotero/storage/7N9W6U3G/Lin et al. - 2018 - Evaluating stably expressed genes in single cells.pdf:application/pdf;Snapshot:/home/pigerm/Zotero/storage/HBYB4N55/229815v2.html:text/html}
+    abstract = {Background: Single-cell RNA-seq (scRNA-seq) profiling has revealed remarkable variation in transcription, suggesting that expression of many genes at the single-cell level is intrinsically stochastic and noisy. Yet, on the cell population level, a subset of genes traditionally referred to as housekeeping genes (HKGs) are found to be stably expressed in different cell and tissue types. It is therefore critical to question whether stably expressed genes (SEGs) can be identified on the single-cell level, and if so, how can their expression stability be assessed? We have previously proposed a computational framework for ranking expression stability of genes in single cells for scRNA-seq data normalization and integration. In this study, we perform detailed evaluation and characterization of SEGs derived from this framework. Results: Here, we show that gene expression stability indices derived from the early human and mouse development scRNA-seq datasets and the "Mouse Atlas" dataset are reproducible and conserved across species. We demonstrate that SEGs identified from single cells based on their stability indices are considerably more stable than HKGs defined previously from cell populations across diverse biological systems. Our analyses indicate that SEGs are inherently more stable at the single-cell level and their characteristics reminiscent of HKGs, suggesting their potential role in sustaining essential functions in individual cells. Conclusions: SEGs identified in this study have immediate utility both for understanding variation and stability of single-cell transcriptomes and for practical applications such as scRNA-seq data normalization. Our framework for calculating gene stability index, "scSEGIndex," is incorporated into the scMerge Bioconductor R package (https://sydneybiox.github.io/scMerge/reference/scSEGIndex.html) and can be used for identifying genes with stable expression in scRNA-seq datasets.},
+    author = {Lin, Yingxin and Ghazanfar, Shila and Strbenac, Dario and Wang, Andy and Patrick, Ellis and Lin, David M. and Speed, Terence and Yang, Jean Y.H. and Yang, Pengyi},
+    doi = {10.1093/gigascience/giz106},
+    file = {:home/anthonys/Documents/PhD/Articles/Lin2019{\_}Evaluating{\_}stably{\_}expressed{\_}genes.pdf:pdf},
+    isbn = {0000000310},
+    issn = {2047217X},
+    journal = {GigaScience},
+    keywords = {gene expression variability,housekeeping genes,scRNA-seq,single cells,stably expressed genes},
+    number = {9},
+    pages = {1--10},
+    publisher = {Oxford University Press},
+    title = {{Evaluating stably expressed genes in single cells}},
+    volume = {8},
+    year = {2019}
 }
+
 
 @article{kiselevChallengesClustering2019,
 	title = {Challenges in unsupervised clustering of single-cell {RNA}-seq data},
@@ -286,12 +288,10 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	volume = {36},
 	copyright = {2017 Nature Publishing Group},
 	issn = {1546-1696},
-	url = {https://www.nature.com/articles/nbt.4042},
 	doi = {10.1038/nbt.4042},
 	abstract = {Droplet single-cell RNA-sequencing (dscRNA-seq) has enabled rapid, massively parallel profiling of transcriptomes. However, assessing differential expression across multiple individuals has been hampered by inefficient sample processing and technical batch effects. Here we describe a computational tool, demuxlet, that harnesses natural genetic variation to determine the sample identity of each droplet containing a single cell (singlet) and detect droplets containing two cells (doublets). These capabilities enable multiplexed dscRNA-seq experiments in which cells from unrelated individuals are pooled and captured at higher throughput than in standard workflows. Using simulated data, we show that 50 single-nucleotide polymorphisms (SNPs) per cell are sufficient to assign 97\% of singlets and identify 92\% of doublets in pools of up to 64 individuals. Given genotyping data for each of eight pooled samples, demuxlet correctly recovers the sample identity of {\textgreater}99\% of singlets and identifies doublets at rates consistent with previous estimates. We apply demuxlet to assess cell-type-specific changes in gene expression in 8 pooled lupus patient samples treated with interferon (IFN)-β and perform eQTL analysis on 23 pooled samples.},
 	language = {en},
 	number = {1},
-	urldate = {2019-03-10},
 	journal = {Nature Biotechnology},
 	author = {Kang, Hyun Min and Subramaniam, Meena and Targ, Sasha and Nguyen, Michelle and Maliskova, Lenka and McCarthy, Elizabeth and Wan, Eunice and Wong, Simon and Byrnes, Lauren and Lanata, Cristina M. and Gate, Rachel E. and Mostafavi, Sara and Marson, Alexander and Zaitlen, Noah and Criswell, Lindsey A. and Ye, Chun Jimmie},
 	month = jan,
@@ -306,7 +306,6 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	volume = {33},
 	copyright = {2015 Nature Publishing Group},
 	issn = {1546-1696},
-	url = {https://www.nature.com/articles/nbt.3192},
 	doi = {10.1038/nbt.3192},
 	abstract = {Spatial localization is a key determinant of cellular fate and behavior, but methods for spatially resolved, transcriptome-wide gene expression profiling across complex tissues are lacking. RNA staining methods assay only a small number of transcripts, whereas single-cell RNA-seq, which measures global gene expression, separates cells from their native spatial context. Here we present Seurat, a computational strategy to infer cellular localization by integrating single-cell RNA-seq data with in situ RNA patterns. We applied Seurat to spatially map 851 single cells from dissociated zebrafish (Danio rerio) embryos and generated a transcriptome-wide map of spatial patterning. We confirmed Seurat's accuracy using several experimental approaches, then used the strategy to identify a set of archetypal expression patterns and spatial markers. Seurat correctly localizes rare subpopulations, accurately mapping both spatially restricted and scattered groups. Seurat will be applicable to mapping cellular localization within complex patterned tissues in diverse systems.},
 	language = {en},
@@ -346,7 +345,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     number = {269},
     pages = {1--21},
     publisher = {Genome Biology},
-    title = {{Accuracy , robustness and scalability of dimensionality reduction methods for single-cell RNA-seq analysis}},
+    title = {{Accuracy, robustness and scalability of dimensionality reduction methods for single-cell RNA-seq analysis}},
     volume = {20},
     year = {2019}
 }
@@ -359,7 +358,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     isbn = {1111111111},
     journal = {PLoS Computational Biology},
     number = {6},
-    pages = {1--14},
+    pages = {e1006245},
     title = {{Exploring the single-cell RNA-seq analysis landscape with the scRNA-tools database}},
     volume = {14},
     year = {2018}
@@ -370,7 +369,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     abstract = {Over 500 single cell transcriptomics studies have been published to date. Many of these have data available, but the links between data, study, and systems studied can be hard to identify through literature search. This manuscript describes a nearly exhaustive and manually curated database of single cell transcriptomics studies with descriptions of what kind of data and what biological systems have been studied. Additionally, based on the text in the listed papers information about analysis is included in the database, allowing analysis of trends in the field. As a particular example, it is demonstrated that the number of cell types identified in single cell RNA sequencing studies is directly proportional to the number of cells analyzed. Instructions to access the database are available at [www.nxn.se/single-cell-studies/][1].
     
      [1]: http://www.nxn.se/single-cell-studies/},
-    author = {Svensson, Valentine and Beltrame, Eduardo da Veiga},
+    author = {Svensson, Valentine and Beltrame, Eduardo da Veiga and Pachter, Lior},
     doi = {10.1101/742304},
     file = {:home/anthonys/Documents/PhD/Articles/Svenson2019v2-Curated{\_}database{\_}sc{\_}rna.pdf:pdf},
     journal = {bioRxiv},
@@ -420,7 +419,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 }
 
 @article{CobosDeconvolution2020,
-    author = {Cobos, Francisco Avila and Alquicira-hernandez, Jos{\'{e}} and Powell, Joseph},
+    author = {Cobos, Francisco Avila and Alquicira-Hernandez, Jos{\'{e}} and Powell, Joseph and Mestdagh, Pieter and De Preter, Katleen},
     doi = {10.1101/2020.01.10.897116. T},
     file = {:home/anthonys/Documents/PhD/Articles/Cobos2020-Benchmarking{\_}computational{\_}deconvolution{\_}transcripotmics.pdf:pdf},
     journal = {bioRxiv},
@@ -431,7 +430,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 
 @article{LunScran2016,
     abstract = {Single-cell RNA sequencing (scRNA-seq) is widely used to profile the transcriptome of individual cells. This provides biological resolution that cannot be matched by bulk RNA sequencing, at the cost of increased technical noise and data complexity. The differences between scRNA-seq and bulk RNA-seq data mean that the analysis of the former cannot be performed by recycling bioinformatics pipelines for the latter. Rather, dedicated single-cell methods are required at various steps to exploit the cellular resolution while accounting for technical noise. This article describes a computational workflow for low-level analyses of scRNA-seq data, based primarily on software packages from the open-source Bioconductor project. It covers basic steps including quality control, data exploration and normalization, as well as more complex procedures such as cell cycle phase assignment, identification of highly variable and correlated genes, clustering into subpopulations and marker gene detection. Analyses were demonstrated on gene-level count data from several publicly available datasets involving haematopoietic stem cells, brain-derived cells, T-helper cells and mouse embryonic stem cells. This will provide a range of usage scenarios from which readers can construct their own analysis pipelines.},
-    author = {Lun, Aaron T L and Mccarthy, Davis J and Marioni, John C and Mcdavid, Andrew},
+    author = {Lun, Aaron T L and Mccarthy, Davis J and Marioni, John C},
     doi = {10.12688/f1000research.9501.2},
     file = {:home/anthonys/Documents/PhD/Articles/Lun2016-scran{\_}workflow{\_}analysis{\_}scRNAseq{\_}bioconductor.pdf:pdf},
     journal = {F1000Research},
@@ -449,9 +448,9 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
     file = {:home/anthonys/Documents/PhD/Articles/Bais2019{\_}scds{\_}doublets{\_}scrnaseq.pdf:pdf},
     issn = {1367-4803},
     journal = {Bioinformatics},
-    pages = {1--9},
+    pages = {1150--1158},
     title = {{scds: computational annotation of doublets in single-cell RNA sequencing data}},
-    year = {2019}
+    year = {2020}
 }
 
 
@@ -520,10 +519,8 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 @article{ChungJackstraw2015,
     abstract = {Motivation: There are a number of well-established methods such as principal component analysis (PCA) for automatically capturing systematic variation due to latent variables in large-scale genomic data. PCA and related methods may directly provide a quantitative characterization of a complex biological variable that is otherwise difficult to precisely define or model. An unsolved problem in this context is how to systematically identify the genomic variables that are drivers of systematic variation captured by PCA. Principal components (PCs) (and other estimates of systematic variation) are directly constructed from the genomic variables themselves, making measures of statistical significance artificially inflated when using conventional methods due to over-fitting. Results: We introduce a new approach called the jackstraw that allows one to accurately identify genomic variables that are statistically significantly associated with any subset or linear combination of PCs. The proposed method can greatly simplify complex significance testing problems encountered in genomics and can be used to identify the genomic variables significantly associated with latent variables. Using simulation, we demonstrate that our method attains accurate measures of statistical significance over a range of relevant scenarios. We consider yeast cell-cycle gene expression data, and show that the proposed method can be used to straightforwardly identify genes that are cell-cycle regulated with an accurate measure of statistical significance. We also analyze gene expression data from post-trauma patients, allowing the gene expression data to provide a molecularly driven phenotype. Using our method, we find a greater enrichment for inflammatory-related gene sets compared to the original analysis that uses a clinically defined, although likely imprecise, phenotype. The proposed method provides a useful bridge between large-scale quantifications of systematic variation and gene-level significance analyses.},
     archivePrefix = {arXiv},
-    arxivId = {1308.6013},
     author = {Chung, Neo Christopher and Storey, John D.},
     doi = {10.1093/bioinformatics/btu674},
-    eprint = {1308.6013},
     file = {:home/anthonys/Documents/PhD/Articles/Chung2015{\_}Jackstraw{\_}dimensions{\_}finder.pdf:pdf},
     issn = {14602059},
     journal = {Bioinformatics},
@@ -535,14 +532,12 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 }
 
 
-@inproceedings{AlberganteSepar2019,
+@article{AlberganteSepar2019,
     abstract = {Modern large-scale datasets are frequently said to be high-dimensional. However, their data point clouds frequently possess structures, significantly decreasing their intrinsic dimensionality (ID) due to the presence of clusters, points being located close to low-dimensional varieties or fine-grained lumping. We introduce and test a dimensionality estimator, based on analysing the separability properties of data points, on several benchmarks and real biological datasets. We show that the introduced measure of ID has performance competitive with state-of-the-art measures, being efficient across a wide range of dimensions and performing better in the case of noisy samples. Moreover, it allows estimating the intrinsic dimension in situations where the intrinsic manifold assumption is not valid.},
     archivePrefix = {arXiv},
-    arxivId = {arXiv:1901.06328v1},
     author = {Albergante, Luca and Bac, Jonathan and Zinovyev, Andrei},
     booktitle = {International Joint Conference on Neural Networks (IJCNN)},
     doi = {10.1109/IJCNN.2019.8852450},
-    eprint = {arXiv:1901.06328v1},
     file = {:home/anthonys/Documents/PhD/Articles/Albergante2019-EffectiveDim{\_}FisherSeparabilityAnalysis.pdf:pdf},
     pages = {1--8},
     publisher = {IEEE},
@@ -666,11 +661,9 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 @article{suCellbench,
 	title = {{CellBench}: {R}/{Bioconductor} software for comparing single-cell {RNA}-seq analysis methods},
 	shorttitle = {{CellBench}},
-	url = {https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btz889/5645177},
 	doi = {10.1093/bioinformatics/btz889},
 	abstract = {AbstractMotivation.  Bioinformatic analysis of f gene expression data is a rapidly evolving field. Hundreds of bespoke methods have been developed in the past f},
 	language = {en},
-	urldate = {2019-11-29},
 	journal = {Bioinformatics},
 	author = {Su, Shian and Tian, Luyi and Dong, Xueyi and Hickey, Peter F. and Freytag, Saskia and Ritchie, Matthew E.},
 	file = {Full Text PDF:/home/pigerm/Zotero/storage/5UN7K3I5/Su et al. - CellBench RBioconductor software for comparing s.pdf:application/pdf;Snapshot:/home/pigerm/Zotero/storage/J8ABFMEV/5645177.html:text/html}
@@ -749,7 +742,6 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	title = {Properties of the {Hubert}-{Arable} {Adjusted} {Rand} {Index}.},
 	volume = {9},
 	issn = {1939-1463, 1082-989X},
-	url = {http://doi.apa.org/getdoi.cfm?doi=10.1037/1082-989X.9.3.386},
 	doi = {10.1037/1082-989X.9.3.386},
 	language = {en},
 	number = {3},
@@ -840,7 +832,6 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 @article{steinleyProperties2004,
 	title = {Properties of the Hubert-Arable Adjusted Rand Index.},
 	volume = {9},
-	url = {http://doi.apa.org/getdoi.cfm?doi=10.1037/1082-989X.9.3.386},
 	doi = {10.1037/1082-989X.9.3.386},
 	language = {en},
 	number = {3},
@@ -860,7 +851,7 @@ Conclusions: Imputation of single-cell RNASeq data introduces circularity that c
 	journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
 	author = {Johnsson, Kerstin and Soneson, Charlotte and Fontes, Magnus},
 	month = jan,
-	year = {2015},
+	year = {2014},
 	keywords = {Calibration, data analysis, Distributed databases, Eigenvalues and eigenfunctions, Estimation, expected simplex skewness, exploratory high-dimensional data analysis, global intrinsic dimension estimators, Intrinsic dimension estimation, low bias local intrinsic dimension estimation, low-dimensional structures, manifold learning, Manifolds, Noise, real data set stratification, Vectors},
 	pages = {196--202},
 	file = {IEEE Xplore Abstract Record:/home/pigerm/Zotero/storage/IT59U67M/6866171.html:text/html;IEEE Xplore Full Text PDF:/home/pigerm/Zotero/storage/9I88CANW/Johnsson et al. - 2015 - Low Bias Local Intrinsic Dimension Estimation from.pdf:application/pdf}
