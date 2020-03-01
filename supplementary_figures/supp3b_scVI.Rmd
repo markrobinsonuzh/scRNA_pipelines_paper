@@ -29,7 +29,7 @@ source("../misc_functions.R")
 res <- readRDS("../data/scVI.rds")
 sil <- res$evaluation$dimreduction$silhouette$top_10_dims
 sil$method <- factor(paste(sil$norm, sil$dr))
-levels(sil$method) <- c("scVI.LD","scVI+seurat.pca","scVI.LD","sctransform+\nseurat.pca")
+levels(sil$method) <- meths <- c("scVI.LD", "scran+seurat.pca", "scVI.LD", "scVI+seurat.pca","scVI.LD","sctransform")
 levels(sil$dataset) <- c("Koh","Kumar","mixology10x3cl","mixology10x5cl","simMix1","simMix2","Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq")
 res$evaluation$dimreduction$silhouette$top_10_dims <- sil
 x <- range(res$evaluation$dimreduction$silhouette$top_10_dims$meanSilWidth)
@@ -41,18 +41,19 @@ H <- scrna_evalPlot_DR(res, "meanSilWidth", scale=FALSE, agg.by = "method",
 
 res$evaluation$clustering$method <- factor(paste(res$evaluation$clustering$norm, res$evaluation$clustering$dr))
 res$evaluation$clustering$delta.nbClust <- res$evaluation$clustering$n_clus-res$evaluation$clustering$true.nbClusts
-levels(res$evaluation$clustering$method) <- c("scVI.LD","scVI+seurat.pca","scVI.LD","sctransform+\nseurat.pca")
-H2 <- scrna_evalPlot_clust(res, what="MI", agg.by="method", anno_legend=FALSE) + 
-  scrna_evalPlot_clust(res, what="ARI", agg.by="method", anno_legend=FALSE) + 
-  scrna_evalPlot_clust(res, what="delta.nbClust", agg.by="method", col=circlize::colorRamp2(c(-6, 0, 6), c("red", "white", "Darkblue")), show_heatmap_legend = FALSE, value_cols = c("black","black"), value_format = "%.0f", anno_legend=FALSE)
+levels(res$evaluation$clustering$method) <- meths
+meths <- levels(sil$method)[c(4,2,3,1)]
+H2 <- scrna_evalPlot_clust(res, what="MI", agg.by="method", anno_legend=FALSE, reorder_rows=meths ) + 
+  scrna_evalPlot_clust(res, what="ARI", agg.by="method", anno_legend=FALSE, reorder_rows=meths) + 
+  scrna_evalPlot_clust(res, what="ARI", atTrueK = TRUE, agg.by="method", anno_legend=FALSE, reorder_rows=meths)
 ```
 
-```{r, fig.width=9, fig.height=3.5}
+```{r, fig.width=9, fig.height=4}
 plot_grid(grid.grabExpr(draw(H)), grid.grabExpr(draw(H2)), ncol=1, labels = LETTERS[1:2])
 ```
 
 ### Supplementary Figure `r getFigNb()`
 
-**scVI evaluation. A:** Average silhouette width per subpopulation using sctransform and standard Seurat PCA, scVI normalization followed by Seurat PCA, or scVI linear decoder (LD). **B:** Clustering accuracy across the same methods followed by Seurat clustering.
+**scVI evaluation. A:** Average silhouette width per subpopulation using either sctransform, scran or scVI normalization followed by Seurat PCA, or the scVI linear decoder (LD). **B:** Clustering accuracy across the same methods followed by Seurat clustering.
 
 \newpage
