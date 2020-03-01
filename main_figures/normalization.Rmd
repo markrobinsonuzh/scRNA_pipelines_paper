@@ -1,10 +1,8 @@
 ---
-title: "Figure 3 normalization"
+title: "Normalization"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r}
@@ -16,35 +14,34 @@ suppressPackageStartupMessages({
   library(pipeComp)
 })
 source("../misc_functions.R")
-theme_set(theme_cowplot(font_size = 11))
-renameNorm <- function(x){
-  .renameHrows(x, f=function(x){
-    x <- gsub("^norm\\.", "", x)
-    x <- gsub("seuratvst","sctransform",x)
-    x <- gsub(".noscale", " (no scaling)", x)
-  })
-}
+theme_set(theme_cowplot(font_size = 10))
 ```
+
+(Requires `pipeComp` version >=0.99.3)
 
 ```{r}
 res <- readRDS("../data/results_norm.rds")
 ```
 
 ```{r}
-p1 <- scrna_evalPlot_DR(res, "covarRes", agg.by = "norm", anno_legend=FALSE, reorder_rows = )
-p1 <- p1 + scrna_evalPlot_DR(res, "covarRes", covar = "log10_total_features", agg.by = "norm", anno_legend=FALSE, reorder_rows=p1)
+p1 <- scrna_evalPlot_DR(res, "log10_total_counts", agg.by = "norm", anno_legend=FALSE)
+p1 <- p1 + scrna_evalPlot_DR(res, "log10_total_features", agg.by = "norm", anno_legend=FALSE, reorder_rows=p1)
 p1 <- grid.grabExpr(draw(renameNorm(p1)))
 
 p2 <- grid.grabExpr(draw(
-  renameNorm(scrna_evalPlot_DR(res, what="silhouette", agg.by = "norm", value_format = "", show_heatmap_legend = TRUE))))
+  renameNorm(scrna_evalPlot_DR(res, what="meanSilWidth", agg.by = "norm", value_format = "", show_heatmap_legend = TRUE))))
 
-H <- scrna_evalPlot_clustAtTrueK(res, "ARI", agg.by = "norm", scale = TRUE, reorder_rows = TRUE, anno_legend=FALSE)
-H <- H + scrna_evalPlot_clust(res, "MI", agg.by = "norm", scale = TRUE, reorder_rows=row.names(H@matrix), anno_legend=FALSE)
+H <- scrna_evalPlot_clust(res, "MI", agg.by = "norm", scale = TRUE, reorder_rows=TRUE, anno_legend=FALSE)
+H <- H + scrna_evalPlot_clust(res, "ARI", agg.by = "norm", scale = TRUE, reorder_rows = row.names(H@matrix), anno_legend=FALSE) +
+  scrna_evalPlot_clust(res, "ARI", atTrueK = TRUE, agg.by = "norm", scale = TRUE, reorder_rows = row.names(H@matrix), anno_legend=FALSE)
 p3 <- grid.grabExpr(draw(renameNorm(H)))
 ```
 
-```{r figure3, fig.width=9, fig.height=9}
-plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3])
+```{r figure3, fig.width=9, fig.height=11}
+pdf("normalization.pdf", width=10, height=11)
+plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3], rel_heights = c(10,9,10))
+dev.off()
+plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3], rel_heights = c(10,9,10))
 ```
 
-Evaluation of normalization procedures. **A:** Residual correlation of the first principal component with library size (left) and detection rate (right), after accounting for biological differences between subpopulations. **B:** Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the ARI at the true number of cluster (left) and by the average mutual information (MI) of the cluster assignment with true subpopulations.
+Evaluation of normalization procedures. **A:** Average of the absolute within-subpopulation correlation of the first 5 principal components with library size (left) and detection rate (right). **B:** Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the mutual information (MI), the adjusted Rand Index (ARI), and the ARI at the true number of cluster.
