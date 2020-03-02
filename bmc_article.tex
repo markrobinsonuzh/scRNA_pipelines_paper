@@ -258,24 +258,6 @@ Since graph-based clustering \cite{satijaSeurat2015} was previously shown to con
 
 The \textit{pipeComp} package defines a pipeline as, minimally, a list of functions executed consecutively on the output of the previous one (Figure \ref{fig:figure2}A). In addition, optional benchmark functions can be set for each step to provide standardized, multi-layered evaluation metrics. Given such a \texttt{PipelineDefinition} object, a set of alternative parameters (which might include different subroutines) and benchmark datasets, the \texttt{runPipeline} function then proceeds through all combinations of arguments, avoiding recomputing the same step twice and compiling evaluations (including run time) on the fly. Variations in a given parameter can be evaluated using all metrics from this point downward in the pipeline. This is especially important because end-point metrics, such as the adjusted Rand index (ARI) \cite{HubertARI1985} for clustering, are not perfect. For example, although the meaning of an ARI score is independent of the number of true subpopulations \cite{steinleyProperties2004}, the number of clusters called is by far the most important determinant of the score: the farther it is from the actual number of subpopulations, the worse the ARI (Supplementary Figures 1-2). In this context, one strategy has been to cluster across various resolutions and only consider the results that have the right number of clusters \cite{duoClustering2018}. While this has the virtue of making the results comparable, in practice the number of subpopulations is typically unknown and tools that operate well in this optimal context might not necessarily be best overall. Clustering results are also very sensitive and might not always capture improvements in earlier steps of the pipeline. In addition, we wanted to assess whether the effect of a given parameter alteration is robust to changes in the rest of the pipeline. We therefore monitored several complementary metrics across multiple steps of the process. We proceeded in a step-wise fashion, first testing a large variety of parameters at the early steps of the pipeline along with only a set of mainstream options downstream, then selecting main alternatives and proceeding to a more detailed benchmark of the next step (Figure \ref{fig:figure2}B).
 
-\iffalse
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth,keepaspectratio]{dataset_description}
-    \caption{\textbf{Overview of the benchmark datasets used.}}
-    \label{fig:figure1}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.7, keepaspectratio]{main_figures/pipeline_explanation.pdf}
-    \caption{\textbf{Overview of the \textit{pipeComp} framework and its application to a scRNAseq clustering pipeline. A:} The package is built around a \texttt{PipelineDefinition} S4 class which defines a set of functions to be executed consecutively, as well as optional evaluation functions for each step. Each step can accept a number of parameters whose alternative values are provided as a list. All (or subsets of) combinations of parameters can then be simultaneously ran and evaluated using the \texttt{runPipeline} function. \textbf{B:} Scheme representing the application of \textit{pipeComp} to evaluate a range of methods that are commonly used in scRNAseq studies and some of the metrics monitored at various steps.}
-    \label{fig:figure2}
-\end{figure}
-
-\fi
-
 \subsection*{Filtering}
 
 \subsubsection*{Doublet detection}
@@ -286,14 +268,6 @@ We tested \textit{DoubletFinder} \cite{mcginnisDoubletfinder2019} and \textit{sc
 
 While most methods accurately identified the doublets in the 3 cell lines dataset (mixology10x3cl), the other two datasets proved more difficult (Figure \ref{fig:figure3}A). \textit{scDblFinder} achieved comparable or better accuracy than top alternatives while being the fastest method (Figure \ref{fig:figure3}B). Across datasets, cells called as doublets tended to be classified in the wrong cluster more often than other cells (Figure \ref{fig:figure3}C). We also found that \textit{scDblFinder} improved the accuracy of the clustering across all benchmark datasets even when, by design, the data contained no heterotypic doublet (Figure \ref{fig:figure4}).
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.65, keepaspectratio]{{main_figures/doublets.pdf}}
-    \caption{\textbf{Identification of doublet cells. A:} Receiver operating characteristic (ROC) curves of the tested doublet detection methods for three datasets with SNP-identified doublets. Dots indicate threshold determined by the true number of doublets. \textbf{B:} Running time of the different methods (\textit{DoubletFinder} failed on one of the datasets). \textbf{C:} Rate of misclassification of the cells identified by \textit{scDblFinder} as doublets (DBL) or singlets (SNG), across a large range of clustering analysis. Even in datasets which should not have neotypic doublets, the cells identified as such tend to be misclassified.    \label{fig:figure3}}
-\end{figure}
-\fi
-
 \subsubsection*{Excluding more cells is not necessarily better}
 
 Beyond doublets, a dataset might include low-quality cells whose elimination would reduce noise. This has for instance been demonstrated for droplets containing a high content of mitochondrial reads, often as a result of cell degradation and resulting loss of cytoplasmic mRNAs \cite{IlicicLowQual2016}. A common practice is to exclude cells that differ considerably from most other cells on the basis of such properties. This can for instance be performed through the \texttt{isOutlier} function from \textit{scater} that measures, for a given control property, the number of median absolute deviations (MADs) of each cell from the median of all cells. Supplementary Figure 4 shows the distributions of some of the typical cell properties commonly used. Of note, these properties tend to be correlated, with some exceptions. For example, while a high proportion of mitochondrial reads is often correlated with a high proportion of the counts in the top features, there can also be other reasons for an over-representation of highly-expressed features (Supplementary Figure 5), such as an over-amplification in non-UMI datasets. In our experience, 10X datasets also exhibit a very strong correlation between the total counts and the total features even across very different cell types (Supplementary Figure 6). We therefore also measure the ratio between the two and treat cells strongly departing from this trend with suspicion.
@@ -301,15 +275,6 @@ Beyond doublets, a dataset might include low-quality cells whose elimination wou
 Reasoning that the cells we wish to exclude are the cells that would be misclassified, we measured the rate of misclassification of each cell in each dataset across a variety of clustering pipelines, correcting for the median misclassification rate of the subpopulation and then evaluated what properties could be predictive of misclassification (Supplementary Figures 7-9). We could not identify any property or simple combination thereof that would be consistently predictive of misclassification; the only feature that consistently stood out across multiple datasets (the Zheng datasets) was that cells with very high read counts have a higher chance of being misclassified.
 
 We next investigated the impact of filtering according to various criteria (see Methods). An important risk of excluding cells on the basis of their distance from the whole distribution of cells on some properties (e.g., library size) is that these properties tend to have different distributions across subpopulations. As a result, thresholds in terms of number of MADs from the whole distribution can lead to strong biases against certain subpopulations (Figure \ref{fig:figure4}A). We therefore examined the tradeoff between the increased accuracy of filtering and the maximum proportion of cells excluded per subpopulation (Figure \ref{fig:figure4}B and Supplementary Figure 10). Since filtering changes the relative abundance of the different subpopulations, global clustering accuracy metrics such as ARI are not appropriate here. We therefore calculated the per-subpopulation precision and recall using the Hungarian algorithm \cite{PapadimitriouHu1998} and monitored their mean F1 score. A first observation was that, although the stringent filtering tended to be associated with an increase in accuracy, it could also become deleterious and most of the benefits could be achieved without very stringent filtering and minimizing subpopulation bias (Figure \ref{fig:figure4}B). Applying the same filtering criteria on individual clusters of cells (identified through scran's \texttt{quickCluster} method) resulted in nearly no cell being filtered out. This suggests that filtering on the global population tends to discard cells of subpopulations with more extreme properties (e.g. high library size), rather than low-quality cells. Finally, by changing the distributions, the doublet removal step in conjunction with filtering sometimes resulted in a net decrease in the proportion of excluded cells while retaining or improving accuracy. We therefore recommend the use of doublet removal followed by relatively mild filtering, such as is implemented in our `default' filtering (see Methods).
-
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.60, keepaspectratio]{{main_figures/filtering.pdf}}
-    \caption{\textbf{Effect of filtering on cell subpopulation structure and clustering. A:} Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. The dashed line indicates a threshold of 2.5 median absolute deviations (MADs) from the median of the overall population. \textbf{B:} Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data. The PCA methods refer to multivariate outlier detected as implemented in \textit{scater} (see Methods for details).}
-    \label{fig:figure4}
-\end{figure}
-\fi
 
 \subsubsection*{Filtering features by type}
 
@@ -324,15 +289,6 @@ An important motivation for the development of \textit{sctransform} was the obse
 
 We further evaluated normalization methods by investigating their impact on the separability of the subpopulations (Figure \ref{fig:figure5}B-C). Since clustering accuracy metrics such as the ARI are very strongly influenced by the number of clusters, we complemented it with silhouette width \cite{RousseeuwSil1987} and mutual information (MI). We found most methods (including no normalization at all) to perform fairly well in most of the subpopulations. An exception was \textit{scVI} (Supplementary Figure 13), which performed poorly on most datasets in terms of both the subpopulation silhouette and clustering accuracy. For time and resource cost reasons, \textit{scVI} was run on a reduced set of pipelines and compared to \textit{sctransform} (more details in the Methods section). Scaling tended to reduce the average silhouette width of some subpopulations and to increase that of some less distinguishable ones and was generally, but not always, beneficial on the accuracy of the final clustering. Regressing out covariates systematically gave poorer performance on all metrics. \textit{sctransform} systematically outperformed other methods and, even though it was developed to be applied to data with unique molecular identifiers (UMI), it also performed fairly well with the Smart-seq protocol (Koh and Kumar datasets).
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.55, keepaspectratio]{{main_figures/normalization.pdf}}
-    \caption{\textbf{Evaluation of normalization procedures.} \textbf{A:} Variance in PC1 explained by library size (left) and detection rate (right) after accounting for subpopulation differences. \textbf{B:} Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. \textbf{C:} Clustering accuracy (\textit{Seurat} clustering), measured by mutual information (MI), Adjusted Rand Index (ARI) and ARI at the true number of cluster. 'feat_regress', 'mt_regress' and 'feat_mt_regress' respectively stand for the regressing out of the number of features, the proportion of mitochondrial reads, or both during scaling. }
-    \label{fig:figure5}
-\end{figure}
-\fi
-
 Finally, we monitored whether, under the same downstream clustering analysis, different normalization methods tended to lead to an over- or under-estimation of the number of clusters. Although some methods had a tendency to lead to a higher (e.g., \textit{sctransform}) or lower (e.g., stable genes) number of clusters, the effect was very mild and not entirely systematic (Supplementary Figure 14). We also confirmed that, especially in the UMI-based datasets, \textit{sctransform} did in fact successfully stabilize variance across mean counts (Supplementary Figure 15), at little apparent cost on computation time (Supplementary Figure 16).
 
 \subsection*{Feature selection}
@@ -340,15 +296,6 @@ Finally, we monitored whether, under the same downstream clustering analysis, di
 A standard clustering pipeline typically involves a step of highly-variable genes selection, which is complicated by the digital nature and the mean-variance relationship of (sc)RNAseq. \textit{Seurat}'s earlier approaches involved the use of dispersion estimates standardized for the mean expression levels, while more recent versions ($\geq$3.0) rely on a different measure of variance, again standardized. While adjusting for the mean-variance relationship removes much of the bias towards highly-expressed genes, it is plausible that this relationship may in fact sometimes reflects biological relevance and would be helpful in classifying cell types. Another common practice in feature selection is to use those with the highest mean expression. Recently, it was instead suggested to use deviance \cite{townesGlmpca2019}, while \textit{sctransform} provides its own ordering of genes based on transformed variance.
 
 Reasoning that a selection method should ideally select genes whose variability is higher between subpopulations than within, we first assessed to what extent each method selected genes with a high proportion of variance or deviance explained by the (real) subpopulations. As the proportion of variability in a gene attributable to subpopulations can be measured in various ways, we first compared three approaches: ANOVA on log-normalized count, ANOVA on \textit{sctransform} normalization, and deviance explained. The ANOVAs performed on a standard \textit{Seurat} normalization and on \textit{sctransform} data were highly correlated (Supplementary Figure 17A). These estimates were also in good agreement with the deviance explained, although lowly-expressed genes could have a high deviance explained without having much of their variance explained by subpopulation (Supplementary Figure 17B-D). We therefore compared the proportion of the cumulative variance/deviance explained by the top X genes that could be retrieved by each gene ranking method (Supplementary Figures 18-19). We first focused on the first 1000 genes to highlight the differences between methods, although a higher number of selected genes decreased the differences between methods (Supplementary Figures 18-20). The standardized measures of variability were systematically worse than their non-standardized counterparts in selecting genes with a high proportion of variance explained by subpopulation. Regarding the percentage of deviance explained however, the standardized measures were often superior (Figure \ref{fig:figure6}A and Supplementary Figures 18-19). Deviance proved the method of choice to prioritize genes with a high variance explained by subpopulations (with mere expression level proving surprisingly performant) but did not perform so well to select genes with a high deviance explained.
-
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.65]{{main_figures/selection.pdf}}
-    \caption{\textbf{Evaluation of feature selection methods. A:} Ability of different feature ranking methods to capture genes with a high proportion of variance (left) or deviance (right) explained by real subpopulations. The asterisk denotes the default Seurat method. \textbf{B:} Accuracy of clusterings (at the true number of clusters) when selecting 1000 genes using the given methods. Based on standard \textit{Seurat} normalization (left) or \textit{sctransform} (right). The  \textit{vst.varExp} and \textit{devianceExplained} methods correspond to the estimates used in \textbf{A} to evaluate the selection methods and were included here only for validation purpose.}
-    \label{fig:figure6}
-\end{figure}
-\fi
 
 We next evaluated how the use of different feature selection methods affected the clustering accuracy (Figure \ref{fig:figure6}B). To validate the previous assay on the proportion of variance/deviance explained by real populations, we included genes that maximized these two latter measures. Interestingly, while these selections were on average the top-ranking methods, they were not systematically best for all datasets. The previous observations were reflected in the ARI of the resulting clustering (Figure \ref{fig:figure6}B): non-standardized measures of variability, including mere expression level, tended to outperform more complex metrics. In general, we found deviance and unstandardized estimates of variance to provide the best results across datasets and normalization methods. Increasing the number of features selected also systematically led to an increase in the accuracy of the clustering, typically plateauing after 4000 features (Supplementary Figure 20).
 
@@ -359,15 +306,6 @@ Since the various PCA approaches and implementations were recently benchmarked i
 The impact of the choice of dimensionality reduction method was far greater than that of normalization or feature selection (Figure \ref{fig:figure7}). GLM-PCA tended to increase the average silhouette width of already well-defined subpopulations, but \textit{Seurat}'s PCA procedure however proved superior on all metrics. Like GLM-PCA, \textit{scVI}'s Linear Decoder (LD) does not explicitly rely on normalized counts. Its performance was lower than a pipeline with non-weighted \textit{Seurat} PCA on all measures for datasets with more subpopulations (Supplementary Figure 13). 
 Overall, weighting the principal components by their variance (as \textit{Seurat} does) had a positive impact on silhouette widths and ARI scores.
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.40, keepaspectratio]{{main_figures/dr.pdf}}
-    \caption{\textbf{Evaluation of common dimensionality reduction methods. A:} Average silhouette width per subpopulation resulting from combinations of normalization and dimension reductions. \textbf{B:} Clustering accuracy, mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).}
-    \label{fig:figure7}
-\end{figure}
-\fi
-
 \subsubsection*{Estimating the number of dimensions}
 
 A common step following dimension reduction is the selection of an appropriate number of dimensions to use for downstream analysis. Since Euclidean distance decreases as the number of non-discriminating dimensions increases, there is usually a trade-off between selecting enough dimensions to keep most information and excluding smaller dimensions that may represent technical noise or other unwanted sources of variation. Overall, increasing the number of dimensions robustly led to a decrease in the number of clusters (Supplementary Figures 14 and 21). This tended to affect the accuracy of the clustering (Supplementary Figure 22), although in both cases (number of clusters and ARI), \textit{Seurat}'s resolution parameter had a much stronger impact.
@@ -376,14 +314,6 @@ Different approaches have been proposed to select the appropriate number of dime
 
 We compared the various estimates of dimensionality in their ability to retrieve the intrinsic number of dimensions in a dataset, based on Seurat's weighted PCA space. As a first approximation of the true dimensionality, we computed the variance in each principal component that was explained by the subpopulations, which sharply decreased after the first few components in most datasets (Figure \ref{fig:figure8}A). Figure \ref{fig:figure8}B shows the difference between the dimension estimates of the above methods and that based on the subpopulations (i.e. from Figure \ref{fig:figure8}A). Of note, the methods differ widely in view of their computing time (Figure \ref{fig:figure8}B) and we saw no relationship between the accuracy of the estimates and the complexity of the method. Reasoning that over-estimating the number of dimensions is less problematic than under-estimating it, we kept the former methods for a full analysis of their impact on clustering (Figure \ref{fig:figure8}C-D), when combined with \textit{sctransform} or the standard \textit{Seurat} normalization. Although most methods performed well on the various clustering measures, the global maximum likelihood based on translated Poisson Mixture Model (\textit{maxLikGlobal}, using the 20 nearest neighbors, although estimates were relatively stable across decent values of \textit{k}; see Supplementary Figure 23) provided the dimensionality estimate that best separated the subpopulations (Figure \ref{fig:figure8}C) and resulted in the best clustering accuracy (Figure \ref{fig:figure8}D). This method systematically selected many more components than were associated with the subpopulations, suggesting that although these additional components appear individually uninformative, in combination they nevertheless contribute to classification. An implication is that the commonly-used elbow method most likely underestimates dimensionality.
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.53, keepaspectratio]{{main_figures/dimensionality.pdf}}
-    \caption{\textbf{Estimating dimensionality. A:} Estimated dimensionality using the proportion of variance in each component explained by the true subpopulations. \textbf{B:} Difference between `real' dimensionality (from \textbf{A}) and dimensionality estimation methods, along with computing time. \textbf{C:} Average silhouette width per subpopulation across a selection of methods, combined with \textit{sctransform} or standard \textit{Seurat} normalization. \textbf{D:} Clustering accuracy across the normalization/dimensionality estimation methods.}
-    \label{fig:figure8}
-\end{figure}
-\fi
 
 \subsection*{Clustering}
 
@@ -393,27 +323,10 @@ Since ARI is dominated by differences in the number of clusters (Supplementary F
 
 The MI score and minimum precision, which are largely independent of the estimated number of clusters, were overall higher for the \textit{walktrap} method (Figure \ref{fig:figure9}), while the mean F1 score favored both \textit{scran} methods (\textit{walktrap} and \textit{fast greedy}) over \textit{Seurat}. Finally, the ARI score at the true number of clusters, when available, showed similar performances. However, because \textit{Seurat}'s resolution parameter had a large impact on the number of clusters identified (Supplementary Figures 1 and 23), \textit{Seurat} could always be coerced into producing the right number of clusters. Instead, the number of clusters found by \textit{scran} was considerably less influenced by the available parameters (number of nearest neighbors or steps in the random walk - see Supplementary Figure 24), and as a result \textit{scran}-based clustering sometimes never produced a partitioning with the right number of clusters. This observation, along with \textit{scran}'s higher MI score, suggest that \textit{scran} sometimes simply divides a real subpopulation into two clusters (possibly tracking some unknown biological differences) rather than committing misclassification errors. Overall, the \textit{walktrap} method appeared superior to the \textit{fast greedy} algorithm and was generally less prone to misclassification than \textit{Seurat} clustering, although the latter offered more control over the resolution. A major difference between \textit{walktrap}-based clustering and \textit{Seurat} is the computing time (Figure \ref{fig:figure9}B). We found that using the Annoy approximation to the nearest neighbors somewhat reduced computing time at no apparent cost to accuracy. It nevertheless remained considerably slower than \textit{Seurat}. For all methods, some poorly distinguishable subpopulations from both the Zhengmix8eq and simMix1 datasets remained very inaccurately classified in regard to all metrics.
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.34, keepaspectratio]{{main_figures/clustering.pdf}}
-    \caption{\textbf{Evaluation of clustering methods.} Clustering accuracy (\textbf{A}) and run time (\textbf{B}) of \textit{scran}- and \textit{Seurat}-based clustering tools in combination with \textit{sctransform} and standard \textit{Seurat}'s normalization.}
-    \label{fig:figure9}
-\end{figure}
-\fi
-
 \subsection*{Further extensions to the pipeline: imputation/denoising}
 
 The basic pipeline presented here can be extended with additional analysis steps while keeping the same evaluation metrics. To demonstrate this, we evaluated various imputation or denoising techniques based on their impact on classification. Since preliminary analysis showed that all methods performed equally well or better on normalized data, we applied them after filtering and normalization, but before scaling and reduction. Although some of the methods (e.g., \textit{DRImpute\_process} and \textit{alra\_norm}) did improve the separability of some more elusive subpopulations, no method had a systematically positive impact on the average silhouette width across all subpopulations (Figure \ref{fig:figure10}A). When restricting ourselves to clustering analyses that yielded the `right' number of clusters, all tested methods improved classification  compared to a scenario with no imputation step (`none' label, Figure \ref{fig:figure10}B). However, the situation was not so straightforward with alternative metrics, where some methods (e.g., \textit{ENHANCE}) consistently underperformed. 10X datasets, which are typically characterized by a lower per-cell coverage and feature detection rate, benefited more from imputation and, in this context, \textit{DrImpute} and \textit{DCA} tended to show the best performance. On the contrary, imputing on normalized counts originating from Smart-seq technology was instead rather deleterious to the clustering accuracy. 
 
-\iffalse
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.49, keepaspectratio]{{main_figures/imputation.pdf}}
-     \caption{\textbf{Evaluation of imputation/denoising methods} Average silhouette width per subpopulation (\textbf{A}) and clustering accuracy (\textbf{B}) with or without (indicated as \textit{none}) application of a denoising/imputation method.}
-    \label{fig:figure10}
-\end{figure}
-\fi
 
 \section*{Discussion}
 
@@ -456,24 +369,15 @@ On the basis of our findings, we can make a number of concrete analysis recommen
    \end{itemize}
 \end{enumerate}
 
-\iffalse
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.9,keepaspectratio]{main_figures/pipeComp_summary.pdf}
-    \caption{\textbf{Recommendations of tools from filtering to clustering.}}
-    \label{fig:figure11}
-\end{figure}
-\fi
-
 \subsection*{Limitations and open questions}
 
 In this study, we evaluated tools commonly used for the processing of scRNAseq with a focus on droplet-based datasets, namely from the 10x technology. Although this platform has been used in almost half of the scRNAseq studies in 2019 \cite{SvenssonDB2019}, other popular technologies such as Drop-seq, InDrops or Smart-seq2/3 were not represented in the present benchmarking. Differences between such protocols, even among droplet-based technologies, can have a very large impact on cell capture efficiency, cell numbers and clustering \cite{MereuCellAtlas2019, ZhangDroplet2019, SalomonDroplet2019}. Although most top-ranking methods in our comparison performed well on both Smart-seq and 10x datasets that we tested, future benchmarking efforts should strive to include less represented technologies. In addition, we did not compare any of the alignment and/or quantification methods used to obtain the count matrix, which was for instance discussed in \cite{viethSystematic2019}. Some steps, such as the implementation of the PCA, were also not explored in detail here as they have already been the object of recent and thorough study elsewhere \cite{SunDimRed2019, TsuyuzakiPCA2020}. We also considered only methods relying on Euclidean distance, while correlation was recently reported to be superior\cite{kim_impact_2019} and would require further investigation.
 
-Our recommendations are in line with the results of several other benchmarking studies. For instance, \textit{Seurat} and \textit{scran} methods were already shown to yield good clustering performance \cite{freytagComparison2018} and \textit{DrImpute} to improve the quality of downstream analyses \cite{ZhangImput2018}. A previous systematic comparison \cite{viethSystematic2019} instead found that the use of \textit{SAVER} for denoising data and \textit{scran} for clustering yielded better performance on the ability to recover differentially-expressed genes, whereas we focused on the ability to recover cell populations. Another disagreement with the present recommendations come from the study of Hou et al. \cite{HouImput2020} that recommends \textit{SAVERX} and discourage the use of \textit{DCA} for better clustering, whereas our study found opposite results for these tools. Several differences in the design of our study could explain this contrast, such as the use of different metrics (ARI at true number of clusters, mean precision/ recall), of different datasets (Koh, Kumar, simMix simulations) and the use of different filtering and normalization strategies. \textit{ALRA} however yielded good results in both studies and may be the most conservative option. The study from Hou et al. also highlighted the usefulness of \textit{ALRA} when followed by differential and trajectory analysis both in UMI and Fluidigm technologies. 
+Our recommendations are in line with the results of several other benchmarking studies. For instance, \textit{Seurat} and \textit{scran} methods were already shown to yield good clustering performance \cite{freytagComparison2018} and \textit{DrImpute} to improve the quality of downstream analyses \cite{ZhangImput2018}. A previous systematic comparison \cite{viethSystematic2019} instead found that the use of \textit{SAVERX} for denoising data and \textit{scran} for clustering yielded better performance on the ability to recover differentially-expressed genes, whereas we focused on the ability to recover cell populations. Another disagreement with the present recommendations come from the study of Hou et al. \cite{HouImput2020} that recommends \textit{SAVERX} and discourage the use of \textit{DCA} for better clustering, whereas our study found opposite results for these tools. Several differences in the design of our study could explain this contrast, such as the use of different metrics (ARI at true number of clusters, mean precision/ recall), of different datasets (Koh, Kumar, simMix simulations) and the use of different filtering and normalization strategies. \textit{ALRA} however yielded good results in both studies and may be the most conservative option. The study from Hou et al. also highlighted the usefulness of \textit{ALRA} when followed by differential and trajectory analysis both in UMI and Fluidigm technologies. 
 
 Here, we chose to concentrate on what could be learned from datasets with known cell labels (as opposed to labels inferred from the data, as in \cite{MereuCellAtlas2019}). In contrast to Tian et al. \cite{tianMixology2018}, who used RNA mixtures of known proportions, we chose to rely chiefly on real cells and their representative form of variability. Given the limited availability of such well-described datasets however, several aspects of single-cell analysis could not be compared, such as batch effect correction or multi-dataset integration. For these aspects of scRNAseq processing that are critical in some experimental designs, we refer the reader to previous evaluations \cite{TranBatch2020, StuartIntegration2019}. In addition, a focus on the identification of the subpopulations might fail to reveal methods that are instead best performing for tasks other than clustering, such as differential expression analysis or trajectory inference. Several informative benchmarks have already been performed on some of these topics \cite{CrowellMuscat2019, DalMolinDE2017, JaakkolaDE2017, SaelensTraject2019, SonesonDE2018, WangDE2019}. Yet, such evaluations could benefit from considering methods not in isolation, but as parts of a connected workflow, as we have done here. We believe that the \textit{pipeComp} framework is modular and flexible enough to integrate new steps in the pipeline, as shown by an example with imputation/denoising methods.
 
-We developed \texttt{pipeComp} to address the need of a framework that can simultaneously evaluate the interaction of multiple tools. The work of Vieth and colleagues\cite{viethSystematic2019} already offered an important precedent in this respect, evaluating the interaction of various steps in the context of scRNAseq differential expression analysis, but did not offer a platform for doing so. Instead, the \textit{CellBench} package was recently proposed to address a similar need \cite{suCellbench}, offering an elegant piping syntax to combine alternative methods at successive steps. A key additional feature of \textit{pipeComp} is its ability to perform evaluation in parallel to the pipeline and offering on-the-fly evaluation at any step. This avoids the need to store potentially large intermediate data for all possible permutations and thus allowing a combinatorial benchmark. In addition, the fact that benchmark functions are stored in the \texttt{PipelineDefinition} makes the benchmark more smoothly portable, making it easy to modify, extend with further methods, or apply to other datasets.
+We developed \textit{pipeComp} to address the need of a framework that can simultaneously evaluate the interaction of multiple tools. The work of Vieth and colleagues\cite{viethSystematic2019} already offered an important precedent in this respect, evaluating the interaction of various steps in the context of scRNAseq differential expression analysis, but did not offer a platform for doing so. Instead, the \textit{CellBench} package was recently proposed to address a similar need \cite{suCellbench}, offering an elegant piping syntax to combine alternative methods at successive steps. A key additional feature of \textit{pipeComp} is its ability to perform evaluation in parallel to the pipeline and offering on-the-fly evaluation at any step. This avoids the need to store potentially large intermediate data for all possible permutations and thus allowing a combinatorial benchmark. In addition, the fact that benchmark functions are stored in the \texttt{PipelineDefinition} makes the benchmark more smoothly portable, making it easy to modify, extend with further methods, or apply to other datasets.
 
 With respect to the methods themselves, we believe there is still space for improvement in some of the steps. Concerning cell filtering, we noticed that the current approach based on whole-population characteristic (e.g., MAD cut-off) can be biased against certain subpopulations, suggesting that more refined methods expecting multimodal distributions should be used rather than relying on whole-population characteristics. In addition, most common filtering approaches do not harness the relationship between cell QC properties. Finally, imputation had a varied impact on the clustering analysis and seemed to be linked to the technology that was used to generate the data. Also, the good performance of \textit{DrImpute} is in line with a previous study focused on the preservation of data structure in trajectory inference from scRNAseq \cite{ZhangImput2018} (\textit{ALRA} was however not included in this previous benchmark). Our results also align with the hypothesis of this study on the respective strengths of linear and non-linear models and their use to different types of data, such as the highest performance of non-linear methods in developmental studies. 
 
@@ -485,7 +389,7 @@ With respect to the methods themselves, we believe there is still space for impr
 
 \subsection*{Code and data availability}
 
-All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with pipeComp 0.99.4, while all other results were produced with pipeComp 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation.
+All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation.
 
 The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \url{https://doi.org/10.6084/m9.figshare.11787210.v1}.
 
@@ -529,7 +433,7 @@ The `pca' and `pca2' clusters refer to the multivariate outlier detection method
 
 Unless specified otherwise, the variance in gene expression explained by subpopulations was calculated on the data normalized and transformed through \textit{sctransform}. For each gene, we fitted a linear model using the subpopulation as only independent variable ($\sim subpopulation$) and used the R-squared as a measure of the variance explained. The same method was used for principal components.
 
-The deviance explained by subpopulations was calculated directly on counts using the \linebreak \texttt{getDevianceExplained} function of \texttt{pipeComp}. The function uses \textit{edgeR} to fit two models, a full ($\sim librarySize + population$) and a reduced one ($\sim librarySize$). For each gene, the deviance explained is then the difference between the deviance of each models, divided by the deviance of the reduced model. In the rare cases where this resulted in a negative deviance explained, it was set to zero.
+The deviance explained by subpopulations was calculated directly on counts using the \linebreak \texttt{getDevianceExplained} function of \textit{pipeComp}. The function uses \textit{edgeR} to fit two models, a full ($\sim librarySize + population$) and a reduced one ($\sim librarySize$). For each gene, the deviance explained is then the difference between the deviance of each models, divided by the deviance of the reduced model. In the rare cases where this resulted in a negative deviance explained, it was set to zero.
 
 To estimate the correlation between the principal components and covariates such as library size, we first fitted a linear model on the subpopulations and correlated the residuals of this model with the covariate of interest.
 
@@ -599,85 +503,122 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \section*{Figures}
 
-\begin{figure}[h!]
+
+\showfigstrue
+
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[width=\textwidth,keepaspectratio]{dataset_description}
+    \fi
     \caption{\textbf{Overview of the benchmark datasets used.}}
     \label{fig:figure1}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.75, keepaspectratio]{main_figures/pipeline_explanation.pdf}
+    \fi
     \caption{\textbf{Overview of the \textit{pipeComp} framework and its application to a scRNAseq clustering pipeline. A:} The package is built around a \texttt{PipelineDefinition} S4 class which defines a set of functions to be executed consecutively, as well as optional evaluation functions for each step. Each step can accept a number of parameters whose alternative values are provided as a list. All (or subsets of) combinations of parameters can then be simultaneously ran and evaluated using the \texttt{runPipeline} function. \textbf{B:} Scheme representing the application of \textit{pipeComp} to evaluate a range of methods that are commonly used in scRNAseq studies and some of the metrics monitored at various steps.}
     \label{fig:figure2}
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.85, keepaspectratio]{{main_figures/doublets.pdf}}
+    \fi
     \caption{\textbf{Identification of doublet cells. A:} Receiver operating characteristic (ROC) curves of the tested doublet detection methods for three datasets with SNP-identified doublets. Dots indicate threshold determined by the true number of doublets. \textbf{B:} Running time of the different methods (\textit{DoubletFinder} failed on one of the datasets). \textbf{C:} Rate of misclassification of the cells identified by \textit{scDblFinder} as doublets (DBL) or singlets (SNG), across a large range of clustering analysis. Even in datasets which should not have neotypic doublets, the cells identified as such tend to be misclassified.    \label{fig:figure3}}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.72, keepaspectratio]{{main_figures/filtering.pdf}}
+    \fi
     \caption{\textbf{Effect of filtering on cell subpopulation structure and clustering. A:} Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. The dashed line indicates a threshold of 2.5 median absolute deviations (MADs) from the median of the overall population. \textbf{B:} Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data. The PCA methods refer to multivariate outlier detected as implemented in \textit{scater} (see Methods for details).}
     \label{fig:figure4}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
-    \caption{\textbf{Evaluation of normalization procedures.} \textbf{A:} Variance in PC1 explained by library size (left) and detection rate (right) after accounting for subpopulation differences. \textbf{B:} Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. \textbf{C:} Clustering accuracy (\textit{Seurat} clustering), measured by mutual information (MI), Adjusted Rand Index (ARI) and ARI at the true number of cluster. 'feat_regress', 'mt_regress' and 'feat_mt_regress' respectively stand for the regressing out of the number of features, the proportion of mitochondrial reads, or both during scaling. }
+    \ifshowfigs
+    \includegraphics[scale=0.6, keepaspectratio]{{main_figures/normalization.pdf}}
+    \fi
+    \caption{\textbf{Evaluation of normalization procedures. A:} Variance in PC1 explained by library size (left) and detection rate (right) after accounting for subpopulation differences. \textbf{B:} Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. \textbf{C:} Clustering accuracy (\textit{Seurat} clustering), measured by mutual information (MI), Adjusted Rand Index (ARI) and ARI at the true number of cluster. `feat\_regress', `mt\_regress' and `feat\_mt\_regress' respectively stand for the regressing out of the number of features, the proportion of mitochondrial reads, or both during scaling.}
     \label{fig:figure5}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.65]{{main_figures/selection.pdf}}
+    \fi
     \caption{\textbf{Evaluation of feature selection methods. A:} Ability of different feature ranking methods to capture genes with a high proportion of variance (left) or deviance (right) explained by real subpopulations. The asterisk denotes the default Seurat method. \textbf{B:} Accuracy of clusterings (at the true number of clusters) when selecting 1000 genes using the given methods. Based on standard \textit{Seurat} normalization (left) or \textit{sctransform} (right). The  \textit{vst.varExp} and \textit{devianceExplained} methods correspond to the estimates used in \textbf{A} to evaluate the selection methods and were included here only for validation purpose.}
     \label{fig:figure6}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.50, keepaspectratio]{{main_figures/dr.pdf}}
+    \fi
     \caption{\textbf{Evaluation of common dimensionality reduction methods. A:} Average silhouette width per subpopulation resulting from combinations of normalization and dimension reductions. \textbf{B:} Clustering accuracy, mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).}
     \label{fig:figure7}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.53, keepaspectratio]{{main_figures/dimensionality.pdf}}
+    \fi
     \caption{\textbf{Estimating dimensionality. A:} Estimated dimensionality using the proportion of variance in each component explained by the true subpopulations. \textbf{B:} Difference between `real' dimensionality (from \textbf{A}) and dimensionality estimation methods, along with computing time. \textbf{C:} Average silhouette width per subpopulation across a selection of methods, combined with \textit{sctransform} or standard \textit{Seurat} normalization. \textbf{D:} Clustering accuracy across the normalization/dimensionality estimation methods.}
     \label{fig:figure8}
 \end{figure}
 
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.43, keepaspectratio]{{main_figures/clustering.pdf}}
+    \fi
     \caption{\textbf{Evaluation of clustering methods.} Clustering accuracy (\textbf{A}) and run time (\textbf{B}) of \textit{scran}- and \textit{Seurat}-based clustering tools in combination with \textit{sctransform} and standard \textit{Seurat}'s normalization.}
     \label{fig:figure9}
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.55, keepaspectratio]{{main_figures/imputation.pdf}}
+    \fi
     \caption{\textbf{Evaluation of imputation/denoising methods} Average silhouette width per subpopulation (\textbf{A}) and clustering accuracy (\textbf{B}) with or without (indicated as \textit{none}) application of a denoising/imputation method.}
     \label{fig:figure10}
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
+    \ifshowfigs
+    \includegraphics[scale=0.9,keepaspectratio]{main_figures/pipeComp_summary.pdf}
+    \fi
     \caption{\textbf{Recommendations of tools from filtering to clustering.}}
     \label{fig:figure11}
 \end{figure}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
