@@ -29,19 +29,70 @@ theme_set(theme_cowplot(font_size = 11))
 source("../misc_functions.R")
 ```
 
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r covar, fig.width=8, fig.height=4.5}
+res <- readRDS("../data/results_norm.rds")
+H <- scrna_evalPlot_DR(res, "log10_total_counts", agg.by = "norm", anno_legend=FALSE, covar.type="mean")
+H <- H + scrna_evalPlot_DR(res, "log10_total_features", agg.by = "norm", anno_legend=FALSE, covar.type="mean", reorder_rows = H)
+H
+```
+
+### Supplementary Figure `r getFigNb()`
+Mean per-subpopulation absolute correlation of the first 5 components with library size (left) and the number of detected features (right) across normalization procedures.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r}
+res <- readRDS("../data/scVI.rds")
+sil <- res$evaluation$dimreduction$silhouette$top_10_dims
+sil$method <- factor(paste(sil$norm, sil$dr))
+levels(sil$method) <- meths <- c("scVI.LD", "scran+seurat.pca", "scVI.LD", "scVI+seurat.pca","scVI.LD","sctransform")
+levels(sil$dataset) <- c("Koh","Kumar","mixology10x3cl","mixology10x5cl","simMix1","simMix2","Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq")
+res$evaluation$dimreduction$silhouette$top_10_dims <- sil
+x <- range(res$evaluation$dimreduction$silhouette$top_10_dims$meanSilWidth)
+silColBreaks <- unique(round(c(x[1],0,x[2]/2,x[2]),1))
+H <- scrna_evalPlot_DR(res, "meanSilWidth", scale=FALSE, agg.by = "method", 
+                       reorder_rows=TRUE, value_format="", 
+                       show_heatmap_legend=TRUE, anno_legend = TRUE, 
+                       heatmap_legend_param=list(at=silColBreaks))
+
+res$evaluation$clustering$method <- factor(paste(res$evaluation$clustering$norm, res$evaluation$clustering$dr))
+res$evaluation$clustering$delta.nbClust <- res$evaluation$clustering$n_clus-res$evaluation$clustering$true.nbClusts
+levels(res$evaluation$clustering$method) <- meths
+meths <- levels(sil$method)[c(4,2,3,1)]
+H2 <- scrna_evalPlot_clust(res, what="MI", agg.by="method", anno_legend=FALSE, reorder_rows=meths ) + 
+  scrna_evalPlot_clust(res, what="ARI", agg.by="method", anno_legend=FALSE, reorder_rows=meths) + 
+  scrna_evalPlot_clust(res, what="ARI", atTrueK = TRUE, agg.by="method", anno_legend=FALSE, reorder_rows=meths)
+```
+
+```{r, fig.width=9, fig.height=4}
+plot_grid(grid.grabExpr(draw(H)), grid.grabExpr(draw(H2)), ncol=1, labels = LETTERS[1:2])
+```
+
+### Supplementary Figure `r getFigNb()`
+
+**scVI evaluation. A:** Average silhouette width per subpopulation using either sctransform, scran or scVI normalization followed by Seurat PCA, or the scVI linear decoder (LD). **B:** Clustering accuracy across the same methods followed by Seurat clustering.
+
+\newpage
+
+
 # Supplementary Figure `r getFigNb(TRUE)`
 
 ```{r norm_nbClusters, fig.width=8, fig.height=8.5}
-res <- readRDS("../data/norm2_endSummary.rds")
-res2 <- res[which(res$filt=="deffilter" & res$norm %in% c("norm.scran", "norm.scran.noscale", "norm.seurat", "norm.seuratvst", "norm.stableGsum")),]
-res2$diff.nbClusters <- res2$nbClusters-truek[res2$dataset]
-res3 <- aggregate(res2[,"diff.nbClusters"], by=res2[,c("dataset","dims","resolution","norm")], FUN=mean)
+res <- readRDS("../data/results_norm.rds")
+res <- res$evaluation$clustering
+res2 <- res[which(res$norm %in% c("norm.scran.scaled", "norm.scran", "norm.seurat", "norm.sctransform", "norm.stableGsum") & res$resolution<4),]
+res2 <- res2[grep("simMix",res2$dataset,invert=TRUE),]
+res2$dataset <- droplevels(res2$dataset)
+res2$delta.nbClusters <- res2$n_clus-res2$true.nbClusts
+res3 <- aggregate(res2[,"delta.nbClusters"], by=res2[,c("dataset","dims","resolution","norm")], FUN=mean)
 colnames(res3)[5] <- "nb"
 res3$norm <- gsub("norm.","",res3$norm, fixed=T)
-# ggplot(res3, aes(factor(dims), factor(resolution), fill=nb)) + stat_bin2d() + 
-#   scale_fill_viridis() + ylab("Resolution") + xlab("Number of dimensions") +
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#   coord_flip() + facet_grid(dataset~norm)
 
 ll <- lapply(split(res3, res3$dataset), FUN=function(x){
   ggplot(x, aes(factor(resolution), factor(dims), fill=nb)) + stat_bin2d() + 
@@ -58,12 +109,12 @@ for(i in names(ll)){
 }
 ll[[4]] <- ll[[4]] + ylab("Number of dimensions")
 
-mod <- summary(lm(nbClusters~dataset+norm+dims+resolution, data=res2))
+mod <- summary(lm(n_clus~dataset+norm+dims+resolution, data=res2))
 plot_grid(plotlist = ll[-2], nrow=6, rel_heights=c(1,1,1,1,1,1.5))
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected. A rough ANOVA on `nbClusters~dataset+norm+dims+resolution` suggests that seuratvst (sctransform) is associated with a higher number of clusters (p~`r round(mod$coefficients["normnorm.seuratvst",4],3)`).
+Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected. A rough ANOVA on `nbClusters~dataset+norm+dims+resolution` suggests that seuratvst (sctransform) is associated with a higher number of clusters (p~`r round(mod$coefficients["normnorm.sctransform",4],3)`).
 
 \newpage 
 
@@ -77,3 +128,18 @@ knitr::include_graphics("vst.png")
 Relationship of the variance with mean count after `sctranform`'s variance stabilizing transformation.
 
 \newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.width=7.5, fig.height=6}
+res <- readRDS("../data/results_norm.rds")
+res <- res$elapsed$stepwise$normalization
+ag <- aggregate(res[,"elapsed",drop=FALSE], by=res[,c("dataset","norm")], FUN=mean)
+cols <- pipeComp::getQualitativePalette(9)
+names(cols) <- levels(ag$dataset)
+ggplot(ag, aes(norm, elapsed)) + geom_boxplot() + geom_point(aes(colour=dataset)) + 
+  coord_flip() + scale_colour_manual(values=cols) + ylab("") + xlab("Time (s)")
+```
+
+### Supplementary Figure `r getFigNb()`
+Running time of the normalization methods.
