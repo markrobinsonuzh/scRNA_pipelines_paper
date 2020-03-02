@@ -44,4 +44,5 @@ dev.off()
 plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3], rel_heights = c(10,9,10))
 ```
 
-Evaluation of normalization procedures. **A:** Average of the absolute within-subpopulation correlation of the first 5 principal components with library size (left) and detection rate (right). **B:** Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the mutual information (MI), the adjusted Rand Index (ARI), and the ARI at the true number of cluster.
+Evaluation of normalization procedures. **A:** Variance in the first principal component explained by 
+library size and detection rate after accounting for subpopulation differences. The values are difference in adjusted _R^2_ between a `PC1~subpopulation+covariate` model and `PC1~subpopulation`. **B:** Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the mutual information (MI), the adjusted Rand Index (ARI), and the ARI at the true number of cluster.
