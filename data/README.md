@@ -1,7 +1,7 @@
 # Compiled pipeline results
 
 This folder contains the aggregated pipeline results. Unless stated otherwise,
-they were used with the default `PipelineDefinition`, i.e. `pipeComp::scrna_seurat_pipeline()`.
+they were produced using the [`biorxiv` branch](https://github.com/plger/pipeComp/tree/biorxiv) of [`pipeComp`](https://github.com/plger/pipeComp) with the default scRNA `PipelineDefinition`.
 
 A number of different runs were made with varying set of alternatives; they are presented in the different sections below, and the files saved separately. All method wrappers are defined in the [pipeComp package](https://github.com/plger/pipeComp/blob/master/inst/extdata/scrna_alternatives.R) (or accessible through `system.file("extdata/scrna_alternatives.R", package="pipeComp")`) or, for those not widely used, defined below.
 
@@ -43,7 +43,7 @@ alternatives <- scrna_seurat_defAlternatives(list(
 
 ## Normalization
 
-Saved in `results_norm.rds` :
+Generated with `pipeComp` 0.99.3 and saved in `results_norm.rds` :
 
 ```{r}
 norm.seurat.mt_regress <- function(x){
@@ -55,7 +55,18 @@ norm.seurat.feat_regress <- function(x){
 norm.seurat.feat_mt_regress <- function(x){
   norm.seurat(x,c("pct_counts_Mt","log10_total_features"))
 }
-
+norm.sctransform.mt_regress <- function(x){
+  norm.sctransform(x,"pct_counts_Mt")
+}
+norm.sctransform.feat_regress <- function(x){
+  norm.sctransform(x,"log10_total_features")
+}
+norm.sctransform.feat_mt_regress <- function(x){
+  norm.sctransform(x,c("pct_counts_Mt","log10_total_features"))
+}
+norm.seurat.noscale <- function(x){
+  norm.seurat(x, noscale=TRUE)
+}
 
 norm.stableG <- function(x, type="CytosolicRibosome", ag="median", topN=50, vars=NULL, noscale=FALSE){
   gl <- readRDS("~/pipComp/stable_genes.rds")
@@ -92,17 +103,19 @@ norm.stableG.nucleus <- function(x){
   norm.stableG(x, type="Nucleus")
 }
 
-
 alternatives <- list(
   doubletmethod=c("doublet.scDblFinder"),
   filt=c("filt.lenient"),
-  norm=c("norm.seurat", "norm.seuratvst"),
+  norm=c("norm.seurat", "norm.seurat.noscale", "norm.scnorm.scaled", "norm.sctransform", "norm.scran","norm.scran.scaled",
+  "norm.none", "norm.none.scaled","norm.stableG", "norm.stableGsum", "norm.stableG.nucleus", "norm.seurat.mt_regress",
+  "norm.seurat.feat_mt_regress", "norm.seurat.feat_regress","norm.sctransform.mt_regress", 
+  "norm.sctransform.feat_regress", "norm.sctransform.feat_mt_regress"),
   sel=c("sel.vst"),
   selnb=2000,
   dr=c("seurat.pca"),
   clustmethod=c("clust.seurat"),
   maxdim=50,
-  dims=c("elbow", "pcaOtpmPointwise.max", "pcaLocal.maxgap", "jackstraw.elbow"),
+  dims=c(10, 15, 20, 30, 50),
   k=20,
   steps=4,
   resolution=c(0.005,0.01,0.02,0.05,0.1,0.15,0.2,0.3,0.4,0.5,0.8,1,1.2,1.5,2,4),
@@ -231,23 +244,50 @@ alternatives$dims <- c("elbow", "pcaOtpmPointwise.max", "pcaLocal.maxgap",
 
 ## Clustering
 
-Saved in `results_clust_2.rds` :
+Generated with `pipeComp` 0.99.3 and saved in `results_clustering2.rds` :
 
 ```{r}
+clust.scran.knn <- function(ds, ...){
+  clust.scran(ds, graph.type="knn", ...)
+}
+clust.scran.snnNumber <- function(ds, ...){
+  clust.scran(ds, graph.type="snn.number", ...)
+}
+clust.scran.knn <- function(ds, ...){
+  clust.scran(ds, graph.type="knn", ...)
+}
+clust.scran.knnAnnoy <- function(ds, ...){
+  clust.scran(ds, graph.type="knn", neighbor.method="Annoy", ...)
+}
+clust.scran.snnNumberAnnoy <- function(ds, ...){
+  clust.scran(ds, graph.type="snn.number", neighbor.method="Annoy", ...)
+}
+clust.scran.Annoy <- function(ds, ...){
+  clust.scran(ds, neighbor.method="Annoy", ...)
+}
+
+pd <- scrna_pipeline(pipeClass="seurat")
+
 alternatives <- list(
-  doubletmethod=c("doublet.scds"),
+  doubletmethod=c("doublet.scDblFinder"),
   filt=c("filt.default"),
   norm=c("norm.seurat","norm.seuratvst"),
   sel=c("sel.vst"),
   selnb=2000,
   dr=c("seurat.pca"),
   maxdim=50,
-  dims=c("maxLikGlobal"),
-  clustmethod=c("clust.seurat","clust.scran","clust.scran.fg"),
-  k=c(5,10,12,14,16,18,20,22,25,28,35),
-  steps=c(2:12,15,20,30),
+  dims=c("elbow", "maxLikGlobal", 25, 50),
+  clustmethod=c("clust.seurat","clust.scran","clust.scran.fg","clust.scran.knn","clust.scran.snnNumber",
+                "clust.scran.knnAnnoy","clust.scran.Annoy","clust.scran.snnNumberAnnoy"),
+  k=c(5,10,20,30),
+  steps=c(2,4,8),
   resolution=c(0.0001,0.001,0.005,0.01,0.02,0.05,0.1,0.15,0.2,0.3,0.4,0.5,0.8,1,1.2,1.5,2,4,6),
   min.size=20
 )
+
+comb <- buildCombMatrix(alternatives)
+comb <- comb[(comb$clustmethod=="clust.seurat" | comb$resolution==0.8),]
+comb <- comb[(comb$steps==4 | comb$clustmethod != "clust.seurat"),]
 ```
 
+(`results_clustering2.rds` contains fewer clustering methods but more values of `k` and `steps` to extend the parameter exploration)
