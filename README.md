@@ -2,7 +2,7 @@
 
 This repository accompanies the [pipeComp paper](https://doi.org/10.1101/2020.02.02.930578). It is still in preparation, and aims to providing a record of what was done and access to compiled results, rather than easy reproducibility.
 
-For the figure and results of the biorxiv paper, refer to the [biorxiv branch](https://github.com/markrobinsonuzh/scRNA_pipelines_paper/tree/biorxiv) of the repo.
+For the figure and results of the first version of the biorxiv paper, refer to the [biorxiv branch](https://github.com/markrobinsonuzh/scRNA_pipelines_paper/tree/biorxiv) of the repo.
 
 ## Figures
 
@@ -20,4 +20,4 @@ For the figure and results of the biorxiv paper, refer to the [biorxiv branch](h
 
 * The pipelines can be run and evaluated with the [pipeComp package](https://github.com/plger/pipeComp), which also includes [wrappers](https://github.com/plger/pipeComp/tree/master/inst/extdata) for all methods used. Unless indicated otherwise, the results were generated with the `biorxiv` branch of the package.
 
-* The compiled pipeline results (i.e. results of _pipeComp_) are available in the `data/` folder (their more detailed description will follow).
+* The compiled pipeline results (i.e. results of _pipeComp_) are available in the `data/` folder (see the [readme](data/README.md) in that folder for the precise sets of alternatives used to generate the results, and the `environment` folder for session info).
