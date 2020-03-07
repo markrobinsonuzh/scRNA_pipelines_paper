@@ -1,10 +1,8 @@
 ---
-title: "Figure 4 selection"
+title: "Selection figure"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r}
@@ -14,11 +12,22 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
-  library(pipeComp)
 })
 source("../misc_functions.R")
 data(datasets)
 theme_set(theme_cowplot(font_size = 12))
+```
+
+```{r, eval=FALSE}
+# NB: the results were generated using an older version of pipeComp (branch 
+# `biorxiv`), and must be plotted using this version of the package
+suppressPackageStartupMessages({
+  library(pipeComp)
+})
+```
+
+```{r, include=FALSE}
+#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
 ```
 
 ```{r}
@@ -60,7 +69,7 @@ h2 <- Heatmap( aucs2[row.names(h1@matrix),],
 p1 <- grid.grabExpr(draw(h1+h2))
 ```
 
-```{r figure4, fig.width=7.5, fig.height=6.5}
+```{r}
 res <- readRDS("../data/results_selection.rds")
 cl <- res$clustering
 vst <- cl[grep("seuratvst",row.names(cl)),]
@@ -68,6 +77,13 @@ snorm <- cl[grep("seuratvst",row.names(cl), invert=TRUE),]
 h1 <- scrna_evalPlot_clustAtTrueK(snorm[grep("=1000;",row.names(snorm)),], "ARI", scale = FALSE, title="ARI at true # clusters", anno_legend = FALSE)
 h2 <- scrna_evalPlot_clustAtTrueK(vst[grep("=1000;",row.names(vst)),], "ARI", scale = FALSE, reorder_rows=row.names(h1@matrix), title="sctransform\nARI at true # clusters", name="ARI2", anno_legend = FALSE)
 p2 <- grid.grabExpr(draw(h1+h2))
+```
+
+```{r figure4, fig.width=7.5, fig.height=6.5}
+pdf("selection.pdf", width = 7.5, height=6.5)
+plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights = c(4,5))
+dev.off()
+
 plot_grid(p1, p2, labels=LETTERS[1:2], nrow=2, rel_heights = c(4,5))
 ```
 

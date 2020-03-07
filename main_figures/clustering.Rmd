@@ -2,9 +2,7 @@
 title: "Clustering"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r}
@@ -28,7 +26,7 @@ theme_set(theme_cowplot(font_size = 12))
 # h <- pipeComp:::.renameHrows(h, function(x) gsub("seurat; clustmethod=|; clustmethod=", "", gsub("seuratvst", "sctransform + ", x)))
 # h <- pipeComp:::.renameHrows(h, function(x) gsub("clust.scran","scran (walktrap)",gsub("clust.scran.fg", "scran (fast_greedy)", x)))
 
-res <- readRDS("../data/results_clustering2.rds")
+res <- readRDS("../data/results_clustering.rds")
 cl <- res$evaluation$clustering
 cl$graph <- cl$clustmethod
 levels(cl$graph) <- c(paste0("scran (",c("exact rank SNN", "Annoy rank SNN", "exact rank SNN", "exact KNN", "Annoy KNN", "exact SNN", "Annoy SNN"),")"), "Seurat SNN")
@@ -44,7 +42,7 @@ renameFn <- function(x){
   x <- gsub("; clustmethod=", "+", x)
   x <- gsub("^graph=","",x)
   x <- gsub("exact ","",x)
-  x <- gsub(" + walktrap","",x,fixed=TRUE)
+  x <- gsub("+walktrap","",x,fixed=TRUE)
 }
 
 tmp <- scale(pipeComp:::.prepRes(cl, "ARI", agg.by=c("norm","graph","clustmethod"))) + 
@@ -80,6 +78,9 @@ h3 <- grid.grabExpr(draw(h3))
 ```
 
 ```{r clustering, fig.width=12, fig.height=8}
+pdf("clustering.pdf", width=15, height=10)
+plot_grid(h2, h3, labels=LETTERS[1:2], ncol=1, rel_heights = c(7,4))
+dev.off()
 plot_grid(h2, h3, labels=LETTERS[1:2], ncol=1, rel_heights = c(7,4))
 ```
 Clustering accuracy (A), computing time (B left) and mean deviation from the true number of clusters (B right). The (exact) rank-based SNN graph represents the default setting in `scran`-based clustering; however we find that the Annoy approximation to the KNN diminishes the computing costs without negatively affecting the accuracy.

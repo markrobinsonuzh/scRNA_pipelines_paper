@@ -2,9 +2,7 @@
 title: "Dimensionality"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r}
@@ -13,11 +11,22 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
-  library(pipeComp)
 })
 source("../misc_functions.R")
 source(system.file("extdata/scrna_alternatives.R", package="pipeComp"))
 theme_set(theme_cowplot(font_size = 12))
+```
+
+```{r, eval=FALSE}
+# NB: the results were generated using an older version of pipeComp (branch 
+# `biorxiv`), and must be plotted using this version of the package
+suppressPackageStartupMessages({
+  library(pipeComp)
+})
+```
+
+```{r, include=FALSE}
+#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
 ```
 
 ```{r}
@@ -88,6 +97,9 @@ p3 <- grid.grabExpr(draw(h2))
 ```
 
 ```{r figure6, fig.width=9, fig.height=9.5}
+pdf("dimensionality.pdf", width=9, height=10)
+plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.36,0.32,0.32), labels=c(NA,LETTERS[3:4]))
+dev.off()
 plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.36,0.32,0.32), labels=c(NA,LETTERS[3:4]))
 ```
 

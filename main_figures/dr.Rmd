@@ -2,9 +2,7 @@
 title: "Figure 5 dimensionality reduction"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r}
@@ -13,9 +11,20 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
-  library(pipeComp)
 })
 source("../misc_functions.R")
+```
+
+```{r, eval=FALSE}
+# NB: the results were generated using an older version of pipeComp (branch 
+# `biorxiv`), and must be plotted using this version of the package
+suppressPackageStartupMessages({
+  library(pipeComp)
+})
+```
+
+```{r, include=FALSE}
+#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
 ```
 
 ```{r dimred, fig.width=12, fig.height=6}
@@ -41,6 +50,9 @@ h <- pipeComp:::.renameHrows(h, function(x) gsub("; dr=", " + ", gsub("seuratvst
 
 p2 <- grid.grabExpr(draw(h))
 
+pdf("dr.pdf", width = 12, height=6)
+plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2], scale=0.95)
+dev.off()
 plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
 ```
 

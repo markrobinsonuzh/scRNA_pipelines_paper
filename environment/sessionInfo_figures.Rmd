@@ -1,0 +1,39 @@
+---
+title: "session info - figures"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    keep_md: true
+---
+
+This is the session information for the environment on which the figures were created (code in this repo). 
+The pipelines were run in a different environment (see `sessionInfo_pipelines.Rmd`).
+
+```{r}
+suppressPackageStartupMessages({
+  library(aricode)
+  library(circlize)
+  library(ComplexHeatmap)
+  library(cowplot)
+  library(dplyr)
+  library(ggplot2)
+  library(ggridges)
+  library(ggridges)
+  library(knitr)
+  library(matrixStats)
+  library(muscat)
+  library(patchwork)
+  library(pheatmap)
+  library(pipeComp)
+  library(purrr)
+  library(reshape2)
+  library(scater)
+  library(scDblFinder)
+  library(Seurat)
+  library(SingleCellExperiment)
+  library(viridis)
+})
+  
+devtools::session_info()
+```

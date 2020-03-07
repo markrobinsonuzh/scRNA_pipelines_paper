@@ -1,15 +1,13 @@
 ---
 title: \Large{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
-subtitle: \vspace{0.5cm}\LARGE{Supplementary Figures}\vspace{0.5cm}
+subtitle: \vspace{0.2cm}\LARGE{Supplementary Figures}\vspace{0.3cm}
 author:
 - "Pierre-Luc Germain"
 - "Anthony Sonrel"
 - "Mark D. Robinson"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
 geometry: margin=1.5cm
 output:
   pdf_document:
-    keep_tex: true
     toc: true
     fig_width: 8
     fig_height: 6
@@ -39,9 +37,6 @@ getFigNb <- function(increment=FALSE){
 ```
 
 ```{r child='supp2_filtering.Rmd'}
-```
-
-```{r child='supp3b_scVI.Rmd'}
 ```
 
 ```{r child='supp3_normalization.Rmd'}

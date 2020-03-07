@@ -37,13 +37,14 @@ res <- res$evaluation$clustering
 res <- res[which(res$clustmethod %in% c("clust.seurat","clust.scran")),]
 res$norm <- gsub("norm\\.seuratvst","sctransform",res$norm)
 dd <- res[!duplicated(res[,c("dataset","true.nbClusts")]),]
-```
-
-```{r, fig.width=7.5, fig.height=7}
-ggplot(res, aes(n_clus, ARI, colour=clustmethod, shape=norm)) + 
+p <- ggplot(res, aes(n_clus, ARI, colour=clustmethod, shape=norm)) + 
     geom_point() + xlim(c(1,40)) + facet_wrap(~dataset) + xlab("Number of clusters") +
     geom_vline(aes(xintercept=k), data=dd, linetype="dashed") + theme(legend.position="bottom") + 
     guides(colour=guide_legend(ncol=1, title = ""), shape=guide_legend(ncol=1, title=""))
+```
+
+```{r, fig.width=7.5, fig.height=7}
+p
 ```
 
 

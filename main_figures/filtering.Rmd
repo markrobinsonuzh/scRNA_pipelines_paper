@@ -1,11 +1,8 @@
 ---
-title: "Figure 2 filtering"
+title: "Filtering figure"
 author: "Pierre-Luc Germain"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output:
-  html_document:
-    keep_md: true
-
+output: html_document
 ---
 
 
@@ -21,7 +18,6 @@ suppressPackageStartupMessages({
 })
 theme_set(theme_cowplot(font_size = 12))
 source("../misc_functions.R")
-data(datasets)
 ```
 
 ```{r}
@@ -60,7 +56,7 @@ m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
 m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
 m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
                      c("nofilter","lenient","default","pca","pca2","stringent","veryStringent"))
-cols <- c("black",plgINS::getQualitativePalette(length(levels(m$filter))-1))
+cols <- c("black", pipeComp::getQualitativePalette(length(levels(m$filter))-1))
 names(cols) <- levels(m$filter)
 
 # ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
@@ -69,6 +65,10 @@ p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletR
   # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
   facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + 
   xlab("Maximum proportion of cells excluded per subpopulation") + ylab("mean F1 at true number of clusters")
+
+pdf("filtering.pdf", width = 8, height=8.5)
+plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])
+dev.off()
 
 plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])
 ```
