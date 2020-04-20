@@ -1,0 +1,102 @@
+---
+title: "SVA - DEA benchmark"
+author: "Pierre-Luc Germain"
+date: "4/15/2020"
+output: html_document
+---
+
+## Benchmark datasets
+
+* **ipsc**: 10 vs 10 random samples from the GSE79636 dataset, which contains heterogeneous samples (background genetic variation, some batch effects). No further technical variation was added, and a foldchange was added on 300 genes.
+* **seqc**: 5 vs 5 samples of seqc mixtures C and D respectively, which include two different spike-in mixes. The samples where selected from two batches with technical differences so that there is weak partial correlation with the mixtures (3:2 vs 2:3). Since the true differences between mixtures are not entirely known, the analysis was performed on all genes but only the spike-ins were considered for benchmarking.
+* **simulation**: 8 vs 8 samples were simulated using `polyester` and the means/dispersions from the GSE79636 (restricted to a single batch and biological group), with 500 DEGs and two batch effects: 1) a technical batch partially correlated with the group (6:2) and affecting 1/3 of the genes, and 2) a linear vector of technical variation uncorrelated with the groups and affecting 1/3 of the genes.
+
+See `data_prep.Rmd` for the data preparation code.
+
+## Running the pipeline
+
+```{r, eval=FALSE}
+suppressPackageStartupMessages({
+  library(SummarizedExperiment)
+  library(pipeComp)
+})
+source(system.file("extdata", "dea_wrappers.R", package="pipeComp"))
+
+pd <- dea_pipeline()
+
+ds <- list.files("../data_preparation", pattern="\\.rds$", full.names = TRUE)
+names(ds) <- gsub("\\.rds$","",basename(ds))
+
+alternatives <- list(
+  filt=c("none","def.filter"),
+  minCount=c(10,20),
+  sva.method=c("none","sva.svaseq","sva.vstsva","sva.RUVr","sva.RUVs"),
+  k=c(1:5,"be","leek"),
+  dea.method=c("dea.edgeR", "dea.edgeR.QLF", "dea.DESeq2", "dea.voom")
+)
+
+# we get rid of meaningless/redundant combinations:
+eg <- buildCombMatrix(alternatives)
+eg <- eg[eg$sva.method %in% c("sva.svaseq", "sva.vstsva") | 
+           !(eg$k %in% c("be","leek")),]
+eg <- eg[eg$filt=="def.filter" | eg$minCount==10,]
+eg <- eg[eg$k=="1" | eg$sva.method!="none",]
+
+res <- runPipeline(ds, alternatives, pd, comb = eg, saveEndResults = TRUE, debug=FALSE, nthreads = 3)
+```
+
+```{r, include=FALSE}
+res <- readRDS("aggregated.rds")
+```
+
+## Results
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+})
+theme_set(theme_cowplot())
+devtools::load_all("../../pipeComp/")
+res1b <- res1 <- res
+res1$evaluation$dea <- lapply(res1$evaluation$dea, FUN=function(x) x[which(x$k==1),])
+res1b$evaluation$dea <- lapply(res1b$evaluation$dea, FUN=function(x){
+  x[x$filt=="def.filter" & x$minCount==10,]
+})
+```
+
+```{r, fig.width=8, fig.height=9.5}
+plot_grid(
+  grid.grabExpr(draw(
+    dea_evalPlot_logFCs(res1, agg.by=c("sva.method","dea.method"), reorder_rows=FALSE, row_split="sva.method") +
+    dea_evalPlot_sig(res1, agg.by=c("sva.method","dea.method"), reorder_rows=FALSE)
+  )),
+  plotElapsed(res, agg.by=c("sva.method","dea.method")),
+  nrow=2, labels=LETTERS[1:2]
+)
+```
+
+```{r, fig.width=11, fig.height=9}
+plot_grid(
+  dea_evalPlot_curve(res1, agg.by=c("sva.method","dea.method"), colourBy="sva.method", shapeBy="dea.method") + ggtitle("Using a single surrogate variable"),
+  dea_evalPlot_curve(res, agg.by=c("sva.method","k"), colourBy="k", shapeBy="sva.method") + ggtitle("Increasing the number of surrogate variables"),
+  nrow=2, labels=LETTERS[1:2]
+)
+```
+
+
+```{r, fig.width=12, fig.height=6.5}
+plot_grid(
+  plot_grid(
+    dea_evalPlot_curve(res1, agg.by=c("dea.method","filt","minCount"), colourBy = "dea.method", shapeBy="filter") + ggtitle("DEA methods, Averaging across SVA strategies"),
+    dea_evalPlot_curve(res1b, agg.by=c("sva.method")) + ggtitle("SVA methods, averaging across DEA methods"),
+    nrow=2, labels=LETTERS[1:2]
+  ),
+  grid.grabExpr(draw(
+    dea_evalPlot_sig(res, agg.by=c("sva.method","k"), reorder_rows=FALSE, 
+                     show_column_names=TRUE, anno_legend = FALSE, row_split="sva.method")
+    )),
+  nrow=1, rel_widths=c(5,2), labels=c(NA,"C")
+)
+```
+

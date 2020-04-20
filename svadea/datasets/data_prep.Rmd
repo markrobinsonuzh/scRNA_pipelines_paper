@@ -1,0 +1,162 @@
+---
+title: "Dataset preparation"
+author: "Pierre-Luc Germain"
+date: "4/14/2020"
+output: html_document
+---
+
+
+## GSE79636 iPSC lines
+
+```{r}
+suppressPackageStartupMessages({
+  library(SummarizedExperiment)
+  library(iPSCpoweR)
+})
+data("GSE79636")
+se <- SummarizedExperiment( list(counts=GSE79636$dat), colData=GSE79636$annotation)
+set.seed(123)
+se <- se[,sample(colnames(se), 20)]
+se <- se[rowSums(assay(se)>0)>1,]
+colData(se) <- droplevels(colData(se))
+se$condition <- rep(0:1,each=10)
+expressed <- which(rowSums(assay(se)>10)>10)
+# add known differential expression
+n <- 300
+w <- sample(expressed, n)
+lfcs <- rep(c(0.25, 0.5, 0.75, 1, 1.25), c(1,2,2,2,1))
+lfcs <- sample(c(lfcs, -lfcs), n, replace=TRUE)
+assay(se)[w,c(5,12:20)] <- round(assay(se)[w,11:20]*2^lfcs)
+rowData(se)$expected.beta <- 0
+rowData(se)[w,"expected.beta"] <- lfcs
+rowData(se)$isDE <- FALSE
+rowData(se)$isDE[w] <- TRUE
+saveRDS(se, file="ipsc.rds")
+```
+
+## SEQC
+
+```{r}
+suppressPackageStartupMessages({
+  library(SummarizedExperiment)
+  library(seqc)
+})
+names(smps) <- smps <- c("ILM_refseq_gene_AGR","ILM_refseq_gene_CNL")
+ds <- lapply(smps, FUN=function(x){
+  e <- get(x)
+  RD <<- e[,1:4]
+  row.names(RD) <<- row.names(e) <- e$EntrezID
+  CD <- as.data.frame(do.call(rbind,strsplit(names(e)[-1:-4], "_")))
+  e <- as.matrix(e[,-1:-4])
+  colnames(CD) <- c("Mix","Replicate","Lane","Flowcell")
+  row.names(CD) <- colnames(e)
+  CD$Replicate <- paste0(CD$Mix,CD$Replicate)
+  w <- which(CD$Flowcell=="FlowCellA" & CD$Lane %in% c("L01","L02")) # keep only part of the runs
+  CD <- CD[w,]
+  sapply(split(row.names(CD), CD$Replicate), FUN=function(x){
+    rowSums(e[,x,drop=FALSE])
+  })
+})
+e <- do.call(cbind, ds)
+lab <- rep(names(ds), sapply(ds,ncol))
+mix <- gsub("[0-9]","",colnames(e))
+colnames(e) <- paste(lab, colnames(e), sep=".")
+
+se <- SummarizedExperiment(list(counts=e), rowData=RD,
+                           colData=data.frame(lab=lab, mix=mix))
+se <- se[,which(se$mix %in% c("C","D"))]
+se <- se[,c(1:3,9:10,7:8,14:16)]
+se$condition <- as.numeric(se$mix!=unique(se$mix)[2])
+
+# expected log2FC between ERCC mixes
+ercc <- c(`ERCC-00002` = -1, `ERCC-00003` = -1, `ERCC-00004` = 2, `ERCC-00009` = 0, 
+`ERCC-00012` = -0.58, `ERCC-00013` = -1, `ERCC-00014` = -1, `ERCC-00016` = -0.58, 
+`ERCC-00017` = 2, `ERCC-00019` = 2, `ERCC-00022` = -1, `ERCC-00024` = -0.58, 
+`ERCC-00025` = 0, `ERCC-00028` = 2, `ERCC-00031` = 0, `ERCC-00033` = 2, 
+`ERCC-00034` = 0, `ERCC-00035` = 0, `ERCC-00039` = -0.58, `ERCC-00040` = -0.58, 
+`ERCC-00041` = -1, `ERCC-00042` = 0, `ERCC-00043` = -1, `ERCC-00044` = -0.58, 
+`ERCC-00046` = -1, `ERCC-00048` = -1, `ERCC-00051` = 0, `ERCC-00053` = 0, 
+`ERCC-00054` = -0.58, `ERCC-00057` = -0.58, `ERCC-00058` = -0.58, 
+`ERCC-00059` = -1, `ERCC-00060` = 0, `ERCC-00061` = -1, `ERCC-00062` = 2, 
+`ERCC-00067` = 0, `ERCC-00069` = -1, `ERCC-00071` = -0.58, `ERCC-00073` = 0, 
+`ERCC-00074` = -0.58, `ERCC-00075` = 0, `ERCC-00076` = -0.58, 
+`ERCC-00077` = -1, `ERCC-00078` = -1, `ERCC-00079` = -1, `ERCC-00081` = -1, 
+`ERCC-00083` = 2, `ERCC-00084` = -0.58, `ERCC-00085` = 2, `ERCC-00086` = -1, 
+`ERCC-00092` = 2, `ERCC-00095` = 2, `ERCC-00096` = 0, `ERCC-00097` = 2, 
+`ERCC-00098` = -0.58, `ERCC-00099` = -0.58, `ERCC-00104` = 0, 
+`ERCC-00108` = 2, `ERCC-00109` = 0, `ERCC-00111` = -0.58, `ERCC-00112` = -1, 
+`ERCC-00113` = -0.58, `ERCC-00116` = 2, `ERCC-00117` = 0, `ERCC-00120` = -0.58, 
+`ERCC-00123` = 2, `ERCC-00126` = 0, `ERCC-00130` = 2, `ERCC-00131` = 2, 
+`ERCC-00134` = 2, `ERCC-00136` = 2, `ERCC-00137` = -1, `ERCC-00138` = 0, 
+`ERCC-00142` = 0, `ERCC-00143` = -0.58, `ERCC-00144` = 2, `ERCC-00145` = -0.58, 
+`ERCC-00147` = 2, `ERCC-00148` = 0, `ERCC-00150` = 0, `ERCC-00154` = 2, 
+`ERCC-00156` = 2, `ERCC-00157` = -0.58, `ERCC-00158` = 0, `ERCC-00160` = -1, 
+`ERCC-00162` = -0.58, `ERCC-00163` = -1, `ERCC-00164` = -0.58, 
+`ERCC-00165` = -1, `ERCC-00168` = -1, `ERCC-00170` = 2, `ERCC-00171` = 0
+)
+# for a 1:4 vs 3:4 mixes, we expect half the logfcs:
+ercc <- ercc/2
+rowData(se)$expected.beta <- NA
+rowData(se)[names(ercc),"expected.beta"] <- as.numeric(ercc)
+rowData(se)$isDE <- NA
+rowData(se)[names(ercc),"isDE"] <- ercc != 0
+se <- se[rowVars(assay(se))>0,]
+saveRDS(se, file="seqc.rds")
+```
+
+## Simulation
+
+Loosely based on C. Leek's simulation, see https://github.com/jtleek/svaseq/blob/master/simulateData.Rmd
+
+
+```{r}
+suppressPackageStartupMessages({
+  library(polyester)
+})
+se <- SummarizedExperiment( list(counts=GSE79636$dat), colData=GSE79636$annotation)
+# restrict to more homogeneous samples
+se <- se[,se$state=="Insulin resistant" & se$race=="White" & se$Sex=="Male"]
+se <- se[rowSums(assay(se)>10)>1,]
+e <- assay(se)
+n <- nrow(e)
+params <- get_params(e)
+group <- rep(c(0,1),each=8)
+batch1 <- rep(c(0, 1, 0),c(6,8,2)) # batch 1 partially correlated to group
+batch2 <- c(rnorm(8,0),rnorm(8,1))[rep(1:8,each=2)+0:1*8] # linear batch effect uncorrelated to group
+mod = model.matrix(~ 0 + batch1 + batch2 + group)
+set.seed(321)
+gco <- bco2 <- bco1 <- rep(0,n)
+bco1[sample.int(n, floor(n)/3)] <- rnorm(floor(n)/3,sd=1.5)
+bco2[sample.int(n, floor(n)/3)] <- rnorm(floor(n)/3,sd=1.3)
+lfcs <- c(0.5, 0.75, 1, 1, 1.5, 2)
+gco[sample.int(n, 500)] <- sample(c(lfcs,-lfcs), 500, replace=TRUE)
+co <- cbind(batch1=bco1, batch2=bco2, group=gco)
+dat0 = create_read_numbers(params$mu,params$fit,params$p0,n=nrow(mod),
+                           beta=co,mod=mod,seed=321)
+row.names(dat0) <- row.names(e)
+se <- SummarizedExperiment(list(counts=dat0), rowData=co,
+                           colData=data.frame(batch1=factor(batch1), batch2=batch2,
+                                              condition=group))
+rowData(se)$expected.beta <- gco
+rowData(se)$isDE <- gco!=0
+se <- se[rowSums(assay(se)>0)>0,]
+saveRDS(se, file="simulation.rds")
+```
+
+```{r}
+homogenizeDEA <- function(x, g=NULL){
+  colnames(x)[which(colnames(x) %in% c("FDR","padj","adj.P.Val"))] <- "FDR"
+  colnames(x)[which(colnames(x) %in% c("P.Value","pvalue","PValue"))] <- "PValue"
+  colnames(x)[which(colnames(x) %in% c("log2FoldChange","logFC"))] <- "logFC"
+  if(is.null(g)) g <- row.names(x)
+  x <- x[g,c("logFC","PValue","FDR")]
+  row.names(x) <- g
+  x
+}
+```
+
+## Session info
+
+```{r}
+sessionInfo()
+```

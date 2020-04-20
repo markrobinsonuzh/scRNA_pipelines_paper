@@ -1,0 +1,57 @@
+---
+title: "SVA-DEA pipeline run"
+author: "Pierre-Luc Germain"
+date: "4/14/2020"
+output: html_document
+---
+
+## Running the pipeline
+
+```{r}
+suppressPackageStartupMessages({
+  library(SummarizedExperiment)
+#  library(pipeComp)
+})
+devtools::load_all("../pipeComp/")
+#source(system.file("extdata", "dea_wrappers.R", package="pipeComp"))
+source("../pipeComp/inst/extdata/dea_wrappers.R")
+
+pd <- dea_pipeline()
+
+ds <- list.files("data_preparation", pattern="\\.rds$", full.names = TRUE)
+names(ds) <- gsub("\\.rds$","",basename(ds))
+
+none <- function(x, ...)  return(x)
+
+alternatives <- list(
+  filt=c("none","def.filter"),
+  minCount=c(10,20),
+  sva.method=c("none","sva.svaseq","sva.vstsva","sva.RUVr","sva.RUVs"),
+  k=c(1:5,"be","leek"),
+  dea.method=c("dea.edgeR", "dea.edgeR.QLF", "dea.DESeq2", "dea.voom")
+)
+eg <- buildCombMatrix(alternatives)
+eg <- eg[eg$sva.method %in% c("sva.svaseq", "sva.vstsva") | 
+           !(eg$k %in% c("be","leek")),]
+eg <- eg[eg$filt=="def.filter" | eg$minCount==10,]
+eg <- eg[eg$k=="1" | eg$sva.method!="none",]
+
+res <- runPipeline(ds[2:3], alternatives, pd, output.prefix = "pipelineResults_test/", debug=FALSE, nthreads = 4)
+```
+
+## Results
+
+```{r}
+dea_evalPlot_logFCs(res, what=c("logFC.pearson","logFC.spearman"), agg.by=c("sva.method","dea.method"), reorder_rows=FALSE)
+dea_evalPlot_curve(res, agg.by=c("sva.method","dea.method"), colourBy="sva.method", shapeBy="dea.method")
+dea_evalPlot_sig(res, agg.by=c("sva.method","dea.method"), reorder_rows=FALSE)
+dea_evalPlot_curve(res, agg.by=c("sva.method")) + ggtitle("Averaging across DEA methods")
+dea_evalPlot_curve(res, agg.by=c("dea.method")) + ggtitle("Averaging across SVA strategies")
+```
+
+
+## Session info
+
+```{r}
+sessionInfo()
+```
