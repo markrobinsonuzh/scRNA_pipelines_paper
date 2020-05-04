@@ -174,7 +174,7 @@ Overall, weighting the principal components by their variance (as \textit{Seurat
 
 A common step following dimension reduction is the selection of an appropriate number of dimensions to use for downstream analysis. Since Euclidean distance decreases as the number of non-discriminating dimensions increases, there is usually a trade-off between selecting enough dimensions to keep most information and excluding smaller dimensions that may represent technical noise or other unwanted sources of variation. Overall, increasing the number of dimensions robustly led to a decrease in the number of clusters (Supplementary Figures 14 and 21). This tended to affect the accuracy of the clustering (Supplementary Figure 22), although in both cases (number of clusters and ARI), \textit{Seurat}'s resolution parameter had a much stronger impact.
 
-Different approaches have been proposed to select the appropriate number of dimensions, from the visual identification of an 'Elbow' (inflexion point) of the variance explained, to more complex algorithms. We evaluated the performance of dimensionality estimators implemented in the \textit{intrinsicDimension} package \cite{johnssonDimensionality2015}, as well as common procedures such as the `elbow` method (inflexion point in the variance explained by each component), some scRNAseq-specific methods such as the JackStraw procedure \cite{ChungJackstraw2015} or \textit{scran}'s \texttt{denoisePCA} \cite{LunScran2016}, and the recent application of Fisher Separability analysis \cite{AlberganteSepar2019}.
+Different approaches have been proposed to select the appropriate number of dimensions, from the visual identification of an `elbow' (inflexion point) of the variance explained by each component, to more complex algorithms. We evaluated the performance of dimensionality estimators implemented in the \textit{intrinsicDimension} package \cite{johnssonDimensionality2015}, as well as common procedures such as the elbow method, some scRNAseq-specific methods such as the JackStraw procedure \cite{ChungJackstraw2015} or \textit{scran}'s \texttt{denoisePCA} \cite{LunScran2016}, and the recent application of Fisher Separability analysis \cite{AlberganteSepar2019}.
 
 We compared the various estimates of dimensionality in their ability to retrieve the intrinsic number of dimensions in a dataset, based on Seurat's weighted PCA space. As a first approximation of the true dimensionality, we computed the variance in each principal component that was explained by the subpopulations, which sharply decreased after the first few components in most datasets (Figure \ref{fig:figure8}A). Figure \ref{fig:figure8}B shows the difference between the dimension estimates of the above methods and that based on the subpopulations (i.e. from Figure \ref{fig:figure8}A). Of note, the methods differ widely in view of their computing time (Figure \ref{fig:figure8}B) and we saw no relationship between the accuracy of the estimates and the complexity of the method. Reasoning that over-estimating the number of dimensions is less problematic than under-estimating it, we kept the former methods for a full analysis of their impact on clustering (Figure \ref{fig:figure8}C-D), when combined with \textit{sctransform} or the standard \textit{Seurat} normalization. Although most methods performed well on the various clustering measures, the global maximum likelihood based on translated Poisson Mixture Model (\textit{maxLikGlobal}, using the 20 nearest neighbors, although estimates were relatively stable across decent values of \textit{k}; see Supplementary Figure 23) provided the dimensionality estimate that best separated the subpopulations (Figure \ref{fig:figure8}C) and resulted in the best clustering accuracy (Figure \ref{fig:figure8}D). This method systematically selected many more components than were associated with the subpopulations, suggesting that although these additional components appear individually uninformative, in combination they nevertheless contribute to classification. An implication is that the commonly-used elbow method most likely underestimates dimensionality.
 
@@ -331,17 +331,17 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 \label{tab:table1}
 \begin{tabular}{rlrrl}
   \hline
-dataset & source & protocol & description \\ 
+dataset & source & # cells & protocol & description \\ 
   \hline
-Koh & GSE85066 & SMARTer & FACS purified H7 hESC in different differention stages \\ 
-  Kumar & GSE60749 & SMARTer & Mouse ESC cultured in different conditions \\ 
-  Zhengmix4eq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix4uneq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix8eq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  mixology10x3cl & \cite{tianMixology2018} & 10x & Mixture of 3  cancer cell lines from CellBench \\ 
-  mixology10x5cl & \cite{tianMixology2018} & 10x & Mixture of 5 cancer cell lines from CellBench \\ 
-  simMix1 & - & 10x-based & Simulation of 10 human cell subpopulations \\
-  simMix2 & - & 10x-based & Simulation of 9 mouse cell subpopulations \\
+Koh & GSE85066 & 531 & SMARTer & FACS purified differentiation stages \\ 
+  Kumar & GSE60749 & 246 & SMARTer & Mouse ESC cultured in different conditions \\ 
+  Zhengmix4eq & \cite{duoClustering2018} & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix4uneq & \cite{duoClustering2018} & 6498 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix8eq & \cite{duoClustering2018} & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  mixology10x3cl & \cite{tianMixology2018} & 902 & 10x & Mixture of 3  cancer cell lines from CellBench \\ 
+  mixology10x5cl & \cite{tianMixology2018} & 3918 & 10x & Mixture of 5 cancer cell lines from CellBench \\ 
+  simMix1 & - & 2500 & 10x-based & Simulation of 10 human cell subpopulations \\
+  simMix2 & - & 3000 & 10x-based & Simulation of 9 mouse cell subpopulations \\
    \hline
 \end{tabular}
 \end{table}
