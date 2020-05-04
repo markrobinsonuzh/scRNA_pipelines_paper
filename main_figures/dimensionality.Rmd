@@ -26,7 +26,8 @@ suppressPackageStartupMessages({
 ```
 
 ```{r, include=FALSE}
-#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
+devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
+source("../../pipeComp_biorxiv/pipeComp/inst/extdata/scrna_alternatives.R")
 ```
 
 ```{r}
@@ -61,39 +62,30 @@ p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, gro
 p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
 ```
 
+```{r, include=FALSE}
+# the second part of these results was generated with pipeComp >0.99.26
+devtools::load_all("../../pipeComp/")
+```
+
+
 ```{r, fig.width=8, fig.height=4}
-res1 <- readRDS("../data/results_dimensionality.rds")
-res2 <- readRDS("../data/results_dimensionality2.rds")
-sw1 <- res1$dimensionality$clust.avg.silwidth$selected
-sw2 <- res2$dimensionality$clust.avg.silwidth$selected
-sw2 <- sw2[grep("Local\\.b",row.names(sw2),invert = TRUE),] # redundant
-sw <- rbind(sw1,sw2[setdiff(row.names(sw2),row.names(sw1)),])
-sw <- sw[grep("=doublet",row.names(sw)),]
-n <- sapply(strsplit(row.names(sw),"="),FUN=function(x) rev(x)[1])
-w <- grep("seuratvst",row.names(sw))
-n[w] <- paste0("sctransform+",n[w])
-row.names(sw) <- n
-sw2 <- sw[order(grepl("sctransform",row.names(sw))*1000+rowMeans(sw)+apply(sw,1,probs=0.2,FUN=quantile),decreasing=TRUE),order(colMeans(sw),decreasing=TRUE)]
-h1 <- Heatmap(sw2, cluster_columns = FALSE, cluster_rows = FALSE, 
-        name="silhouette width", col=pipeComp:::.silScale(sw2), show_column_names = FALSE,
-        column_title = "Subpopulation mean silhouette width",
-        bottom_annotation=pipeComp:::.ds_anno(colnames(sw2)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
-p2 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
+res <- readRDS("../data/results_dimensionality.rds")
+H <- renameHrows(
+  scrna_evalPlot_silh( res, step="dimensionality", reorder_rows=TRUE, 
+                       row_split=gsub("norm\\.","",norm),
+                       heatmap_legend_param=list(direction="horizontal")),
+  function(x) gsub("norm\\.","",x))
+p2 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
 
-cl1 <- res1$clustering
-cl2 <- res2$clustering
-res2 <- rbind(cl1, cl2[setdiff(row.names(cl2),row.names(cl1)), colnames(cl1)])
-res2 <- res2[grep("=doublet",row.names(res2)),]
-method <- as.character(parsePipNames(row.names(res2))$dims)
-w <- grep("seuratvst", row.names(res2))
-method[w] <- paste0("sctransform+",method[w])
-row.names(res2) <- paste0("method=",method,";",row.names(res2))
-
-h2 <- scrna_evalPlot_clust(res2, what="NMI", agg.by = c("method"), scale=TRUE, reorder_rows = TRUE, anno_legend = FALSE)
-h2 <- h2 + 
-  scrna_evalPlot_clust(res2, what="min_pr", agg.by = c("method"), reorder_rows=h2, scale=TRUE, anno_legend = FALSE) + 
-scrna_evalPlot_clustAtTrueK(res2, agg.by = c("method"), reorder_rows=h2, scale=TRUE, anno_legend = FALSE)
-p3 <- grid.grabExpr(draw(h2))
+p3 <- renameHrows(
+  evalHeatmap( res, what=c("NMI","min_pr"), agg.by=c("norm","dims"), 
+                   row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE) + 
+  evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dims"), row_split=gsub("norm\\.","",norm), 
+              reorder_rows=TRUE, filterExpr=n_clus==true.nbClusts, 
+              anno_legend=FALSE, title="ARI at\ntrue k"),
+  function(x) gsub("norm\\.","",x)
+)
+p3 <- grid.grabExpr(draw(p3))
 ```
 
 ```{r figure6, fig.width=9, fig.height=9.5}

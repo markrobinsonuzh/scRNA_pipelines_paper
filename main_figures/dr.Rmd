@@ -11,49 +11,36 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp)
 })
 source("../misc_functions.R")
 ```
 
-```{r, eval=FALSE}
-# NB: the results were generated using an older version of pipeComp (branch 
-# `biorxiv`), and must be plotted using this version of the package
-suppressPackageStartupMessages({
-  library(pipeComp)
-})
-```
-
 ```{r, include=FALSE}
-#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
+devtools::load_all("../../pipeComp/")
 ```
 
-```{r dimred, fig.width=12, fig.height=6}
-res <- readRDS("../data/results_dimred.rds")
-x <- res$dimreduction$clust.avg.silwidth
-x <- x[grep("norm\\.seurat\\.noscale.*denoise", row.names(x), invert=TRUE),]
-x <- x[order(colSums(apply(x,1,prob=c(0.05,0.5),FUN=quantile))+
-                         rowMeans(x), decreasing=TRUE),order(colMeans(x), decreasing=TRUE)]
-row.names(x) <- gsub("norm\\.","",apply(parsePipNames(row.names(x))[,c("norm","dr")],1,collapse=" + ",FUN=paste))
-row.names(x) <- gsub("seuratvst","sctransform",row.names(x))
-h1 <- Heatmap(x, cluster_columns = FALSE, cluster_rows = FALSE, 
-        name="silhouette width", col=pipeComp:::.silScale(x), show_column_names = FALSE,
-        column_title = "Subpopulation mean silhouette width", row_names_max_width = unit(9,"cm"),
-        bottom_annotation=pipeComp:::.ds_anno(colnames(x)), heatmap_legend_param = list(direction="horizontal", legend_width=unit(3, "cm")))
-p1 <- grid.grabExpr(draw(h1, heatmap_legend_side="bottom"))
+```{r dimred, fig.width=10.5, fig.height=6}
+res <- readRDS("../data/results_dimred2.rds")
+H <- renameHrows(
+  scrna_evalPlot_silh( res, reorder_rows=TRUE, 
+                       heatmap_legend_param=list(direction="horizontal")),
+  function(x) gsub("norm\\.","",x))
+p1 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
 
-res$clustering <- res$clustering[grep("norm\\.seurat\\.noscale.*denoise", row.names(res$clustering), invert=TRUE),]
-h <- scrna_evalPlot_clust(res, what="MI", agg.by=c("norm","dr"), scale=TRUE, anno_legend = FALSE)
-h <- h + scrna_evalPlot_clust(res, what="mean_F1", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
-  scrna_evalPlot_clust(res, what="min_pr", agg.by=c("norm","dr"), scale=TRUE, reorder_rows = h, anno_legend = FALSE) +
-  scrna_evalPlot_clustAtTrueK(res, agg.by=c("norm","dr"), reorder_rows = h, anno_legend = FALSE)
-h <- pipeComp:::.renameHrows(h, function(x) gsub("; dr=", " + ", gsub("seuratvst", "sctransform", x)))
+p2 <- renameHrows(
+  evalHeatmap( res, what=c("MI","min_pr"), agg.by=c("norm","dr"), reorder_rows=TRUE, anno_legend=FALSE,
+               title=c("MI","Minimum precision")) + 
+  evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dr"), filterExpr=n_clus==true.nbClusts, 
+              anno_legend=FALSE, title="ARI at true k"),
+  function(x) gsub("norm\\.","",x)
+)
+p2 <- grid.grabExpr(draw(p2))
 
-p2 <- grid.grabExpr(draw(h))
-
-pdf("dr.pdf", width = 12, height=6)
-plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2], scale=0.95)
+pdf("dr.pdf", width = 10.5, height=6)
+plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
 dev.off()
 plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
 ```
 
-**A:** Average silhouette width per subpopulation according to various normalization and dimension reductions. **B:** Clustering accuracy , mean proportion of the variance in the first 5 components explained by real subpopulations (center), and median ARI of the resulting clustering (right).
+Silhouette width (**A**) per subpopulation and clustering accuracy (**B**) according to various normalization and dimension reductions.

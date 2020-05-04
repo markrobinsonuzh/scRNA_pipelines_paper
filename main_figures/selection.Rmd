@@ -27,7 +27,7 @@ suppressPackageStartupMessages({
 ```
 
 ```{r, include=FALSE}
-#devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
+devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
 ```
 
 ```{r}

@@ -50,3 +50,6 @@ getFigNb <- function(increment=FALSE){
 
 ```{r child='supp6_clust.Rmd'}
 ```
+
+```{r child='supp_svadea.Rmd'}
+```
