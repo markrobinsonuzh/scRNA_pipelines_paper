@@ -81,9 +81,9 @@ p4 <- ggplot(d, aes(pldf.class, pct_misclassified, fill=pldf.class)) + geom_viol
 
 
 
-```{r figure1, fig.height=6, fig.width=8}
+```{r figure1, fig.height=6, fig.width=7}
 p1m <- plot_grid(p1, p2, p3, nrow=1, rel_widths = c(9,10,10))
-pdf("doublets.pdf", width=8, height=6)
+pdf("doublets.pdf", width=7, height=6)
 plot_grid(p1m, pt, p4, rel_heights=c(3.5,2,2), labels = LETTERS[1:3], ncol = 1, hjust=0, scale=0.95)
 dev.off()
 plot_grid(p1m, pt, p4, rel_heights=c(3.5,2,2), labels = LETTERS[1:3], ncol = 1, hjust=0)
