@@ -61,7 +61,7 @@ ll2 <- list( "mean ARI"=mycast(ag, "ARI"),
 e <- do.call(cbind, ll2)
 o <- names(sort(rowMeans(e, na.rm=TRUE)+rowMedians(e, na.rm=TRUE), decreasing=TRUE))
 ll2 <- lapply(ll2, FUN=function(x) x[o,])
-ll2s <- lapply(ll2, scale)
+ll2s <- lapply(ll2, pipeComp::colCenterScale)
 
 myh <- function(k,title=k,...){
   rmLead0 <- sum(abs(ll2[[k]])>1,na.rm=TRUE)==0
