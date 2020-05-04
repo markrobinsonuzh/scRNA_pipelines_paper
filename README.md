@@ -2,7 +2,7 @@
 
 This repository accompanies the [pipeComp paper](https://doi.org/10.1101/2020.02.02.930578). It is still in preparation, and aims to providing a record of what was done and access to compiled results, rather than easy reproducibility.
 
-For the figure and results of the first version of the biorxiv paper, refer to the [biorxiv branch](https://github.com/markrobinsonuzh/scRNA_pipelines_paper/tree/biorxiv) of the repo.
+For the figure and results of the first version of the biorxiv paper, refer to the [biorxiv branch](https://github.com/markrobinsonuzh/scRNA_pipelines_paper/tree/biorxiv) of the repo. For the second version, refer to the [biorxiv_20200302 branch](https://github.com/markrobinsonuzh/scRNA_pipelines_paper/tree/biorxiv_20200302). The master branch contains the latest results.
 
 ## Figures
 
