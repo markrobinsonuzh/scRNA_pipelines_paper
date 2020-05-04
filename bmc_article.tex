@@ -176,7 +176,7 @@
 
 \begin{abstract} % abstract
 %\parttitle{Background} %if any
-%The massive growth of single-cell RNA-sequencing (scRNAseq) and methods for its analysis still lacks sufficient and up-to-date benchmarks that would guide analytical choices. Moreover, current studies are often focused on isolated steps of the process. Here, we present a flexible R framework for pipeline comparison with multi-level evaluation metrics and apply it to the benchmark of scRNAseq analysis pipelines using datasets with known cell identities. We evaluate common steps of such analyses, including filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. On the basis of these analyses, we make a number of practical recommendations about current analysis choices. The evaluation framework, \textit{pipeComp}, has been implemented so as to easily integrate any other step or tool, allowing extensible benchmarks and easy application to other fields (\url{https://github.com/plger/pipeComp}).
+%The massive growth of single-cell RNA-sequencing (scRNAseq) and methods for its analysis still lacks sufficient and up-to-date benchmarks that would guide analytical choices. Moreover, current studies are often focused on isolated steps of the process. Here, we present a flexible R framework for pipeline comparison with multi-level evaluation metrics and apply it to the benchmark of scRNAseq analysis pipelines using datasets with known cell identities. We evaluate common steps of such analyses, including filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. On the basis of these analyses, we make a number of concrete recommendations about current analysis choices. The evaluation framework, \textit{pipeComp}, has been implemented so as to easily integrate any other step or tool, allowing extensible benchmarks and easy application to other fields (\url{https://github.com/plger/pipeComp}).
 
 \parttitle{Background} The massive growth of single-cell RNA-sequencing (scRNAseq) and the methods for its analysis still lack sufficient and up-to-date benchmarks that could guide analytical choices. Numerous benchmark studies already exist and cover most of scRNAseq processing and analytical methods but only a few give advice on a comprehensive pipeline. Moreover, current studies often focused on isolated steps of the process and do not address the impact of a tool on both the intermediate and the final steps of the analysis. 
 
@@ -638,20 +638,21 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 \label{tab:table1}
 \begin{tabular}{rlrrl}
   \hline
-dataset & source & protocol & description \\ 
+dataset & source & # cells & protocol & description \\ 
   \hline
-Koh & GSE85066 & SMARTer & FACS purified H7 hESC in different differention stages \\ 
-  Kumar & GSE60749 & SMARTer & Mouse ESC cultured in different conditions \\ 
-  Zhengmix4eq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix4uneq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix8eq & \cite{duoClustering2018} & 10x & Mixtures of FACS purified PBMCs \\ 
-  mixology10x3cl & \cite{tianMixology2018} & 10x & Mixture of 3  cancer cell lines from CellBench \\ 
-  mixology10x5cl & \cite{tianMixology2018} & 10x & Mixture of 5 cancer cell lines from CellBench \\ 
-  simMix1 & - & 10x-based & Simulation of 10 human cell subpopulations \\
-  simMix2 & - & 10x-based & Simulation of 9 mouse cell subpopulations \\
+Koh & GSE85066 & 531 & SMARTer & FACS purified differentiation stages \\ 
+  Kumar & GSE60749 & 246 & SMARTer & Mouse ESC cultured in different conditions \\ 
+  Zhengmix4eq & \cite{duoClustering2018} & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix4uneq & \cite{duoClustering2018} & 6498 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix8eq & \cite{duoClustering2018} & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  mixology10x3cl & \cite{tianMixology2018} & 902 & 10x & Mixture of 3  cancer cell lines from CellBench \\ 
+  mixology10x5cl & \cite{tianMixology2018} & 3918 & 10x & Mixture of 5 cancer cell lines from CellBench \\ 
+  simMix1 & - & 2500 & 10x-based & Simulation of 10 human cell subpopulations \\
+  simMix2 & - & 3000 & 10x-based & Simulation of 9 mouse cell subpopulations \\
    \hline
 \end{tabular}
 \end{table}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
