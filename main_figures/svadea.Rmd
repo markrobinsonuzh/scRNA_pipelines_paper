@@ -1,0 +1,60 @@
+---
+title: "SVA-DEA benchmark"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(pipeComp)
+  library(grid)
+  library(ComplexHeatmap)
+  library(circlize)
+})
+theme_set(theme_cowplot(font_size = 11))
+res1 <- res <- readRDS("../svadea/results/aggregated.rds")
+res1$evaluation$dea <- lapply(res1$evaluation$dea, FUN=function(x){
+  x[which(x$k==1),]
+})
+```
+
+```{r, fig.width=11.5, fig.height=6.8}
+# hts <- dea_evalPlot_sig(res, what=c("logFC.pearson","TPR"), agg.by=c("sva.method","k"), row_split="sva.method", 
+#                      anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale",
+#                      show_heatmap_legend=TRUE, heatmap_legend_param=list(direction="horizontal") ) +
+#   dea_evalPlot_sig(res, what="FDR", agg.by=c("sva.method","k"), row_split="sva.method", 
+#                      anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale",
+#                      col=rev(viridisLite::inferno(100)), value_cols=c("white","black"), 
+#                      show_heatmap_legend=TRUE, heatmap_legend_param=list(direction="horizontal") )
+# draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE)
+
+
+hts <- dea_evalPlot_sig(res, what=c("logFC.pearson","TPR"), agg.by=c("sva.method","k"), row_split="sva.method", 
+                     anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale") +
+  dea_evalPlot_sig(res, what="FDR", agg.by=c("sva.method","k"), row_split="sva.method", 
+                     anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale",
+                     col=rev(viridisLite::inferno(100)), value_cols=c("white","black"))
+lgd <- Legend(col_fun=colorRamp2(1:100, viridisLite::inferno(100)), at=c(1,100), 
+              title="MADs", labels=c("worst","best"), direction="horizontal")
+hts <- pipeComp:::.renameHrows(hts, f = function(x) gsub("none > 1", "none",x, fixed=TRUE))
+#draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=lgd)
+
+
+p <- plot_grid(
+  plot_grid(
+    dea_evalPlot_curve(res1, agg.by=c("sva.method","dea.method"), colourBy="dea.method", shapeBy="sva.method") + ggtitle("Using a single surrogate variable"),
+    dea_evalPlot_curve(res, agg.by=c("sva.method","k"), colourBy="k", shapeBy="sva.method") + ggtitle("Increasing the number of surrogate variables"),
+    nrow=2, labels=LETTERS[1:2]
+  ),
+  grid.grabExpr(draw( hts, heatmap_legend_side = "bottom", merge_legend=TRUE, 
+                      annotation_legend_list=lgd)),
+  nrow=1, rel_widths=c(5,2.2), labels=c(NA,"C")
+)
+pdf("svadea.pdf", width=11.5, height=6.8)
+p
+dev.off()
+p
+```
