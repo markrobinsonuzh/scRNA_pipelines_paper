@@ -50,6 +50,11 @@ p1 <- plot_grid( thresplot(koh, title="Koh"),
                  thresplot(sim, title="simMix1", xlims=c(2.4, 3.82)), nrow=1)
 ```
 
+```{r, include=FALSE}
+# requires old pipeComp version
+devtools::load_all("pipeComp_biorxiv/pipeComp/")
+```
+
 ```{r figure2, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/results_filtering.rds")
 m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
@@ -61,7 +66,7 @@ names(cols) <- levels(m$filter)
 
 # ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
 
-p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) +
+p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=2.2,alpha=0.8) +
   # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
   facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + 
   xlab("Maximum proportion of cells excluded per subpopulation") + ylab("mean F1 at true number of clusters")
