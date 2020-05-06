@@ -52,7 +52,7 @@ p1 <- plot_grid( thresplot(koh, title="Koh"),
 
 ```{r, include=FALSE}
 # requires old pipeComp version
-devtools::load_all("pipeComp_biorxiv/pipeComp/")
+devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
 ```
 
 ```{r figure2, fig.width=8, fig.height=8.5}
@@ -61,6 +61,7 @@ m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
 m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
 m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
                      c("nofilter","lenient","default","pca","pca2","stringent","veryStringent"))
+levels(m$filter)[4:5] <- c("pca.all","pca.sel")
 cols <- c("black", pipeComp::getQualitativePalette(length(levels(m$filter))-1))
 names(cols) <- levels(m$filter)
 
