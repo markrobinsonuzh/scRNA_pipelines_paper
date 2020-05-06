@@ -12,6 +12,7 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(matrixStats)
   library(pipeComp)
+  library(circlize)
 })
 source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 10))
@@ -32,13 +33,15 @@ classifyNorms <- function(x){
   y[grep("stableG",x)] <- "stableG"
   y
 }
+for(f in rev(colnames(res$evaluation$dimreduction$PC1.covar.adjR2))[1:3]){
+  res$evaluation$dimreduction$PC1.covar.adjR2[[f]] <- 
+    round(res$evaluation$dimreduction$PC1.covar.adjR2[[f]], 3)
+}
 
-p1 <- evalHeatmap(res, step="dimreduction", what=c("log10_total_counts","log10_total_features"), 
-                  what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, 
-                  row_split = classifyNorms(norm), row_title="Variance in PC1 explained by covariate")
-lgd <- Legend(col_fun=colorRamp2(1:100, viridisLite::inferno(100)), at=c(1,50,100), 
-              title="MADs", labels=c("lowest","median","highest"))
-p1 <- grid.grabExpr(draw(renameNorm(p1), merge_legend=TRUE, annotation_legend_list=lgd))
+p1 <- renameNorm(evalHeatmap(res, step="dimreduction", what="log10_total_counts", scale=FALSE, show_heatmap_legend = TRUE, name="adj.R2", what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100), row_split = classifyNorms(norm), row_title="Variance in PC1 explained by covariate") + 
+  evalHeatmap(res, step="dimreduction", what="log10_total_features", scale=FALSE, show_heatmap_legend = FALSE, what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100)))
+
+p1 <- grid.grabExpr(draw(p1, merge_legend=TRUE))
 
 p2 <- grid.grabExpr(draw(renameNorm(
   scrna_evalPlot_silh(res, reorder_rows = TRUE, row_split = classifyNorms(norm),
@@ -64,4 +67,4 @@ plot_grid(p1,p2,p3, nrow = 3, labels=LETTERS[1:3], rel_heights = c(9,9,10))
 ```
 
 Evaluation of normalization procedures. **A:** Variance in the first principal component explained by 
-library size and detection rate after accounting for subpopulation differences. The values are difference in adjusted _R^2_ between a `PC1~subpopulation+covariate` model and `PC1~subpopulation`. **B:** Minimum and mean silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the mutual information (MI), the adjusted Rand Index (ARI), and the ARI at the true number of cluster. The coloring scheme in panels **A** and **B** is based on the per-metric number of median absolute deviations (MADs) from the per-column medians, and mapped to color using a square-root transformation to minimize the effect of outliers. The values shown in the cells are the direct metric values (no transformation except rounding).
+library size and detection rate after accounting for subpopulation differences. The values are difference in adjusted _R^2_ between a `PC1~subpopulation+covariate` model and `PC1~subpopulation`. **B:** Minimum and mean silhouette width per true subpopulation, where higher silhouette width means a higher separability. **C:** Clustering accuracy, measured by the mutual information (MI), the adjusted Rand Index (ARI), and the ARI at the true number of cluster. The coloring scheme in panel **C** is based on the per-metric number of median absolute deviations (MADs) from the per-column medians, and mapped to color using a square-root transformation to minimize the effect of outliers. The values shown in the cells are the direct metric values (no transformation except rounding).
