@@ -1,0 +1,99 @@
+---
+title: "Imputation/denoising"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(matrixStats)
+  library(pipeComp)
+})
+source("../misc_functions.R")
+theme_set(theme_cowplot(font_size = 10))
+```
+
+
+```{r, include=FALSE}
+if(!exists('FIG_NB')){
+  FIG_NB <- 0
+  getFigNb <- function(increment=FALSE){
+    if(increment) FIG_NB <<- FIG_NB + 1
+    FIG_NB
+  }
+}
+```
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, include=FALSE}
+res <- readRDS("../data/results_imputation.rds")
+dr <- res$dr
+dr <- dr[order(rowMeans(dr>0,na.rm=TRUE)+rowMedians(dr, na.rm=TRUE), decreasing=TRUE),order(colMeans(dr,na.rm=TRUE),decreasing=TRUE)]
+ds <- factor(sapply(strsplit(colnames(dr),"\\."),FUN=function(x) x[[1]]))
+cols <- getQualitativePalette(length(unique(ds)))
+names(cols) <- sort(unique(ds))
+dsa <- ComplexHeatmap::HeatmapAnnotation(dataset=ds, col=list(dataset=cols), show_annotation_name = FALSE, show_legend=TRUE)
+
+h1 <- Heatmap(dr, cluster_columns = FALSE, col=pipeComp:::.silScale(dr), cluster_rows = FALSE, 
+        bottom_annotation=dsa,
+        show_column_names = FALSE, show_column_dend = FALSE, 
+        name="silh.\nwidth", column_title="Mean silhouette width", 
+        right_annotation=rowAnnotation( mean=rowMeans(dr, na.rm=TRUE), 
+                                        median=rowMedians(dr, na.rm=TRUE), 
+                                        min=rowMins(dr, na.rm=TRUE), 
+                                        show_legend=FALSE)
+        )
+p1 <- grid.grabExpr(draw(h1))
+
+cl <- res$cl
+mycast <- function(x,y){
+  x <- reshape2::dcast(x, method~dataset, value.var=y, fun.aggregate = mean, na.rm=TRUE)
+  row.names(x) <- x[,1]
+  as.matrix(x[,-1])
+}
+ag <- aggregate(cl[,c("ARI",grep("_",colnames(cl),value=TRUE))], by=cl[,1:2], FUN=function(x){
+  mean(as.numeric(unlist(x)),na.rm=TRUE)
+  })
+clw <- cl[which(cl$nbClustDeviation==0),]
+ag2 <- aggregate(clw[,c("ARI",grep("_",colnames(clw),value=TRUE))], by=clw[,1:2], FUN=function(x){
+  mean(as.numeric(unlist(x)),na.rm=TRUE)
+})
+  
+ll2 <- list( "mean ARI"=mycast(ag, "ARI"),
+            "ARI at true\nnb clusters"=mycast(ag2, "ARI"),
+            "Mean precision"=mycast(ag, "mean_pr")
+            )
+
+e <- do.call(cbind, ll2)
+o <- names(sort(rowMeans(e, na.rm=TRUE)+rowMedians(e, na.rm=TRUE), decreasing=TRUE))
+ll2 <- lapply(ll2, FUN=function(x) x[o,])
+ll2s <- lapply(ll2, pipeComp::colCenterScale)
+
+myh <- function(k,title=k,...){
+  rmLead0 <- sum(abs(ll2[[k]])>1,na.rm=TRUE)==0
+  sp <- paste0('sprintf("%.2f", ll2[["',k,'"]][i, j])')
+  resmid <- range(ll2s[[k]], na.rm=TRUE)
+  resmid <- resmid[1]+(resmid[2]-resmid[1])/2
+  cellfn <- eval(parse(text=paste0('function(j, i, x, y, width, height, fill){',
+      'lab <- ', ifelse(rmLead0, paste('gsub("^0\\\\.",".",', sp,')'), sp),
+      '; grid.text(lab, x, y, gp = gpar(fontsize = 10, 
+      col=ifelse(ll2s[["',k,'"]][i,j]>',resmid,',"black","white"))) }')))
+  Heatmap(ll2s[[k]], col = viridis::inferno(100), show_column_names = FALSE, bottom_annotation = pipeComp:::.ds_anno(colnames(ll2[[k]]), FALSE), cluster_columns=FALSE, cluster_rows = FALSE, show_heatmap_legend = FALSE, column_title=title, cell_fun=cellfn, ...)
+}
+
+p2 <- grid.grabExpr(draw( myh(names(ll2)[1]) + myh(names(ll2)[2]) + 
+                            myh(names(ll2)[3]) ))
+```
+
+```{r imputation, fig.width=8.5, fig.height=7}
+plot_grid( p1, p2, nrow=2, labels=LETTERS[1:2], rel_heights = c(4,6))
+```
+
+
+### Supplementary Figure `r getFigNb()`
+**Evaluation of imputation/denoising methods.** Average silhouette width (**A**) and clustering accuracy (**B**) with or without (indicated as _none_) application of a denoising/imputation method.

@@ -31,6 +31,34 @@ source("../misc_functions.R")
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
+```{r dimred, fig.width=10.5, fig.height=6}
+res <- readRDS("../data/results_dimred2.rds")
+H <- renameHrows(
+  scrna_evalPlot_silh( res, reorder_rows=TRUE, 
+                       heatmap_legend_param=list(direction="horizontal")),
+  function(x) gsub("norm\\.","",x))
+p1 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
+
+p2 <- renameHrows(
+  evalHeatmap( res, what=c("MI","min_pr"), agg.by=c("norm","dr"), reorder_rows=TRUE, anno_legend=FALSE,
+               title=c("MI","Minimum precision")) + 
+  evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dr"), filterExpr=n_clus==true.nbClusts, 
+              anno_legend=FALSE, title="ARI at true k"),
+  function(x) gsub("norm\\.","",x)
+)
+p2 <- grid.grabExpr(draw(p2))
+
+plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
+```
+
+### Supplementary Figure `r getFigNb()`
+Silhouette width (**A**) per subpopulation and clustering accuracy (**B**) according to various normalization and dimension reductions.
+**Evaluation of common dimensionality reduction methods. A:** Minimum (left) and average (right) silhouette width per subpopulation resulting from combinations of normalization and dimension reductions. **B:** Clustering accuracy, measured by mutual information (MI), minimum subpopulation precision, and adjusted Rand index (ARI) at the true number of clusters.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
 
 ```{r, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/clust_endSummary.rds")

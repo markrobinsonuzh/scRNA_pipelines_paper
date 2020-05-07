@@ -1,6 +1,7 @@
 ---
-title: \Large{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
-subtitle: \vspace{0.2cm}\LARGE{Supplementary Figures}\vspace{0.3cm}
+title: \vspace{2cm}\Large{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
+subtitle: \vspace{2cm}\LARGE{Supplementary Figures}\vspace{2cm}
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 author:
 - "Pierre-Luc Germain"
 - "Anthony Sonrel"
@@ -8,7 +9,6 @@ author:
 geometry: margin=1.5cm
 output:
   pdf_document:
-    toc: true
     fig_width: 8
     fig_height: 6
     citation_package: natbib
@@ -27,6 +27,13 @@ getFigNb <- function(increment=FALSE){
 }
 ```
 
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.align="center", echo=FALSE, out.height="0.9\\textheight"}
+knitr::include_graphics("dataset_description.pdf")
+```
+
+### Supplementary Figure `r getFigNb()`: Overview of the benchmark datasets
 
 \newpage
 
@@ -53,3 +60,15 @@ getFigNb <- function(increment=FALSE){
 
 ```{r child='supp_svadea.Rmd'}
 ```
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+```{r, fig.align="center", echo=FALSE, out.height="0.8\\textheight"}
+knitr::include_graphics("../main_figures/pipeComp_summary.pdf")
+```
+
+### Supplementary Figure `r getFigNb()`: Summary of the recommendations.
+
+
+

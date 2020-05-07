@@ -53,7 +53,7 @@ rt <- data.frame(
 250.14, 21.8199999999999, 678.81, 100.05, 823.09, 54.0140000000001, 
 956.63)
 )
-
+  
 pt <- ggplot(rt, aes(method, time, fill=method)) + geom_col() + facet_wrap(~dataset, scale="free_x") + coord_flip() + xlab("") + ylab("Running time (s)") + scale_fill_manual(values=cols) + theme(legend.position="none")
 
 # le <- get_legend(plotROCs(scores, factor(CDs[[i]]$demuxlet_cls, c("SNG","DBL"))))

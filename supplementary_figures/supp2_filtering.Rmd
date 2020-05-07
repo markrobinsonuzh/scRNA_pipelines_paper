@@ -101,6 +101,32 @@ Mean clustering F1 score per subpopulation, mean F1 at true number of clusters, 
 # Supplementary Figure `r getFigNb(TRUE)`
 
 
+```{r, fig.height=4, fig.width=7}
+res <- readRDS("../data/filtering_intermediateSummary.rds")
+tmp <- res$filtering$pcCells
+dbl <- 1+grepl("doublet",row.names(tmp))
+row.names(tmp) <- paste0(c("","doublet + ")[dbl],sapply(strsplit(row.names(tmp)," "), FUN=function(x) x[2]))
+cols <- colorRamp2( seq(from=0,to=sqrt(max(tmp)),length.out=100)^2,
+                    colorRampPalette(c("white","red"))(100) )
+draw(Heatmap(tmp, bottom_annotation=pipeComp:::.ds_anno(colnames(tmp)), 
+        show_column_names = FALSE, cluster_columns=FALSE, show_row_dend=FALSE, 
+        row_split=c("No doublet removal","Doublet removal")[dbl], 
+        name="proportion\nexcluded", col=cols, heatmap_legend_param=list(
+          at=c(0,5,10,30,60), labels=paste0(c(0,5,10,30,60),"%"),
+          grid_height=unit(7,"mm")) ),
+     merge_legend=TRUE)
+```
+
+### Supplementary Figure `r getFigNb()`
+
+Proportion of cells filtered out by subpopulation. Applying the filters in a cluster-wise fashion (using `scran::quickCluster`) leads to virtually no cell exclusion. The color-mapping is square-root transformed.
+
+\newpage
+
+
+# Supplementary Figure `r getFigNb(TRUE)`
+
+
 ```{r}
 res <- readRDS("../data/selection_old.rds")
 res <- res[grep("deviance|seurat.variance.standardized",res$sel),]

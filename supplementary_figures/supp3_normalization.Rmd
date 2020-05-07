@@ -27,6 +27,15 @@ suppressPackageStartupMessages({
 })
 theme_set(theme_cowplot(font_size = 11))
 source("../misc_functions.R")
+
+classifyNorms <- function(x){
+  y <- rep("other", length(x))
+  y[grep("sctransform",x)] <- "sctransform"
+  y[grep("seurat",x)] <- "seurat"
+  y[grep("scran",x)] <- "scran"
+  y[grep("stableG",x)] <- "stableG"
+  y
+}
 ```
 
 
@@ -35,9 +44,7 @@ source("../misc_functions.R")
 
 ```{r covar, fig.width=8, fig.height=4.5}
 res <- readRDS("../data/results_norm.rds")
-H <- scrna_evalPlot_DR(res, "log10_total_counts", agg.by = "norm", anno_legend=FALSE, covar.type="mean")
-H <- H + scrna_evalPlot_DR(res, "log10_total_features", agg.by = "norm", anno_legend=FALSE, covar.type="mean", reorder_rows = H)
-H
+renameNorm(evalHeatmap(res, step="dimreduction", c("log10_total_counts","log10_total_features"), what2="meanAbsCorr.covariate2", agg.by = "norm", anno_legend=FALSE, row_split=classifyNorms(norm)))
 ```
 
 ### Supplementary Figure `r getFigNb()`
@@ -56,7 +63,7 @@ levels(sil$dataset) <- c("Koh","Kumar","mixology10x3cl","mixology10x5cl","simMix
 res$evaluation$dimreduction$silhouette$top_10_dims <- sil
 x <- range(res$evaluation$dimreduction$silhouette$top_10_dims$meanSilWidth)
 silColBreaks <- unique(round(c(x[1],0,x[2]/2,x[2]),1))
-H <- scrna_evalPlot_DR(res, "meanSilWidth", scale=FALSE, agg.by = "method", 
+H <- scrna_evalPlot_silh(res, agg.by = "method", 
                        reorder_rows=TRUE, value_format="", 
                        show_heatmap_legend=TRUE, anno_legend = TRUE, 
                        heatmap_legend_param=list(at=silColBreaks))
@@ -65,9 +72,8 @@ res$evaluation$clustering$method <- factor(paste(res$evaluation$clustering$norm,
 res$evaluation$clustering$delta.nbClust <- res$evaluation$clustering$n_clus-res$evaluation$clustering$true.nbClusts
 levels(res$evaluation$clustering$method) <- meths
 meths <- levels(sil$method)[c(4,2,3,1)]
-H2 <- scrna_evalPlot_clust(res, what="MI", agg.by="method", anno_legend=FALSE, reorder_rows=meths ) + 
-  scrna_evalPlot_clust(res, what="ARI", agg.by="method", anno_legend=FALSE, reorder_rows=meths) + 
-  scrna_evalPlot_clust(res, what="ARI", atTrueK = TRUE, agg.by="method", anno_legend=FALSE, reorder_rows=meths)
+H2 <- evalHeatmap(res, step="clustering", what=c("MI","ARI"), agg.by="method", anno_legend=FALSE, reorder_rows=meths ) + evalHeatmap(res, step="clustering", what="ARI", agg.by="method", anno_legend=FALSE, reorder_rows=meths, filterExpr = n_clus==true.nbClusts, name="ARI at true k", title="ARI at true k" )
+
 ```
 
 ```{r, fig.width=9, fig.height=4}
