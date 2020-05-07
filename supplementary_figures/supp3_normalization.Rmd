@@ -144,7 +144,7 @@ ag <- aggregate(res[,"elapsed",drop=FALSE], by=res[,c("dataset","norm")], FUN=me
 cols <- pipeComp::getQualitativePalette(9)
 names(cols) <- levels(ag$dataset)
 ggplot(ag, aes(norm, elapsed)) + geom_boxplot() + geom_point(aes(colour=dataset)) + 
-  coord_flip() + scale_colour_manual(values=cols) + ylab("") + xlab("Time (s)")
+  coord_flip() + scale_colour_manual(values=cols) + xlab("") + ylab("Time (s)")
 ```
 
 ### Supplementary Figure `r getFigNb()`
