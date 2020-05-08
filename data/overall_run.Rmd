@@ -1,0 +1,61 @@
+---
+title: "Overall run"
+output: html_document
+---
+  
+
+```{r}
+suppressPackageStartupMessages({
+  library(Seurat)
+  library(SingleCellExperiment)
+  library(Matrix)
+  library(devtools)
+  library(scater)
+  library(pipeComp)
+})
+source(system.file("extdata", "scrna_alternatives.R", package="pipeComp"))
+ds_files <- list.files("datasets", full.names = T)
+names(ds_files) <- gsub(".SCE.rds","",basename(ds_files),fixed=T)
+names(ds_files)
+```
+
+## Methods
+
+```{r}
+clust.scran.knnAnnoy <- function(ds, ...){
+  clust.scran(ds, graph.type="knn", neighbor.method="Annoy", ...)
+}
+none <- function(x, ...) return(x)
+
+pd <- scrna_pipeline(pipeClass="seurat")
+
+alternatives <- list(
+  doubletmethod=c("none","doublet.scDblFinder"),
+  filt=c("none","filt.default","filt.stringent"),
+  norm=c("norm.seurat","norm.sctransform","norm.scran"),
+  sel=c("sel.vst","sel.deviance","sel.expr"),
+  selnb=c(2000,4000),
+  dr=c("seurat.pca"),
+  maxdim=50,
+  dims=c("elbow", 10, "maxLikGlobal"),
+  clustmethod=c("clust.seurat","clust.scran.knnAnnoy"),
+  k=c(5,8,10,15,20,30),
+  steps=4,
+  resolution=c(0.001,0.005,0.01,0.02,0.05,0.1,0.15,0.2,0.3,0.4,0.5,0.8,1,1.2,1.5,2,4),
+  min.size=20
+)
+
+comb <- buildCombMatrix(alternatives)
+comb <- comb[(comb$clustmethod=="clust.seurat" | comb$resolution==0.8),]
+```
+
+## Run
+
+```{r}
+res <- runPipeline(ds_files, alternatives, pd, output.prefix="pipeComp_overall/", nthreads=18, comb=comb)
+saveRDS(res, file="pipeComp_overall/summary.rds")
+```
+
+```{r session_info}
+sessionInfo()
+```
