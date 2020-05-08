@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
   library(knitr)
   library(circlize)
   library(pipeComp)
+  library(grid)
 })
 source("../misc_functions.R")
 ```
@@ -101,25 +102,51 @@ Mean clustering F1 score per subpopulation, mean F1 at true number of clusters, 
 # Supplementary Figure `r getFigNb(TRUE)`
 
 
-```{r, fig.height=4, fig.width=7}
+```{r, fig.height=8.5, fig.width=7}
 res <- readRDS("../data/filtering_intermediateSummary.rds")
 tmp <- res$filtering$pcCells
 dbl <- 1+grepl("doublet",row.names(tmp))
 row.names(tmp) <- paste0(c("","doublet + ")[dbl],sapply(strsplit(row.names(tmp)," "), FUN=function(x) x[2]))
 cols <- colorRamp2( seq(from=0,to=sqrt(max(tmp)),length.out=100)^2,
                     colorRampPalette(c("white","red"))(100) )
-draw(Heatmap(tmp, bottom_annotation=pipeComp:::.ds_anno(colnames(tmp)), 
+H <- Heatmap(tmp, bottom_annotation=pipeComp:::.ds_anno(colnames(tmp)), 
         show_column_names = FALSE, cluster_columns=FALSE, show_row_dend=FALSE, 
         row_split=c("No doublet removal","Doublet removal")[dbl], 
         name="proportion\nexcluded", col=cols, heatmap_legend_param=list(
           at=c(0,5,10,30,60), labels=paste0(c(0,5,10,30,60),"%"),
-          grid_height=unit(7,"mm")) ),
-     merge_legend=TRUE)
+          grid_height=unit(7,"mm")) )
+
+res <- readRDS("../data/overall.rds")
+# get cell numbers
+nb <- aggregate(res$evaluation$doublet$N.before, res$evaluation$doublet[,"dataset",drop=FALSE], FUN=sum)
+row.names(nb) <- nb[,1]
+res <- readRDS("../data/excluded.rds")
+res <- lapply(res, FUN=function(x){
+  names(x) <- gsub("doubletmethod=none;filt=filt.","",names(x))
+  x <- x[names(x)!="doubletmethod=none;filt=none"]
+  names(x) <- c("Doublet removal", "Default filter", "Stringent filter")
+  x
+})
+res2 <- lapply(names(res), FUN=function(x){
+  e <- sapply(res[[x]], FUN=function(i) sapply(res[[x]], FUN=function(j) sum(i %in% j)))
+  e/nb[x,2]*100
+})
+names(res2) <- names(res)
+h2 <- Heatmap(do.call(cbind, res2), column_split = rep(names(res2), each=ncol(res2[[1]])), 
+              cluster_columns = FALSE, cluster_rows = FALSE, col=c("white","red"), 
+              name="% of\ndataset", column_title_gp = gpar(font.size=10), column_title=" ",
+              top_annotation=pipeComp:::.ds_anno(rep(names(res),each=ncol(res2[[1]])),legend = FALSE))
+```
+
+
+```{r, fig.height=6.5, fig.width=8}
+plot_grid( grid.grabExpr(draw(H,merge_legend=TRUE)), grid.grabExpr(draw(h2)), 
+           nrow=2, rel_heights=c(6,4), labels=LETTERS[1:2])
 ```
 
 ### Supplementary Figure `r getFigNb()`
 
-Proportion of cells filtered out by subpopulation. Applying the filters in a cluster-wise fashion (using `scran::quickCluster`) leads to virtually no cell exclusion. The color-mapping is square-root transformed.
+**A:** Proportion of cells filtered out by subpopulation. Applying the same filters in a cluster-wise fashion (using `scran::quickCluster`, and desginated here with `clustFilter*`) leads to virtually no cell exclusion. The color-mapping is square-root transformed to improve the visibility of differences at low proportions. **B:** Overlap between cells excluded by doublet removal (`scDblFinder`) and those excluded by MAD-based filters (without doublet removal; the filters are described in the methods), expressed as a proportion of the dataset. The cells excluded as doublets do not tend to be excluded by (even stringent) MAD-based filtering.
 
 \newpage
 

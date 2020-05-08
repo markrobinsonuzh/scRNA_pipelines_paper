@@ -11,14 +11,41 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
+  library(pipeComp) # the first part requires pipeComp >0.99.26
 })
 source("../misc_functions.R")
-source(system.file("extdata/scrna_alternatives.R", package="pipeComp"))
 theme_set(theme_cowplot(font_size = 12))
 ```
 
+```{r, fig.width=8, fig.height=4}
+rnfn <- function(x){
+  x <- gsub("norm\\.","",x)
+  x <- gsub("maxLikGlobal$","maxLikGlobal(k=20)",x)
+  gsub("maxLikGlobal10$","maxLikGlobal(k=10)",x)
+}
+res <- readRDS("../data/results_dimensionality.rds")
+H <- renameHrows(
+  scrna_evalPlot_silh( res, step="dimensionality", reorder_rows=TRUE, 
+                       row_split=gsub("norm\\.","",norm),
+                       heatmap_legend_param=list(direction="horizontal")),
+  rnfn)
+p2 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
+
+p3 <- renameHrows(
+  evalHeatmap( res, what=c("NMI","min_pr"), agg.by=c("norm","dims"), 
+                   row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE) + 
+  evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dims"), row_split=gsub("norm\\.","",norm), 
+              reorder_rows=TRUE, filterExpr=n_clus==true.nbClusts, 
+              anno_legend=FALSE, title="ARI at\ntrue k"),
+  rnfn
+)
+p3 <- grid.grabExpr(draw(p3))
+```
+
+
+
 ```{r, eval=FALSE}
-# NB: the results were generated using an older version of pipeComp (branch 
+# NB: the next results were generated using an older version of pipeComp (branch 
 # `biorxiv`), and must be plotted using this version of the package
 suppressPackageStartupMessages({
   library(pipeComp)
@@ -62,37 +89,11 @@ p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, gro
 p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
 ```
 
-```{r, include=FALSE}
-# the second part of these results was generated with pipeComp >0.99.26
-devtools::load_all("../../pipeComp/")
-```
-
-
-```{r, fig.width=8, fig.height=4}
-res <- readRDS("../data/results_dimensionality.rds")
-H <- renameHrows(
-  scrna_evalPlot_silh( res, step="dimensionality", reorder_rows=TRUE, 
-                       row_split=gsub("norm\\.","",norm),
-                       heatmap_legend_param=list(direction="horizontal")),
-  function(x) gsub("norm\\.","",x))
-p2 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
-
-p3 <- renameHrows(
-  evalHeatmap( res, what=c("NMI","min_pr"), agg.by=c("norm","dims"), 
-                   row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE) + 
-  evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dims"), row_split=gsub("norm\\.","",norm), 
-              reorder_rows=TRUE, filterExpr=n_clus==true.nbClusts, 
-              anno_legend=FALSE, title="ARI at\ntrue k"),
-  function(x) gsub("norm\\.","",x)
-)
-p3 <- grid.grabExpr(draw(p3))
-```
-
 ```{r figure6, fig.width=9, fig.height=9.5}
 pdf("dimensionality.pdf", width=9, height=10)
-plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.36,0.32,0.32), labels=c(NA,LETTERS[3:4]))
+plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))
 dev.off()
-plot_grid( p1, p2, p3, nrow=3, rel_heights=c(0.36,0.32,0.32), labels=c(NA,LETTERS[3:4]))
+plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))
 ```
 
 **A:** Estimated dimensionality using the proportion of variance in each component explained by subpopulations. **B:** Difference between `real' dimensionality (from **A**) and various dimensionality estimation methods, along with computing time. **C:** Average silhouette width per subpopulation across a selection of dimensionality estimators, using sctransform or standard seurat normalization. **D:** Clustering accuracy of across the normalization/dimensionality methods.
