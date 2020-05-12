@@ -78,7 +78,7 @@ reduceMethods <- function(x, pos=1:2, FUN=mean, sep=" "){
   x[,-1]
 }
 renameNorm <- function(x){
-  pipeComp:::.renameHrows(x, f=function(x){
+  renameHrows(x, f=function(x){
     x <- gsub("^norm\\.", "", x)
     x <- gsub("seuratvst","sctransform",x)
     x <- gsub(".noscale", " (no scaling)", x)
@@ -329,4 +329,39 @@ old_evalPlot_filtering <- function(res, steps=c("doublet","filtering"), returnTa
   ggplot(m, aes(maxPCout, meanF1, group=method, colour=method)) + geom_point(size=3) + 
     facet_wrap(~dataset, scales="free") + xlab("Proportion") + 
     xlab("Max proportion of subpopulation excluded")
+}
+
+.scaledLegend <- function(){
+  ComplexHeatmap::Legend(
+    col_fun=circlize::colorRamp2(1:100, viridisLite::inferno(100)), 
+    at=c(1,50,100), title="MADs", labels=c("worst","median","best"), 
+    direction="horizontal", title_position = "lefttop" )
+}
+
+# legacy...
+.renameHrows <- function(h, f) renameHrows(h,f)
+#' renameHrows
+#'
+#' Applies a function to the row labels of a Heatmap or HeatmapList
+#'
+#' @param h A `Heatmap` or `HeatmapList`
+#' @param f The function to apply on row labels.
+#'
+#' @return the modified `h`
+#' @export
+#'
+#' @examples
+#' data("exampleResults", package="pipeComp")
+#' H <- evalHeatmap(exampleResults, what=c("ARI", "MI"), agg.by="norm")
+#' H
+#' H <- renameHrows(H, function(x) gsub("^norm\\.", "", x))
+#' H
+renameHrows <- function(h, f=identity){
+  if(is(h,"HeatmapList")){
+    h@ht_list <- lapply(h@ht_list, f=f, FUN=.renameHrows)
+    return(h)
+  }
+  h@row_names_param$anno@var_env$value <- 
+    f(h@row_names_param$anno@var_env$value)
+  h
 }

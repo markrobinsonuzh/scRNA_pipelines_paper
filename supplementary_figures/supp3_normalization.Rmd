@@ -44,7 +44,7 @@ classifyNorms <- function(x){
 
 ```{r covar, fig.width=8, fig.height=4.5}
 res <- readRDS("../data/results_norm.rds")
-renameNorm(evalHeatmap(res, step="dimreduction", c("log10_total_counts","log10_total_features"), what2="meanAbsCorr.covariate2", agg.by = "norm", anno_legend=FALSE, row_split=classifyNorms(norm)))
+renameNorm(evalHeatmap(res, step="dimreduction", c("log10_total_counts","log10_total_features"), what2="meanAbsCorr.covariate2", agg.by="norm", anno_legend=FALSE, scale=FALSE, row_split=classifyNorms(norm)))
 ```
 
 ### Supplementary Figure `r getFigNb()`
