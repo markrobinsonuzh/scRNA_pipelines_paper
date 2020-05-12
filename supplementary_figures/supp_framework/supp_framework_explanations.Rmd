@@ -1,0 +1,103 @@
+---
+title: "pipeComp - Supplementary Methods"
+author: Pierre-Luc Germain, Anthony Sonrel, Mark D. Robinson
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    toc_depth: 2
+urlcolor: blue
+---
+
+\vfill
+
+Supplementary methods to:
+
+_pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools_<br/>
+
+\newpage 
+
+```{r, include=FALSE}
+library(BiocStyle)
+```
+
+# Introduction
+
+This document aims at describing in more detail the `r Rpackage("pipeComp")` benchmarking framework. As it represents a snapshot (`r Rpackage("pipeComp")` version `r paste0(packageVersion("pipeComp"), ", ", format(Sys.time(), '%d %B, %Y'))`), the most up-to-date information can be found on the [github repository](https://github.com/plger/pipeComp).
+
+`r Rpackage("pipeComp")` is especially suited to the benchmarking of pipelines that include many steps/parameters, enabling the exploration of combinations of parameters and of the robustness of methods to various changes in other parts of a pipeline. It is also particularly suited to benchmarks across multiple datasets. It is entirely based on _R_/Bioconductor, meaning that methods outside of _R_ need to be called via _R_ wrappers. `r Rpackage("pipeComp")` handles multithreading in a way that minimizes re-computation and duplicated memory usage, and computes evaluation metrics on the fly to avoid saving many potentially large intermediate files, making it well-suited for benchmarks involving large datasets.
+
+<br/><br/><br/>
+
+# _pipeComp_ overview and main inputs
+
+`r Rpackage("pipeComp")` requires three main inputs, through which we will go in order:
+
+* a `PipelineDefinition` object, which specifies the basic pipeline structure and evaluation metrics
+* a list of alternative parameter values
+* benchmark datasets
+
+## _PipelineDefinition_ objects
+
+```{r figure1, echo = FALSE, out.width="0.75\\linewidth", fig.align="center", fig.cap = "Overview of the pipeComp framework. A: 'PipelineDefinition' objects include general pipeline structures, concentrated around consecutive steps, as well as all evaluation metrics to be computed after any of these steps. B: Given a 'PipelineDefinition', a list of alternative parameters and a list benchmark datasets, the 'runPipeline' function proceeds through combinations arguments, avoiding recomputing the same step twice and computing evaluations on the fly."}
+knitr::include_graphics("framework.pdf")
+```
+
+`r Rpackage("pipeComp")` is built around the S4 class `PipelineDefinition` which encapsulates a basic abstract workflow (different steps and their parameters) along with pre-defined evaluation metrics to be computed, as depicted in Figure  \ref{fig:figure1}A. When a pipeline is executed, each step is consecutively applied to a starting object. In addition, each step can optionally have evaluation functions, which take as input the output of the main step function, and generate associated evaluation metrics. These metrics are automatically aggregated across analyses and datasets if they have standard formats (e.g. vectors, data.frames or lists thereof), or otherwise custom aggregation functions can be specified.
+
+Each step of a `PipelineDefinition` can have any number of parameters, which can take any scalar values (e.g. character, numeric, logical). Alternative methods for a step can therefore be passed as the name of wrapper functions which need to be prepared in advance. While the `PipelineDefinition` defines the different parameters, the alternatives parameter values are not contained in the object itself, which enables the use of the same `PipelineDefinition` to run several benchmarks. To facilitate this, however, `PipelineDefinition` objects can also hold information about default parameter values, thereby enabling users to run benchmarks without having to define every single parameter.
+
+The packages comes with two different pre-built `PipelineDefinition`s: the single-cell RNAseq clustering pipeline (in two flavours, see `?scrna_pipeline`) and the SVA-DEA pipeline (see `?dea_pipeline`), each with their in-built evaluation functions. For more information about building (or editing) a `PipelineDefinition` object, refer to the examples in the following vignettes:
+
+```{r, eval=FALSE}
+vignette("pipeComp", package = "pipeComp")
+vignette("pipeComp_dea", package = "pipeComp")
+```
+
+## Alternative parameter values
+
+Each pipeline step defined in the `PipelineDefinition` can have any number of parameters, which can take any scalar values (i.e. character, numeric or logical vectors of length 1), as illustrated in Figure \ref{fig:figure1}B. If a `PipelineDefinition` was built in a way that expects it, distinct alternative methods for a step can be passed as the name of wrapper functions, which need to be prepared in advance and to be loaded in the environment in which `runPipeline` (see below) will be run.
+
+For example:
+
+```{r, eval=FALSE, echo=TRUE}
+function_A <- function(x) 1+sqrt(x)
+function_B <- function(x) log1p(x)
+alternatives <- list(
+  par1=c("function_A", "function_B")
+)
+```
+
+## Benchmark datasets
+
+`r Rpackage("pipeComp")` was especially designed to run parallel benchmarks across multiple datasets. There is no a priori restriction on the format of benchmark datasets, so long as the `PipelineDefinition` and wrappers can deal with them. The datasets objects should contain any data that is needed for the pipeline to run, as well as any information that is needed for the evaluation of the results (e.g. their own truth, such as true cell labels for the scRNAseq application, or true differential expression labels for the SVA-DEA application).
+
+<br/><br/><br/>
+
+# The `runPipeline` function.
+
+Once the three main inputs are available, the actual processing can be launched with the `runPipeline` function, e.g.:
+
+```{r, eval=FALSE}
+res <- runPipeline( datasets, alternatives, PipelineDefinition,
+                    output.prefix="folder/prefix", nthreads=3 )
+```
+
+The function's processing is illustrated in Figure \ref{fig:figure1}B. First, a matrix of parameter combinations is created (it can alternatively be manually provided/edited to run only subsets of possible combinations). Multithreading is handled through `r Biocpkg("BiocParallel")`, by first splitting datasets across threads, and then splitting the parameter matrix in a way that minimizes re-computation. In each thread, the parameter combinations are executed in a branching fashion (Figure \ref{fig:figure1}B) so that, if combinations share the same first steps, these are computed only once. Evaluation is computed in the thread immediately after step processing.
+
+<br/><br/><br/>
+
+# Comparison with other (_R_) tools
+
+## _drake_
+
+`r Rpackage("pipeComp")` is _not_ a general pipeline/workflow framework like, for instance, `r CRANpkg("drake")`, which boasts an impressive array of features (object histories and dependencies, caching and recovery, etc.). Instead, `r Rpackage("pipeComp")` was specifically designed for benchmarking: it makes benchmarks easily deployable, modifiable and extendable by encapsulating together abstract pipeline structures and evaluation procedures, and facilitates running many combinations of step parameters through hierarchical branching.
+
+The same branching pattern could in principle be done with `r CRANpkg("drake")`, however in a much more cumbersome fashion. Indeed, planning a static or dynamic `r CRANpkg("drake")` branching on all combinations would result in a target for each (and hence many duplicated computation) unless it was planned for each step separately, requiring considerably more scripting than when implemented in `r Rpackage("pipeComp")`. In addition, it would mean that all intermediate targets need to be stored, which is not practicable for combinatorial explorations with large datasets (for our scRNAseq comparison, we estimate this to be approximately 16 TB).
+
+On the other hand, a `r CRANpkg("drake")`-based workflow has several advantages, in particular the capacity, upon failure of a pipeline (or changes made to a step), to recover and restart from the very next upstream target. We are currently working on an `bptry`-based approach to error handling and selective recomputation, but for the moment users requiring smooth error recovery should rather rely on `r CRANpkg("drake")`.
+
+## _CellBench_
+
+The `r Biocpkg("CellBench")` package was recently proposed for single-cell benchmarking, offering an elegant piping syntax to combine alternative methods at successive steps. Both packages have similar functionalities, although implemented very differently. For instance, `r Biocpkg("CellBench")` uses on-disk caching to avoid recomputing steps, which has the same drawback as `r CRANpkg("drake")` for large datasets / number of combinations. `r Rpackage("pipeComp")` instead keeps computed intermediates in memory no longer than is strictly necessary to avoid recomputation. In addition, because the benchmark is, in `r Biocpkg("CellBench")`, simply a function piped after the pipeline steps, it does not allow the multi-step evaluation central to `r Rpackage("pipeComp")`.
+
