@@ -56,7 +56,7 @@ p3 <- grid.grabExpr(draw(
     evalHeatmap(res, step="clustering", what="ARI", agg.by = "norm", 
                 filter=n_clus==true.nbClusts, reorder_rows=TRUE, anno_legend=FALSE,
                 row_split=classifyNorms(norm), name="ARI at true k", title="ARI at true k")),
-  heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=lgd))
+  heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=.scaledLegend()))
 ```
 
 ```{r figure3, fig.width=9, fig.height=11}

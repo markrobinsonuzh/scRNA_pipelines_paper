@@ -14,8 +14,9 @@ suppressPackageStartupMessages({
   library(ggridges)
   library(cowplot)
   library(SingleCellExperiment)
-  library(pipeComp)
+  #library(pipeComp)
 })
+devtools::load_all("../../pipeComp/")
 theme_set(theme_cowplot(font_size = 12))
 source("../misc_functions.R")
 ```
@@ -50,27 +51,11 @@ p1 <- plot_grid( thresplot(koh, title="Koh"),
                  thresplot(sim, title="simMix1", xlims=c(2.4, 3.82)), nrow=1)
 ```
 
-```{r, include=FALSE}
-# requires old pipeComp version
-devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
-```
-
 ```{r figure2, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/results_filtering.rds")
-m <- scrna_evalPlot_filtering(res, returnTable=TRUE)
-m$doubletRemoval <- !grepl("doubletmethod=none;", m$method)
-m$filter <- factor(sapply(strsplit(as.character(m$method),"\\.|="), FUN=function(x) rev(x)[1]),
-                     c("nofilter","lenient","default","pca","pca2","stringent","veryStringent"))
-levels(m$filter)[4:5] <- c("pca.all","pca.sel")
-cols <- c("black", pipeComp::getQualitativePalette(length(levels(m$filter))-1))
-names(cols) <- levels(m$filter)
 
-# ggplot(m, aes(maxPCout, meanF1, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=3) + facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + xlab("Max proportion of subpopulation excluded")
-
-p2 <- ggplot(m, aes(maxPCout, F1atK, group=method, colour=filter, shape=doubletRemoval)) + geom_point(size=2.2,alpha=0.8) +
-  # geom_line(aes(group=doubletRemoval), colour="lightgrey") + 
-  facet_wrap(~dataset, scales="free") + scale_color_manual(values=cols) + 
-  xlab("Maximum proportion of cells excluded per subpopulation") + ylab("mean F1 at true number of clusters")
+p2 <- scrna_evalPlot_filtering(res, atNearestK=TRUE, alpha=0.8) + 
+  ylab("Mean F1 at best number of clusters")
 
 pdf("filtering.pdf", width = 8, height=8.5)
 plot_grid(p1, p2, nrow=2, rel_heights = c(3,8), labels=LETTERS[1:2])

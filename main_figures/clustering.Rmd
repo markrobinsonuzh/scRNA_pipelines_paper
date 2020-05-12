@@ -56,7 +56,7 @@ h <- renameHrows(
               agg.by=c("norm","graph","clustmethod"), anno_legend=FALSE) +
   evalHeatmap(res, step="clustering", what="ARI", agg.by=c("norm","graph","clustmethod"), font_factor = 0.85, filter=n_clus==true.nbClusts, title="ARI at\ntrue k", name="ARIatk",anno_legend=FALSE), function(x) sapply(strsplit(x," > "), FUN=function(x) paste(x[-1],collapse=" > ")))
 
-h2 <- grid.grabExpr(draw(h))
+h2 <- grid.grabExpr(draw(h, annotation_legend_list=.scaledLegend(), merge_legend=TRUE, heatmap_legend_side="bottom"))
 ```
 
 

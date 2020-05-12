@@ -39,7 +39,7 @@ p3 <- renameHrows(
               anno_legend=FALSE, title="ARI at\ntrue k"),
   rnfn
 )
-p3 <- grid.grabExpr(draw(p3))
+p3 <- grid.grabExpr(draw(p3, annotation_legend_list=.scaledLegend(), merge_legend=TRUE, heatmap_legend_side="bottom"))
 ```
 
 

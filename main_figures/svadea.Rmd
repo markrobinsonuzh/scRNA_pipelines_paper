@@ -14,6 +14,7 @@ suppressPackageStartupMessages({
   library(ComplexHeatmap)
   library(circlize)
 })
+source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 11))
 res1 <- res <- readRDS("../svadea/results/aggregated.rds")
 res1$evaluation$dea <- lapply(res1$evaluation$dea, FUN=function(x){
@@ -32,15 +33,17 @@ res1$evaluation$dea <- lapply(res1$evaluation$dea, FUN=function(x){
 # draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE)
 
 
-hts <- dea_evalPlot_sig(res, what=c("logFC.pearson","TPR"), agg.by=c("sva.method","k"), row_split="sva.method", 
-                     anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale") +
-  dea_evalPlot_sig(res, what="FDR", agg.by=c("sva.method","k"), row_split="sva.method", 
+hts <- evalHeatmap( res, step="dea", what="logFC.pearson", agg.by=c("sva.method","k"), 
+                    row_split="sva.method", anno_legend=FALSE, show_column_names=TRUE, 
+                    font_factor=0.85, scale="colCenterScale" ) +
+  evalHeatmap( res, step="dea", what="TPR", agg.by=c("sva.method","k"), 
+                    row_split="sva.method", anno_legend=FALSE, show_column_names=TRUE, 
+                    font_factor=0.85, scale="colCenterScale", filterExpr=threshold==0.05 ) +
+  evalHeatmap(res, step="dea", what="FDR", agg.by=c("sva.method","k"), row_split="sva.method", 
                      anno_legend=FALSE, show_column_names=TRUE, font_factor=0.85, scale="colCenterScale",
-                     col=rev(viridisLite::inferno(100)), value_cols=c("white","black"))
-lgd <- Legend(col_fun=colorRamp2(1:100, viridisLite::inferno(100)), at=c(1,100), 
-              title="MADs", labels=c("worst","best"), direction="horizontal")
+                     col=rev(viridisLite::inferno(100)), value_cols=c("white","black"), filterExpr=threshold==0.05)
 hts <- pipeComp:::.renameHrows(hts, f = function(x) gsub("none > 1", "none",x, fixed=TRUE))
-#draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=lgd)
+#draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=.scaledLegend())
 
 
 p <- plot_grid(
@@ -50,7 +53,7 @@ p <- plot_grid(
     nrow=2, labels=LETTERS[1:2]
   ),
   grid.grabExpr(draw( hts, heatmap_legend_side = "bottom", merge_legend=TRUE, 
-                      annotation_legend_list=lgd)),
+                      annotation_legend_list=.scaledLegend())),
   nrow=1, rel_widths=c(5,2.2), labels=c(NA,"C")
 )
 pdf("svadea.pdf", width=11.5, height=6.8)
