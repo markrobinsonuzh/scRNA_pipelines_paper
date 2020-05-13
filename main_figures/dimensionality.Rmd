@@ -90,7 +90,7 @@ p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
 ```
 
 ```{r figure6, fig.width=9, fig.height=9.5}
-pdf("dimensionality.pdf", width=9, height=10)
+pdf("dimensionality.pdf", width=9, height=10.5)
 plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))
 dev.off()
 plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))

@@ -38,8 +38,8 @@ for(f in rev(colnames(res$evaluation$dimreduction$PC1.covar.adjR2))[1:3]){
     round(res$evaluation$dimreduction$PC1.covar.adjR2[[f]], 3)
 }
 
-p1 <- renameNorm(evalHeatmap(res, step="dimreduction", what="log10_total_counts", scale=FALSE, show_heatmap_legend = TRUE, name="adj.R2", what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100), row_split = classifyNorms(norm), row_title="Variance in PC1 explained by covariate") + 
-  evalHeatmap(res, step="dimreduction", what="log10_total_features", scale=FALSE, show_heatmap_legend = FALSE, what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100)))
+p1 <- renameNorm(evalHeatmap(res, step="dimreduction", what="log10_total_counts", scale=FALSE, show_heatmap_legend = TRUE, name="adj.R2", what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100), row_split = classifyNorms(norm), row_title="Variance in PC1 explained by covariate", value_cols=c("black","black")) + 
+  evalHeatmap(res, step="dimreduction", what="log10_total_features", scale=FALSE, show_heatmap_legend = FALSE, what2="PC1.covar.adjR2", agg.by = "norm", reorder_rows = TRUE, col=viridisLite::viridis(100), value_cols=c("black","black")))
 
 p1 <- grid.grabExpr(draw(p1, merge_legend=TRUE))
 

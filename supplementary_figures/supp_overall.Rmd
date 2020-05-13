@@ -86,8 +86,21 @@ plot_grid(p1 + ylab("Proportion of variance in metric explained by the parameter
 
 ### Supplementary Figure `r getFigNb()`
 
-**A:** Proportion of the variance in clustering accuracy metrics explained by main parameters. **B:** Proportion of the variance in Adjusted Rand Index (ARI) explained by the parameters, among the analyses giving the true number of clusters. In both panels, the proportion is calculated after accounting for differences due to the dataset, the resolution and their interaction.
+**A:** Proportion of the variance in clustering accuracy metrics explained by main parameters. **B:** Proportion of the variance in Adjusted Rand Index (ARI) explained by the parameters, among the analyses giving the true number of clusters. The ANOVA were performed with the model 
 
+`metric ~ dataset*resolution+doubletmethod+filt+norm+clustmethod+dims`
+
+In both panels, the proportion is calculated after substracting the variance attributable to differences due to the dataset, the resolution and their interaction. The alternatives included in the analysis (other than the default ones described in the methods) were: 
+```
+list( doubletmethod=c("none","doublet.scDblFinder"),
+      filt=c("none","filt.default","filt.stringent"),
+      norm=c("norm.seurat","norm.sctransform","norm.scran"),
+      sel=c("sel.vst","sel.deviance","sel.expr"),
+      selnb=c(2000,4000),
+      dr=c("seurat.pca"),
+      dims=c("elbow", 10, "maxLikGlobal"),
+      clustmethod=c("clust.seurat","clust.scran.knnAnnoy") )
+```
 
 \newpage
 
