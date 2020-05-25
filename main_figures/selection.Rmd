@@ -74,9 +74,9 @@ res <- readRDS("../data/results_selection.rds")
 cl <- res$clustering
 vst <- cl[grep("seuratvst",row.names(cl)),]
 snorm <- cl[grep("seuratvst",row.names(cl), invert=TRUE),]
-h1 <- scrna_evalPlot_clustAtTrueK(snorm[grep("=1000;",row.names(snorm)),], "ARI", scale = FALSE, title="ARI at true # clusters", anno_legend = FALSE)
+h1 <- scrna_evalPlot_clustAtTrueK(snorm[grep("=1000;",row.names(snorm)),], "ARI", scale = FALSE, title="ARI at true # clusters", anno_legend = FALSE, show_heatmap_legend=TRUE, heatmap_legend_param=list(direction="horizontal", at=5:10/10, title_position="leftcenter"))
 h2 <- scrna_evalPlot_clustAtTrueK(vst[grep("=1000;",row.names(vst)),], "ARI", scale = FALSE, reorder_rows=row.names(h1@matrix), title="sctransform\nARI at true # clusters", name="ARI2", anno_legend = FALSE)
-p2 <- grid.grabExpr(draw(h1+h2))
+p2 <- grid.grabExpr(draw(h1+h2, heatmap_legend_side = "bottom", merge_legend=TRUE))
 ```
 
 ```{r figure4, fig.width=7.5, fig.height=6.5}
