@@ -1,0 +1,153 @@
+---
+title: "Overall"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ComplexHeatmap)
+  library(S4Vectors)
+  library(matrixStats)
+  library(pipeComp) # version >= 0.99.26
+})
+source("../misc_functions.R")
+```
+
+
+```{r}
+##########
+## Note that a very similar plot can be created much more simply using the
+## `scrna_evalPlot_overall` function of pipeComp. Here we do it manually in
+## order to customize the positions of legends and such.
+
+ov <- readRDS("../data/overall.rds")
+
+ll <- lapply(c("minSilWidth", "meanSilWidth"), FUN=function(x){
+  pipeComp:::.prepRes(ov$evaluation$dimreduction$silhouette$top_10_dims, what=x,
+                      agg.by=c("doubletmethod","filt","norm","sel"), 
+                      pipDef=metadata(ov)$PipelineDefinition, 
+                      returnParams=TRUE, shortNames=TRUE)
+})
+
+pp1 <- ll[[1]]$pp
+pp1$method <- NULL
+ll1 <- lapply(ll, FUN=function(x) x$res)
+
+ll <- lapply(c("ARI", "MI"), FUN=function(x){
+  pipeComp:::.prepRes(ov$evaluation$clustering, what=x,
+                      agg.by=c("doubletmethod","filt","norm","sel","dims","clustmethod"), 
+                      pipDef=metadata(ov)$PipelineDefinition, 
+                      returnParams=TRUE, shortNames=TRUE)
+})
+ll[[3]] <- pipeComp:::.prepRes(ov$evaluation$clustering, what="ARI",
+                      agg.by=c("doubletmethod","filt","norm","sel","dims","clustmethod"), 
+                      pipDef=metadata(ov)$PipelineDefinition, 
+                      returnParams=TRUE, shortNames=TRUE, filt=rlang::expr(true.nbClusts==n_clus))
+pp <- ll[[1]]$pp
+pp$method <- NULL
+ll2 <- lapply(ll, FUN=function(x) colCenterScale(x$res))
+
+pclost <- scrna_evalPlot_filtering(ov, returnTable = TRUE)
+pclost <- reshape2::dcast(pclost, doubletmethod+filt~dataset, value.var="max.lost")
+row.names(pclost) <- apply(pclost[,1:2],1,collapse=" > ",FUN=paste)
+tmp <- as.character(apply(pp[,colnames(pclost)[1:2]],1,collapse=" > ",FUN=paste))
+pclost <- pclost[tmp,-1:-2]
+row.names(pclost) <- row.names(ll2[[1]])
+pclost <- apply(pclost,1,FUN=max)
+
+tmp <- as.character(apply(pp[,colnames(pp1)],1,collapse=" > ",FUN=paste))
+ll1 <- lapply(ll1, FUN=function(x){ x <- x[tmp,]; row.names(x) <- row.names(ll2[[1]]); x})
+ll <- c(ll1,ll2)
+```
+
+```{r}
+ll2 <- list( list(mat=ll[[1]], title="min silhouette\nwidth", cluster_columns=TRUE, name="silhouette width"),
+             list(mat=ll[[2]], title="mean silhouette\nwidth", cluster_columns=TRUE, show_heatmap_legend=FALSE),
+             list(mat=ll[[3]], title="mean ARI", name="ARI (MADs)", cluster_columns=FALSE),
+             list(mat=ll[[4]], title="mean MI", name="MI (MADs)", cluster_columns=FALSE),
+             list(mat=ll[[5]], title="mean ARI at\ntrue k", name="ARI at true k (MADs)", cluster_columns=FALSE) )
+silhscale <- pipeComp:::.silScale(cbind(ll2[[1]]$mat, ll2[[2]]$mat))
+
+ro <- rowMeans(do.call(cbind, lapply(ll[c(2:4)], FUN=function(x){
+  x/sd(x,na.rm=TRUE)
+  rowMeans(x,na.rm=TRUE)+rowMins(x,na.rm=TRUE)
+})))
+names(ro) <- row.names(ll[[1]])
+h <- hclust(dist(do.call(cbind,ll)))
+h2 <- reorder(as.dendrogram(h), ro)
+ro2 <- names(sort(ro,decreasing=TRUE))
+
+pp$doubletmethod <- gsub("doublet\\.","",pp$doubletmethod)
+pp$filt <- factor(gsub("filt\\.","",pp$filt), c("none","default","stringent"))
+pp$sel <- gsub("sel\\.","",pp$sel)
+pp$norm <- gsub("norm\\.","",pp$norm)
+pp$clustmethod <- gsub("clust\\.","",pp$clustmethod)
+colnames(pp) <- c("doubet","filtering","normalization","feature sel","# dimensions","clustering")
+
+
+cols <- getQualitativePalette(15)
+vals <- as.character(unlist(lapply(lapply(pp, FUN=unique), as.character)))
+cols <- c("none"="white", "scDblFinder"="black", "stringent"="black", "default"="darkgrey", sctransform="#114477", scran="#117755", seurat="#AA4444", deviance="#777711", vst="#771111", expr="#DD77AA", "maxLikGlobal"="#77AADD", "10"="#AAAA44", elbow="#DD7777", "scran.knnAnnoy"="#44AA88")
+cols <- lapply(pp, FUN=function(x) cols[as.character(sort(unique(x)))])
+ha <- HeatmapAnnotation(which = "row", "max\n% lost"=anno_barplot(pclost, bar_width = 1, border=FALSE, gp = gpar(fill = "#282828", col="#282828"), width=unit(1.5,"cm")), df=pp, col=cols, show_legend=FALSE)
+legends <- lapply(names(cols), FUN=function(f){
+  Legend( labels=names(cols[[f]]), title=f, legend_gp=gpar(fill=cols[[f]]) )
+})
+
+do.cluster <- TRUE
+H <- NULL
+for(i in seq_along(ll2)){
+  if((do.cluster || is.null(ro)) && i==1){
+    hi <- h2
+  }else{
+    hi <- FALSE
+  }
+  if(grepl("silhouette", ll2[[i]]$title)){
+    col <- silhscale
+  }else{
+    col <- pipeComp:::.defaultColorMapping(ll2[[i]]$mat, center=TRUE)
+  }
+  la <- ra <- NULL
+  if(i==length(ll2)) ra <- ha
+  name <- ifelse(is.null(ll2[[i]]$name),ll2[[i]]$title,ll2[[i]]$name)
+  H <- H + Heatmap(ll2[[i]]$mat, name=name, cluster_rows=hi, row_order=ro2, show_row_names=FALSE, show_column_names=FALSE, row_title=ifelse(i==1,"Unsupervised clustering",""), heatmap_legend_param = list(direction="horizontal", byrow=TRUE, nrow=1), column_title=ll2[[i]]$title, width=unit(ifelse(i<=2,3.2,2.7), "cm"), cluster_columns=ll2[[i]]$cluster_columns, show_column_dend=FALSE, bottom_annotation = pipeComp:::.ds_anno(colnames(ll2[[i]]$mat), legend=FALSE), right_annotation = ra, col=col,  column_names_gp = gpar(fontsize=10), column_title_gp = gpar(fontsize=13), show_heatmap_legend=ifelse(is.null(ll2[[i]]$show_heatmap_legend),TRUE,ll2[[i]]$show_heatmap_legend) )
+}
+
+
+top <- ro2[1:15]
+ll3 <- lapply(ll2, FUN=function(x){
+  x$mat <- x$mat[top,]
+  x
+})
+
+ha2 <- HeatmapAnnotation(which = "row", "max\n% lost"=anno_barplot(pclost[top], bar_width = 1, border=FALSE, gp = gpar(fill = "#282828", col="#282828"), width=unit(1.5,"cm")), df=pp[top,], col=cols, show_legend=FALSE)
+
+H2 <- NULL
+for(i in seq_along(ll3)){
+  if(grepl("silhouette", ll2[[i]]$title)){
+    col <- silhscale
+  }else{
+    col <- pipeComp:::.defaultColorMapping(ll2[[i]]$mat, center=TRUE)
+  }
+  la <- ra <- NULL
+  if(i==length(ll2)) ra <- ha2
+  name <- ifelse(is.null(ll2[[i]]$name),ll2[[i]]$title,ll2[[i]]$name)
+  H2 <- H2 + Heatmap(ll3[[i]]$mat, name=name, cluster_rows=FALSE, show_row_names=FALSE, row_title="Top 15 analyses", show_column_names=FALSE, heatmap_legend_param = list(direction="horizontal"), column_title=ll2[[i]]$title, width=unit(ifelse(i<=2,3.2,2.7), "cm"), cluster_columns=ll2[[i]]$cluster_columns, show_column_dend=FALSE, bottom_annotation = pipeComp:::.ds_anno(colnames(ll2[[i]]$mat), legend=TRUE), right_annotation = ra, col=col,  column_names_gp = gpar(fontsize=10), column_title_gp = gpar(fontsize=13), show_heatmap_legend=ifelse(is.null(ll2[[i]]$show_heatmap_legend),TRUE,ll2[[i]]$show_heatmap_legend) )
+}
+```
+
+```{r, fig.width=10, fig.height=7}
+pdf("merged.clustered.2.pdf", width=10, height=7)
+draw(H, annotation_legend_side="right", heatmap_legend_side="bottom", annotation_legend_list=legends)
+dev.off()
+draw(H, annotation_legend_side="right", heatmap_legend_side="bottom", annotation_legend_list=legends)
+```
+
+```{r, fig.width=10, fig.height=3.5}
+pdf("merged.clustered.2.pdf", width=10, height=4)
+draw(H2, annotation_legend_side="right", heatmap_legend_side="bottom")
+dev.off()
+draw(H2, annotation_legend_side="right", heatmap_legend_side="bottom")
+```
