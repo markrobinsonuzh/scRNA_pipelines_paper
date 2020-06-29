@@ -26,7 +26,7 @@ source("../misc_functions.R")
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-```{r, fig.width=7, fig.height=6}
+```{r, fig.width=6, fig.height=5}
 ov <- readRDS("../data/overall.rds")
 
 cl <- ov$evaluation$clustering
@@ -38,7 +38,7 @@ cl$clustmethod <- relevel(cl$clustmethod, "clust.seurat")
 cl$clustmethod <- relevel(cl$clustmethod, "clust.seurat")
 
 ff <- function(x, trueK=FALSE){
-  f <- paste0(x,"~dataset+resolution*dataset+doubletmethod+filt+norm+clustmethod+dims")
+  f <- paste0(x,"~dataset+resolution*dataset+doubletmethod+sel+filt+norm+clustmethod+dims")
   if(trueK) cl <- cl[cl$n_clus==cl$true.nbClusts,]
   mod <- lm(as.formula(f), data=cl)
   co <- as.data.frame(coef(summary(mod)))
@@ -67,7 +67,7 @@ p2 <- ggplot(aov2, aes(reorder(parameter, -varExpl), varExpl, group=parameter, f
 
 co <- dplyr::bind_rows(lapply(cos, FUN=function(x) x$coef), .id="metric")
 co2 <- dplyr::bind_rows(lapply(cos2, FUN=function(x) x$coef), .id="metric")
-for(f in c("norm","filt","doubletmethod","dims","clustmethod")){
+for(f in c("norm","filt","doubletmethod","dims","sel","clustmethod")){
   co$coef <- gsub(paste0("^",f),"",co$coef)
   co2$coef <- gsub(paste0("^",f),"",co2$coef)
 }
@@ -88,7 +88,7 @@ plot_grid(p1 + ylab("Proportion of variance in metric explained by the parameter
 
 **A:** Proportion of the variance in clustering accuracy metrics explained by main parameters. **B:** Proportion of the variance in Adjusted Rand Index (ARI) explained by the parameters, among the analyses giving the true number of clusters. The ANOVA were performed with the model 
 
-`metric ~ dataset*resolution+doubletmethod+filt+norm+clustmethod+dims`
+`metric ~ dataset*resolution+doubletmethod+filt+sel+norm+clustmethod+dims`
 
 In both panels, the proportion is calculated after substracting the variance attributable to differences due to the dataset, the resolution and their interaction. The alternatives included in the analysis (other than the default ones described in the methods) were: 
 ```
@@ -108,33 +108,35 @@ list( doubletmethod=c("none","doublet.scDblFinder"),
 
 ```{r}
 rnfn <- function(x){
-  x <- gsub("^norm\\.","",x)
+  x <- gsub("norm\\.","",x)
   x <- gsub("^doublet\\.","",x)
   x <- gsub("> none > ","> no filter > ",x)
   gsub("^none > ","",x)
 }
 
-H1 <- renameHrows( scrna_evalPlot_silh(ov, agg.by = c("doubletmethod","filt","norm"), row_split = norm,
+H1 <- renameHrows( scrna_evalPlot_silh(ov, agg.by = c("doubletmethod","filt","norm"), row_split = rnfn(norm),
                                        heatmap_legend_param=list(direction="horizontal"),font_factor = 0.8,
                                        row_names_max_width=unit(7, "cm")), rnfn)
 H2 <- renameHrows(
      evalHeatmap(ov, step="clustering", what=c("MI","min_pr"), anno_legend=FALSE, title=c("MI","Min precision"), 
                  agg.by=c("doubletmethod","filt","norm"), font_factor = 0.8, 
-                 row_split=norm,row_names_max_width=unit(7, "cm")) + 
+                 row_split=rnfn(norm),row_names_max_width=unit(7, "cm")) + 
     evalHeatmap(ov, step="clustering", what=c("ARI"), agg.by=c("doubletmethod","filt","norm"), 
-                row_split=norm,filter=n_clus==true.nbClusts, title="ARI at true k",
-                anno_legend=FALSE, font_factor = 0.8,row_names_max_width=unit(7, "cm")),
+                row_split=rnfn(norm),filter=n_clus==true.nbClusts, title="ARI at true k",
+                anno_legend=FALSE, font_factor = 0.8, row_names_max_width=unit(7, "cm")),
   rnfn)
 
-H3 <- renameHrows( scrna_evalPlot_silh(ov, agg.by = c("doubletmethod","sel","norm"), row_split = norm,
+H3 <- renameHrows( scrna_evalPlot_silh(ov, agg.by = c("doubletmethod","sel","norm"), row_split = rnfn(norm),
                                        heatmap_legend_param=list(direction="horizontal"),
+                                       font_factor = 0.8, 
                                        row_names_max_width=unit(7, "cm")), rnfn)
 H4 <- renameHrows(
      evalHeatmap(ov, step="clustering", what=c("MI","min_pr"), anno_legend=FALSE, title=c("MI","Min precision"),
-                 agg.by=c("doubletmethod","sel","norm"), row_split=norm,row_names_max_width=unit(7, "cm")) + 
+                 agg.by=c("doubletmethod","sel","norm"), row_split=rnfn(norm), 
+                 font_factor = 0.8, row_names_max_width=unit(7, "cm")) + 
     evalHeatmap(ov, step="clustering", what=c("ARI"), agg.by=c("doubletmethod","sel","norm"), 
-                row_split=norm,filter=n_clus==true.nbClusts, title="ARI at true k", 
-                anno_legend=FALSE, row_names_max_width=unit(7, "cm")),
+                row_split=rnfn(norm),filter=n_clus==true.nbClusts, title="ARI at true k", 
+                anno_legend=FALSE, font_factor = 0.8, row_names_max_width=unit(7, "cm")),
   rnfn)
 ```
   
