@@ -11,7 +11,7 @@ suppressPackageStartupMessages({
   library(cowplot)
   library(ComplexHeatmap)
   library(matrixStats)
-  library(pipeComp) # the first part requires pipeComp >0.99.26
+  library(pipeComp) # requires pipeComp >0.99.26
 })
 source("../misc_functions.R")
 theme_set(theme_cowplot(font_size = 12))
@@ -26,42 +26,31 @@ rnfn <- function(x){
 res <- readRDS("../data/results_dimensionality.rds")
 H <- renameHrows(
   scrna_evalPlot_silh( res, step="dimensionality", reorder_rows=TRUE, 
-                       row_split=gsub("norm\\.","",norm),
-                       heatmap_legend_param=list(direction="horizontal")),
+                       row_split=gsub("norm\\.","",norm), 
+                       filter=sel=="sel.vst" & !(dims %in% c("10","30","essLocal.b")),
+                       heatmap_legend_param=list(direction="horizontal"),
+                       row_names_max_width = unit(6.2, "cm")),
   rnfn)
 p2 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
 
 p3 <- renameHrows(
   evalHeatmap( res, what=c("NMI","min_pr"), agg.by=c("norm","dims"), 
-                   row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE) + 
+               filter=sel=="sel.vst" & !(dims %in% c("10","30","essLocal.b")),
+                   row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE,
+               row_names_max_width = unit(6.2, "cm")) + 
   evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dims"), row_split=gsub("norm\\.","",norm), 
-              reorder_rows=TRUE, filterExpr=n_clus==true.nbClusts, 
-              anno_legend=FALSE, title="ARI at\ntrue k"),
+              filterExpr=n_clus==true.nbClusts & sel=="sel.vst" & !(dims %in%                                                                      c("10","30","essLocal.b")), row_names_max_width = unit(6.2, "cm"),
+              reorder_rows=TRUE, anno_legend=FALSE, title="ARI at\ntrue k"),
   rnfn
 )
 p3 <- grid.grabExpr(draw(p3, annotation_legend_list=.scaledLegend(), merge_legend=TRUE, heatmap_legend_side="bottom"))
 ```
 
 
-
-```{r, eval=FALSE}
-# NB: the next results were generated using an older version of pipeComp (branch 
-# `biorxiv`), and must be plotted using this version of the package
-suppressPackageStartupMessages({
-  library(pipeComp)
-})
-```
-
-```{r, include=FALSE}
-devtools::load_all("../../pipeComp_biorxiv/pipeComp/")
-source("../../pipeComp_biorxiv/pipeComp/inst/extdata/scrna_alternatives.R")
-```
-
 ```{r}
 o <- readRDS("../data/ndims.RDS")
 o <- lapply(o, FUN=function(x){
-  x$nselected$elbow <- x$nselected$elbow-1
-  x
+  x <- x[setdiff(names(x), c("essLocal.b","pcaLocal.FO"))]
 })
 o2 <- data.table::rbindlist( lapply(o, FUN=function(x){
   data.frame( method=names(x$nselected), 
@@ -85,15 +74,20 @@ o2$Time <- mt2[as.character(o2$method)]
 tcols <- c("darkblue", "blue", "violet", "red")
 names(tcols) <- levels(mt2)
 o2$avgTime <- tmp[as.character(o2$method)]
-p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, group=method, fill=Time)) + geom_violin() + coord_flip() + geom_hline(yintercept=0, linetype="dashed") + ylab("Difference to expected dimensionality") + scale_fill_manual(values=tcols) + theme(axis.title.y=element_blank(), legend.position=c(0.7, 0.3))
+p1b <- ggplot(o2, aes(reorder(method, diff, function(x) mean(abs(x))), diff, 
+                      group=method, fill=Time, colour=Time)) + geom_violin() + 
+  coord_flip() + geom_hline(yintercept=0, linetype="dashed") + 
+  ylab("Difference to expected dimensionality") + scale_fill_manual(values=tcols) +
+  scale_color_manual(values=tcols) + 
+  theme(axis.title.y=element_blank(), legend.position=c(0.7, 0.3))
 p1 <- plot_grid(p1a, p1b, rel_widths = c(0.42,0.58), labels=LETTERS[1:2])
 ```
 
 ```{r figure6, fig.width=9, fig.height=9.5}
 pdf("dimensionality.pdf", width=9, height=10.5)
-plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))
+plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]), rel_heights = c(3,4,4))
 dev.off()
-plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]))
+plot_grid( p1, p2, p3, nrow=3, labels=c(NA,LETTERS[3:4]), rel_heights = c(3,4,4))
 ```
 
 **A:** Estimated dimensionality using the proportion of variance in each component explained by subpopulations. **B:** Difference between `real' dimensionality (from **A**) and various dimensionality estimation methods, along with computing time. **C:** Average silhouette width per subpopulation across a selection of dimensionality estimators, using sctransform or standard seurat normalization. **D:** Clustering accuracy of across the normalization/dimensionality methods.
