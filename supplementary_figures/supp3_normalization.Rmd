@@ -56,33 +56,26 @@ Mean per-subpopulation absolute correlation of the first 5 components with libra
 
 ```{r}
 res <- readRDS("../data/scVI.rds")
-sil <- res$evaluation$dimreduction$silhouette$top_10_dims
-sil$method <- factor(paste(sil$norm, sil$dr))
-levels(sil$method) <- meths <- c("scVI.LD", "scran+seurat.pca", "scVI.LD", "scVI+seurat.pca","scVI.LD","sctransform")
-levels(sil$dataset) <- c("Koh","Kumar","mixology10x3cl","mixology10x5cl","simMix1","simMix2","Zhengmix4eq","Zhengmix4uneq","Zhengmix8eq")
-res$evaluation$dimreduction$silhouette$top_10_dims <- sil
-x <- range(res$evaluation$dimreduction$silhouette$top_10_dims$meanSilWidth)
-silColBreaks <- unique(round(c(x[1],0,x[2]/2,x[2]),1))
-H <- scrna_evalPlot_silh(res, agg.by = "method", 
-                       reorder_rows=TRUE, value_format="", 
-                       show_heatmap_legend=TRUE, anno_legend = TRUE, 
-                       heatmap_legend_param=list(at=silColBreaks))
+res$evaluation$dimreduction$silhouette[[1]] <- res$evaluation$dimreduction$silhouette[[1]][with(res$evaluation$dimreduction$silhouette[[1]], filt=="filt.default" & (!(dr %in% c("scVI.latent","scVI.LD")) | norm=="norm.scVI")),]
+res$evaluation$dimreduction$silhouette[[1]]$norm <- gsub("norm.seuratvst","sctransform",res$evaluation$dimreduction$silhouette[[1]]$norm)
+res$evaluation$clustering <- res$evaluation$clustering[with(res$evaluation$clustering, filt=="filt.default" & (!(dr %in% c("scVI.latent","scVI.LD")) | norm=="norm.scVI")),]
+res$evaluation$clustering$norm <- gsub("norm.seuratvst","sctransform",res$evaluation$clustering$norm)
 
-res$evaluation$clustering$method <- factor(paste(res$evaluation$clustering$norm, res$evaluation$clustering$dr))
+H <- scrna_evalPlot_silh(res)
+
 res$evaluation$clustering$delta.nbClust <- res$evaluation$clustering$n_clus-res$evaluation$clustering$true.nbClusts
-levels(res$evaluation$clustering$method) <- meths
-meths <- levels(sil$method)[c(4,2,3,1)]
-H2 <- evalHeatmap(res, step="clustering", what=c("MI","ARI"), agg.by="method", anno_legend=FALSE, reorder_rows=meths ) + evalHeatmap(res, step="clustering", what="ARI", agg.by="method", anno_legend=FALSE, reorder_rows=meths, filterExpr = n_clus==true.nbClusts, name="ARI at true k", title="ARI at true k" )
-
+H2 <- evalHeatmap(res, step="clustering", what=c("MI"), agg.by=c("norm","dr"), anno_legend=FALSE, width=unit(6.5,"cm")) +
+  evalHeatmap(res, step="clustering", what="ARI", agg.by=c("norm","dr"), anno_legend=FALSE, filterExpr = n_clus==true.nbClusts, name="ARI at true k", title="ARI at true k" ) + 
+  evalHeatmap(res, step="clustering", what=c("delta.nbClust"), value_format = "%.0f", scale=FALSE, col=circlize::colorRamp2(c(-3,0,9),c("red","white","blue")), value_cols = c("black","black"),agg.by=c("norm","dr"), anno_legend=FALSE, show_heatmap_legend = TRUE, heatmap_legend_param=list(direction="horizontal"))
 ```
 
-```{r, fig.width=9, fig.height=4}
-plot_grid(grid.grabExpr(draw(H)), grid.grabExpr(draw(H2)), ncol=1, labels = LETTERS[1:2])
+```{r, fig.width=9, fig.height=5.5}
+plot_grid(grid.grabExpr(draw(H)), grid.grabExpr(draw(H2, heatmap_legend_side="bottom")), ncol=1, labels = LETTERS[1:2], rel_heights=c(3,4))
 ```
 
 ### Supplementary Figure `r getFigNb()`
 
-**scVI evaluation. A:** Average silhouette width per subpopulation using either sctransform, scran or scVI normalization followed by Seurat PCA, or the scVI linear decoder (LD). **B:** Clustering accuracy across the same methods followed by Seurat clustering.
+**scVI evaluation. A:** Average silhouette width per subpopulation using either sctransform, scran or scVI normalization followed by Seurat PCA, or the scVI latent space (latent) or imputed values (LD) of the linear decoder. **B:** Clustering accuracy across the same methods followed by Seurat clustering.
 
 \newpage
 
