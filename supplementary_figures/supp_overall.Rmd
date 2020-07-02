@@ -37,6 +37,14 @@ cl$sel <- relevel(cl$sel, "sel.vst")
 cl$clustmethod <- relevel(cl$clustmethod, "clust.seurat")
 cl$clustmethod <- relevel(cl$clustmethod, "clust.seurat")
 
+# checking for interactions:
+# mod <- lm(ARI~resolution*dataset+doubletmethod*sel*filt*norm*clustmethod*dims, data=cl)
+# co <- as.data.frame(coef(summary(mod)))
+# coi <- co[grep(":",row.names(co)),]
+# coi <- coi[grep("dataset", row.names(coi), invert=TRUE),]
+# colnames(coi) <- c("Estimate","SE","t","p.value")
+# coi <- coi[order(coi$p.value),]
+
 ff <- function(x, trueK=FALSE){
   f <- paste0(x,"~dataset+resolution*dataset+doubletmethod+sel+filt+norm+clustmethod+dims")
   if(trueK) cl <- cl[cl$n_clus==cl$true.nbClusts,]

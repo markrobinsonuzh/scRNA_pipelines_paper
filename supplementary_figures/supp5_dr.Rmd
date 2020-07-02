@@ -82,12 +82,7 @@ Mean difference between the number of detected clusters and the number of real s
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
-
 ```{r, fig.width=8, fig.height=8.5}
-library(viridis)
-res <- readRDS("../data/clust_endSummary.rds")
-res2 <- res[which(res$clust=="clust.seurat" & res$k==20 & res$dims>2 & res$resolution > 0.05 & res$resolution <= 1),]
-res2 <- res2[which(res2$dr=="seurat.pca" & res2$dataset!="Kumar"),]
 res3 <- aggregate(res2[,"ARI",drop=FALSE], by=res2[,c("dataset","dims","resolution")], FUN=mean)
 ll <- lapply(split(res3, res3$dataset), FUN=function(x){
   ggplot(x, aes(factor(dims), factor(resolution), fill=ARI)) + stat_bin2d() + 
@@ -99,9 +94,36 @@ plot_grid(plotlist = ll, nrow=3)
 ```
 
 ### Supplementary Figure `r getFigNb()`
-Adjusted Rand Index of clustering depending on the resolution and number of dimensions used. Based on sctransform and seurat PCA.
+
+Adjusted Rand Index of clustering depending on the resolution and number of dimensions used. Based on sctransform
+and seurat PCA.
+
+\newpage
+
+# Supplementary Figure `r getFigNb(TRUE)`
 
 
+```{r, fig.width=7.5, fig.height=8.5}
+cl <- readRDS("../data/results_dimensionality.rds")$evaluation$clustering
+cl$delta.nbClust <- cl$n_clus-cl$true.nbClusts
+
+cl$dims <- gsub("maxLikGlobal$","maxLikGlobal(k=20)",cl$dims)
+cl$dims <- gsub("maxLikGlobal10$","maxLikGlobal(k=10)",cl$dims)
+cl <- cl[cl$norm=="norm.seurat" & !(cl$dims %in% c("10","30","essLocal.b")),]
+
+ggplot(cl, aes(x=dims, y=delta.nbClust, fill=dims)) + geom_violin() + 
+  facet_wrap(~dataset, scales = "free_x", ncol = 2) + coord_flip() + 
+  stat_summary(size=0.25, fun.data = mean_se, na.rm = TRUE) + 
+  geom_hline(yintercept = 0, linetype="dashed") + xlab("") +
+  theme(legend.position="none", text=element_text(size=10)) + 
+  ylab("Deviation from true number of clusters")
+```
+
+### Supplementary Figure `r getFigNb()`
+
+Deviation from the true number of clusters using different number of principal components (based the indicated dimensionality estimates) of the same Seurat-based PCA. Default pipeline parameters were used for the other steps, and the distributions represent the different resolutions of Seurat clustering. Across datasets, MCVR and maxLikGlobal appear to depart less from the true number of clusters.
+
+\newpage
 
 # Supplementary Figure `r getFigNb(TRUE)`
 
