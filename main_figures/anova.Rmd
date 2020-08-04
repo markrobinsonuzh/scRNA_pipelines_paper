@@ -1,0 +1,60 @@
+---
+title: "Overall"
+author: "Pierre-Luc Germain"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(ComplexHeatmap)
+  library(pipeComp)
+})
+theme_set(theme_cowplot(font_size = 11))
+source("../misc_functions.R")
+```
+
+```{r, fig.width=4, fig.height=4}
+ov <- readRDS("../data/overall.rds")
+
+cl <- ov$evaluation$clustering
+cl$norm <- relevel(cl$norm, "norm.seurat")
+cl$doubletmethod <- relevel(cl$doubletmethod, "none")
+cl$filt <- relevel(cl$filt, "none")
+cl$sel <- relevel(cl$sel, "sel.vst")
+cl$clustmethod <- relevel(cl$clustmethod, "clust.seurat")
+
+ff <- function(x, trueK=FALSE){
+  f <- paste0(x,"~dataset+resolution*dataset+doubletmethod+sel+filt+norm+clustmethod+dims")
+  if(trueK) cl <- cl[cl$n_clus==cl$true.nbClusts,]
+  mod <- lm(as.formula(f), data=cl)
+  co <- as.data.frame(coef(summary(mod)))
+  co <- co[grep("sctransfrom|scran|filt|elbow|doublet|Annoy", row.names(co)),]
+  colnames(co)[2:4] <- c("stderr","t","pvalue")
+  co$coef <- gsub(" +$","",row.names(co))
+  aov <- as.data.frame(summary(aov(mod))[[1]])[,-1]
+  aov <- aov[grep("^Residuals|resolution|dataset", row.names(aov), invert=TRUE),]
+  aov$varExpl <- aov[,1]/sum(aov[,1])
+  aov <- aov[grep("^Residuals", row.names(aov), invert=TRUE),4:5]
+  colnames(aov)[1] <- "pvalue"
+  aov$parameter <- gsub(" +$","",row.names(aov))
+  list( coefs=co, aov=aov )
+}
+
+cos <- lapply(c(MI="MI",ARI="ARI",minPre="min_pr"), FUN=ff)
+aov <- dplyr::bind_rows(lapply(cos, FUN=function(x) x$aov), .id="metric")
+
+cos2 <- lapply(c(ARI="ARI"), trueK=TRUE, FUN=ff)
+aov2 <- dplyr::bind_rows(lapply(cos2, FUN=function(x) x$aov), .id="metric")
+aov2 <- aov2[aov2$metric=="ARI",]
+aov2$metric <- "ARI at true k"
+p <- ggplot(rbind(aov,aov2), aes(reorder(parameter, -varExpl), varExpl, fill=metric, colour=metric)) + 
+  geom_col(position="dodge") + xlab("") + ylab("Proportion of variance explained") + 
+  coord_flip() + theme(legend.position=c(.62,.85))
+pdf("anova.pdf", width=4, height=4)
+p
+dev.off()
+p
+```
