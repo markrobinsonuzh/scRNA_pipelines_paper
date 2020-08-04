@@ -20,6 +20,12 @@ res1 <- res <- readRDS("../svadea/results/aggregated.rds")
 res1$evaluation$dea <- lapply(res1$evaluation$dea, FUN=function(x){
   x[which(x$k==1),]
 })
+res$evaluation$dea <- lapply(res$evaluation$dea, FUN=function(x){
+  levels(x$k) <- c(levels(x$k), "0")
+  x$k <- relevel(x$k, "0")
+  x$k[x$sva.method=="none"] <- 0
+  x
+})
 ```
 
 ```{r, fig.width=11.5, fig.height=6.8}
@@ -45,11 +51,18 @@ hts <- evalHeatmap( res, step="dea", what="logFC.pearson", agg.by=c("sva.method"
 hts <- .renameHrows(hts, f = function(x) gsub("none > 1", "none",x, fixed=TRUE))
 #draw(hts, heatmap_legend_side = "bottom", merge_legend=TRUE, annotation_legend_list=.scaledLegend())
 
+res <- lapply(res$evaluation$dea, FUN=function(x){
+  x[which(x$k %in% as.character(0:5)),]
+})
+
+cols <- c("#00204DFF", "#31446BFF", "#666970FF", "#958F78FF", "#CBBA69FF", "#FFEA46FF")
+names(cols) <- 0:5
 
 p <- plot_grid(
   plot_grid(
-    dea_evalPlot_curve(res1, agg.by=c("sva.method","dea.method"), colourBy="dea.method", shapeBy="sva.method") + ggtitle("Using a single surrogate variable"),
-    dea_evalPlot_curve(res, agg.by=c("sva.method","k"), colourBy="k", shapeBy="sva.method") + ggtitle("Increasing the number of surrogate variables"),
+    dea_evalPlot_curve(res1, agg.by=c("sva.method"), colourBy="sva.method", shapeBy="sva.method") + ggtitle("Using a single surrogate variable"),
+    dea_evalPlot_curve(res, agg.by=c("sva.method","k"), colourBy="k", shapeBy="sva.method") + 
+      scale_colour_manual(values=cols) + ggtitle("Increasing the number of surrogate variables"),
     nrow=2, labels=LETTERS[1:2]
   ),
   grid.grabExpr(draw( hts, heatmap_legend_side = "bottom", merge_legend=TRUE, 
