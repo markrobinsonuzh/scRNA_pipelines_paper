@@ -23,3 +23,7 @@ For the figure and results of the first version of the biorxiv paper, refer to t
 * The pipelines can be run and evaluated with the [pipeComp package](https://github.com/plger/pipeComp), which also includes [wrappers](https://github.com/plger/pipeComp/tree/master/inst/extdata) for all methods used. Unless indicated otherwise, the results were generated with the `biorxiv` branch of the package.
 
 * The compiled pipeline results (i.e. results of _pipeComp_) are available in the [data/](data) folder (see the [readme](data/README.md) in that folder for the precise sets of alternatives used to generate the results, and the [environment/](environment) folder for session info).
+
+## License
+
+The pipeComp software, as well as simulated data and code in this repository are all released under the GNU General Public License.
