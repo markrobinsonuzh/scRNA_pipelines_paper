@@ -33,15 +33,19 @@ H <- renameHrows(
   rnfn)
 p2 <- grid.grabExpr(draw(H, heatmap_legend_side="bottom"))
 
+res$evaluation$clustering <- res$evaluation$clustering[!(res$evaluation$clustering$dims %in% c("10","30","essLocal.b")),]
+
 p3 <- renameHrows(
-  evalHeatmap( res, what=c("NMI","min_pr"), agg.by=c("norm","dims"), 
-               filter=sel=="sel.vst" & !(dims %in% c("10","30","essLocal.b")),
+  evalHeatmap( res, what=c("MI","ARI"), agg.by=c("norm","dims"), 
                    row_split=gsub("norm\\.","",norm), reorder_rows=TRUE, anno_legend=FALSE,
                row_names_max_width = unit(6.2, "cm")) + 
   evalHeatmap(res, what=c("ARI"), agg.by=c("norm","dims"), row_split=gsub("norm\\.","",norm), 
-              filterExpr=n_clus==true.nbClusts & sel=="sel.vst" & !(dims %in%                                                                      c("10","30","essLocal.b")), row_names_max_width = unit(6.2, "cm"),
+              row_names_max_width = unit(6.2, "cm"),
+              filterExpr = n_clus==true.nbClusts,
               reorder_rows=TRUE, anno_legend=FALSE, title="ARI at\ntrue k"),
-  rnfn
+  function(x){
+    x <- rnfn(sapply(strsplit(x," > "), FUN=function(x) rev(x)[1]))
+  }
 )
 p3 <- grid.grabExpr(draw(p3, annotation_legend_list=.scaledLegend(), merge_legend=TRUE, heatmap_legend_side="bottom"))
 ```
