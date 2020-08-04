@@ -1,252 +1,117 @@
-%% BioMed_Central_Tex_Template_v1.06
-%%                                      %
-%  bmc_article.tex            ver: 1.06 %
-%                                       %
+\documentclass[11pt]{article}
 
-%%IMPORTANT: do not delete the first line of this template
-%%It must be present to enable the BMC Submission system to
-%%recognise this template!!
+\renewcommand\familydefault{\sfdefault}
+\usepackage[left=3cm,right=3cm,top=2cm,bottom=3cm]{geometry}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                     %%
-%%  LaTeX template for BioMed Central  %%
-%%     journal article submissions     %%
-%%                                     %%
-%%          <8 June 2012>              %%
-%%                                     %%
-%%                                     %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                                                 %%
-%% For instructions on how to fill out this Tex template           %%
-%% document please refer to Readme.html and the instructions for   %%
-%% authors page on the biomed central website                      %%
-%% http://www.biomedcentral.com/info/authors/                      %%
-%%                                                                 %%
-%% Please do not use \input{...} to include other tex files.       %%
-%% Submit your LaTeX manuscript as one .tex document.              %%
-%%                                                                 %%
-%% All additional figures and files should be attached             %%
-%% separately and not embedded in the \TeX\ document itself.       %%
-%%                                                                 %%
-%% BioMed Central currently use the MikTex distribution of         %%
-%% TeX for Windows) of TeX and LaTeX.  This is available from      %%
-%% http://www.miktex.org                                           %%
-%%                                                                 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%% additional documentclass options:
-%  [doublespacing]
-%  [linenumbers]   - put the line numbers on margins
-
-%%% loading packages, author definitions
-
-%\documentclass[twocolumn]{bmcart}% uncomment this for twocolumn layout and comment line below
-\documentclass{bmcart}
-
-%%% Load packages
-%\usepackage{amsthm,amsmath}
-%\RequirePackage{natbib}
-%\RequirePackage[authoryear]{natbib}% uncomment this for author-year bibliography
-\usepackage[square,sort,comma,numbers]{natbib}
-\usepackage{hyperref}
-\usepackage[utf8]{inputenc} %unicode support
-%\usepackage[applemac]{inputenc} %applemac support if unicode package fails
-%\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
+% graphics, colors & math
 \usepackage{graphicx}
-\usepackage{url}
+\usepackage[dvipsnames,usenames]{xcolor}
+\usepackage{amsmath,amssymb, amsfonts,nicefrac,textcomp,icomma,bm}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                             %%
-%%  If you wish to display your graphics for   %%
-%%  your own use using includegraphic or       %%
-%%  includegraphics, then comment out the      %%
-%%  following two lines of code.               %%
-%%  NB: These line *must* be included when     %%
-%%  submitting to BMC.                         %%
-%%  All figure files must be submitted as      %%
-%%  separate graphics through the BMC          %%
-%%  submission process, not included in the    %%
-%%  submitted article.                         %%
-%%                                             %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% links & figures
+\usepackage{hyperref}
+\usepackage[labelfont=bf,font=small]{caption}
+\captionsetup[figure]{font={stretch=1}}
+\newcommand{\bcaption}[2]{\caption[#1]{\textbf{#1} #2}}
+\usepackage{float}
+
+% cross-referencing
+\usepackage{xr}
+\makeatletter
+\newcommand*{\addFileDependency}[1]{%
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+
+\usepackage{pdfpages}
+
+% line spacing
+\usepackage{setspace}
+\renewcommand{\baselinestretch}{1.5}
+\setlength{\parindent}{2em}
+
+% line numbering
+\usepackage{etoolbox,lineno}
+\newcommand*{\Section}[1]{\par\nolinenumbers\section*{#1}\linenumbers}
+
+% title layout
+\usepackage[affil-it]{authblk}
+\renewcommand\Authands{ \& }
+
+\usepackage{lipsum}
+\makeatletter
+\renewcommand{\maketitle}{\bgroup
+\setlength{\parindent}{0pt}\begin{flushleft}
+\textbf{\Large{\@title}}\\\vspace{1em}\@author
+\end{flushleft}\egroup}
+\makeatother
+
+\author[1,2,3,*]{Pierre-Luc Germain}
+\author[1,2]{Anthony Sonrel}
+\author[1,2,*]{Mark D. Robinson}
+
+\affil[1]{Department of Molecular Life Sciences, University of Z{\"u}rich, Switzerland}
+\affil[2]{SIB Swiss Institute of Bioinformatics, Z{\"u}rich, Switzerland}
+\affil[3]{D-HEST Institute for Neuroscience, Swiss Federal Institute of Technology (ETH), Z{\"u}rich, Switzerland}
+\affil[*]{Correspondence to Pierre-Luc Germain (pierre-luc.germain@hest.ethz.ch) and Mark D. Robinson (mark.robinson@imls.uzh.ch)}
+
+\date{\today}
+
+% code font-style
+\newsavebox{\foobox}
+\newcommand{\slantbox}[2][0]{\mbox{%
+        \sbox{\foobox}{#2}%
+        \hskip\wd\foobox
+        \pdfsave
+        \pdfsetmatrix{1 0 #1 1}%
+        \llap{\usebox{\foobox}}%
+        \pdfrestore
+}}
+\newcommand\unslant[2][-.25]{\slantbox[#1]{$#2$}}
+\newcommand{\code}[1]{\unslant{\mathit{#1}}}
+
+% citations
+\usepackage[style=nature,citestyle=numeric,sorting=none]{biblatex}
+\renewcommand*{\bibfont}{\footnotesize}
+\addbibresource{refs.bib}
+
+\renewcommand{\cite}[1]{\textcolor{Blue}{$^[$\supercite{#1}$^]$}}
+\newcommand{\citet}[1]{\citeauthor{#1}\textcolor{Blue}{$^[$\supercite{#1}$^]$}}
+
+% check marks
+\usepackage{pifont}
+\newcommand{\cmark}{\textcolor{Green}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{Red}{\ding{55}}}
+
+% tables
+\usepackage{colortbl}
 
 
-%\def\includegraphic{}
-%\def\includegraphics{}
+\title{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
 
-
-
-%%% Put your definitions there:
-\startlocaldefs
-\endlocaldefs
-
-
-%%% Begin ...
 \begin{document}
 
-%%% Start of article front matter
-\begin{frontmatter}
+\thispagestyle{empty}
+\maketitle
 
-\begin{fmbox}
-\dochead{Research}
+\linenumbers
+%\modulolinenumbers[5]
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% Enter the title of your article here     %%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Abstract}
 
-\title{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single cell RNA-seq preprocessing tools}
+The massive growth of single-cell RNA-sequencing (scRNAseq) and the methods for its analysis still lack sufficient and up-to-date benchmarks that could guide analytical choices. Numerous benchmark studies already exist and cover most of scRNAseq processing and analytical methods but only a few give advice on a comprehensive pipeline. Moreover, current studies often focused on isolated steps of the process and do not address the impact of a tool on both the intermediate and the final steps of the analysis. Here, we present a flexible R framework for pipeline comparison with multi-level evaluation metrics. We apply it to the benchmark of scRNAseq analysis pipelines using simulated and real datasets with known cell identities, covering common methods of filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. We evaluate the choice of these tools with multi-purpose metrics to assess their ability to reveal cell population structure and lead to efficient clustering. On the basis of our systematic evaluations of analysis pipelines, we make a number of practical recommendations about current analysis choices and for a comprehensive pipeline. The evaluation framework that we developed, \textit{pipeComp} (\url{https://github.com/plger/pipeComp}), has been implemented so as to easily integrate any other step, tool, or evaluation metric allowing extensible benchmarks and easy applications to other fields of research in Bioinformatics, as we demonstrate through a study of the impact of removal of unwanted variation on differential expression analysis.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% Enter the authors here                   %%
-%%                                          %%
-%% Specify information, if available,       %%
-%% in the form:                             %%
-%%   <key>={<id1>,<id2>}                    %%
-%%   <key>=                                 %%
-%% Comment or delete the keys which are     %%
-%% not used. Repeat \author command as much %%
-%% as required.                             %%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\author[
-   addressref={aff1,aff2,aff3},          % id's of addresses, e.g. {aff1,aff2}
-   email={pierre-luc.germain@hest.ethz.ch}   % email address
-]{\inits{PLG}\fnm{Pierre-Luc} \snm{Germain}}
-\author[
-   addressref={aff1,aff2},
-    email={anthony.sonrel@uzh.ch}
-]{\fnm{Anthony} \snm{Sonrel}}
-\author[
-   addressref={aff1,aff2},
-   corref={aff1},  % id of corresponding address, if any
-   email={mark.robinson@imls.uzh.ch}
-]{\inits{MR}\fnm{Mark D.} \snm{Robinson}}
+\newpage
+\pagenumbering{arabic}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% Enter the authors' addresses here        %%
-%%                                          %%
-%% Repeat \address commands as much as      %%
-%% required.                                %%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\address[id=aff1]{
-  \orgname{Department of Molecular Life Sciences, University of Zürich}, % university, etc
-  \street{Winterthurerstrasse 190},
-  \postcode{8057}
-  \city{Zürich},
-  \cny{Switzerland}
-}
-\address[id=aff2]{
-  \orgname{SIB Swiss Institute of Bioinformatics}, % university, etc
-  \city{Zürich},
-  \cny{Switzerland}
-}
-\address[id=aff3]{
-  \orgname{D-HEST Institute for Neurosciences, ETH Zürich},
-  \street{Winterthurerstrasse 190},
-  \postcode{8057}
-  \city{Zürich},
-  \cny{Switzerland}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\end{fmbox}% comment this for two column layout
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% The Abstract begins here                 %%
-%%                                          %%
-%% Please refer to the Instructions for     %%
-%% authors on http://www.biomedcentral.com  %%
-%% and include the section headings         %%
-%% accordingly for your article type.       %%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{abstractbox}
-
-\begin{abstract}
-
-\parttitle{Background} Despite the massive growth of single-cell RNA-sequencing (scRNAseq) and corresponding computational methods, sufficient and up-to-date benchmarks to guide analytical choices are still lacking. Numerous benchmark studies already exist and cover most of scRNAseq processing and analytical methods but only a few give advice on a comprehensive pipeline. Moreover, current studies often focused on isolated steps of the process and do not address the impact of a tool on both the intermediate and the final steps of the analysis. 
-
-\parttitle{Results} Here, we present a flexible R framework for pipeline comparison with multi-level evaluation metrics. We apply it to the benchmark of scRNAseq analysis pipelines using simulated and real datasets with known cell identities, covering common methods of filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. We evaluate the choice of these tools with multi-purpose metrics to assess their ability to reveal cell population structure and lead to efficient clustering. 
-
-\parttitle{Conclusion} On the basis of our systematic evaluations of analysis pipelines, we make a number of practical recommendations about current analysis choices and for a comprehensive pipeline. The evaluation framework that we developed, \textit{pipeComp} (\url{https://github.com/plger/pipeComp}), has been implemented so as to easily integrate any other step, tool, or evaluation metric allowing extensible benchmarks and easy applications to other fields of research in Bioinformatics, as we demonstrate through a study of the impact of removal of unwanted variation on differential expression analysis.
-
-\end{abstract}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% The keywords begin here                  %%
-%%                                          %%
-%% Put each keyword in separate \kwd{}.     %%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{keyword}
-\kwd{single-cell RNA sequencing (scRNAseq)}
-\kwd{pipeline}
-\kwd{clustering}
-\kwd{normalization}
-\kwd{dimensionality reduction}
-\kwd{filtering}
-\kwd{benchmark}
-\end{keyword}
-
-% MSC classifications codes, if any
-%\begin{keyword}[class=AMS]
-%\kwd[Primary ]{}
-%\kwd{}
-%\kwd[; secondary ]{}
-%\end{keyword}
-
-\end{abstractbox}
-%
-%\end{fmbox}% uncomment this for twcolumn layout
-
-\end{frontmatter}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                          %%
-%% The Main Body begins here                %%
-%%                                          %%
-%% Please refer to the instructions for     %%
-%% authors on:                              %%
-%% http://www.biomedcentral.com/info/authors%%
-%% and include the section headings         %%
-%% accordingly for your article type.       %%
-%%                                          %%
-%% See the Results and Discussion section   %%
-%% for details on how to create sub-sections%%
-%%                                          %%
-%% use \cite{...} to cite references        %%
-%%  \cite{koon} and                         %%
-%%  \cite{oreg,khar,zvai,xjon,schn,pond}    %%
-%%  \nocite{smith,marg,hunn,advi,koha,mouse}%%
-%%                                          %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%% start of article main body
-% <put your article body there>
-
-%%%%%%%%%%%%%%%%
-%% Background %%
-%%
 \section*{Background}
-
 Single-cell RNA-sequencing (scRNAseq) and the set of attached analysis methods are evolving fast, with more than 560 software tools available to the community \cite{ZappiaDB2018}, roughly half of which are dedicated to tasks related to data processing such as clustering, ordering, dimension reduction or normalization. This increase in the number of available tools follows the development of new sequencing technologies and the growing number of reported cells, genes and cell populations \cite{SvenssonDB2019}. As data processing is a critical step in any scRNAseq analysis, affecting downstream analysis and interpretation, it is critical to evaluate the available tools.
 
-A number of good comparison and benchmark studies have already been performed on various steps related to scRNAseq processing and analysis and can guide the choice of methodology (\citealp{CobosDeconvolution2020, colePerformance2018, DalMolinDE2017, duoClustering2018, freytagComparison2018, GaoProcessing2020, HeiserDimred2019, HouImput2020, JaakkolaDE2017, KrzakClust2019, SonesonDE2018, SunDimRed2019, tianMixology2018, TranBatch2020, TsuyuzakiPCA2020, viethSystematic2019, WangDE2019, YipHVGs2018, ZhangImput2018}). However these recommendations need constant updating and often leave open many details of an analysis. Another missing aspect of current benchmarking studies is their limitation to capture all aspects of a scRNAseq processing workflow. Although previous benchmarks already brought valuable recommendations for data processing, some only focused on one aspect of data processing (e.g., \citealp{SunDimRed2019}), did not evaluate how the tool selection affects downstream analysis (e.g., \citealp{TsuyuzakiPCA2020}) or did not tackle all aspects of data processing, such as doublet identification or cell filtering (e.g., \citealp{viethSystematic2019}). A thorough evaluation of the tools covering all major processing steps is however urgently needed as previous benchmarking studies highlighted that a combination of tools can have a drastic impact on downstream analysis, such as differential expression analysis and cell-type deconvolution\cite{viethSystematic2019,CobosDeconvolution2020}. It is then critical to evaluate not only the single effect of a preprocessing method but also its positive or negative interaction with all parts of a workflow.
+A number of good comparison and benchmark studies have already been performed on various steps related to scRNAseq processing and analysis and can guide the choice of methodology \cite{CobosDeconvolution2020, colePerformance2018, DalMolinDE2017, duoClustering2018, freytagComparison2018, GaoProcessing2020, HeiserDimred2019, HouImput2020, JaakkolaDE2017, KrzakClust2019, SonesonDE2018, SunDimRed2019, tianMixology2018, TranBatch2020, TsuyuzakiPCA2020, viethSystematic2019, WangDE2019, YipHVGs2018, ZhangImput2018}. However these recommendations need constant updating and often leave open many details of an analysis. Another missing aspect of current benchmarking studies is their limitation to capture all aspects of a scRNAseq processing workflow. Although previous benchmarks already brought valuable recommendations for data processing, some only focused on one aspect of data processing (e.g., \cite{SunDimRed2019}), did not evaluate how the tool selection affects downstream analysis (e.g., \cite{TsuyuzakiPCA2020}) or did not tackle all aspects of data processing, such as doublet identification or cell filtering (e.g., \cite{viethSystematic2019}). A thorough evaluation of the tools covering all major processing steps is however urgently needed as previous benchmarking studies highlighted that a combination of tools can have a drastic impact on downstream analysis, such as differential expression analysis and cell-type deconvolution\cite{viethSystematic2019,CobosDeconvolution2020}. It is then critical to evaluate not only the single effect of a preprocessing method but also its positive or negative interaction with all parts of a workflow.
 
 Here, we develop a flexible R framework for pipeline comparison and apply it to the evaluation of the various steps of analysis leading from an initial count matrix to a cluster assignment, which are critical in a wide range of applications. We collected real datasets of known cell composition (Table \ref{tab:table1}) and used a variety of evaluation metrics to investigate in a multilevel fashion the impact of various parameters and variations around a core scRNAseq pipeline. Although we use some datasets based on other protocols, our focus is especially on droplet-based datasets that do not include exogenous control RNA (i.e. spike-ins); see Table \ref{tab:table1} and Supplementary Figure 1 for more details. In addition to previously-used benchmark datasets with true cell labels \cite{duoClustering2018,tianMixology2018}, we simulated two datasets with a hierarchical subpopulation structure based on real 10x human and mouse data using \textit{muscat} \cite{CrowellMuscat2019}. 
 Since graph-based clustering \cite{satijaSeurat2015} was previously shown to consistently perform well across several datasets \cite{duoClustering2018,tianMixology2018}, we used the \textit{Seurat} pipeline as the starting point to perform an integrated investigation of: 1) doublet identification; 2) cell filtering; 3) normalization; 4) feature selection; 5) dimension reduction; and, 6) clustering. We compared competing approaches and also explored more fine-grained parameters and variations on common methods. Importantly, the success of methods at a certain analytical step might be dependent on choices at other steps. Therefore, instead of evaluating each step in isolation, we developed a general framework for evaluating nested variations on a pipeline and suggest a multilevel panel of metrics. Finally, we evaluate several recent methods and provide practical recommendations.
@@ -271,7 +136,7 @@ While most methods accurately identified the doublets in the 3 cell lines datase
 
 Beyond doublets, a dataset might include low-quality cells whose elimination would reduce noise. This has for instance been demonstrated for droplets containing a high content of mitochondrial reads, often as a result of cell degradation and resulting loss of cytoplasmic mRNAs \cite{IlicicLowQual2016}. A common practice is to exclude cells that differ considerably from most other cells on the basis of such properties. This can for instance be performed through the \texttt{isOutlier} function from \textit{scater} that measures, for a given control property, the number of median absolute deviations (MADs) of each cell from the median of all cells. Supplementary Figure 5 shows the distributions of some of the typical cell properties commonly used. Of note, these properties tend to be correlated, with some exceptions. For example, while a high proportion of mitochondrial reads is often correlated with a high proportion of the counts in the top features, there can also be other reasons for an over-representation of highly-expressed features (Supplementary Figure 6), such as an over-amplification in non-UMI datasets. In our experience, 10X datasets also exhibit a very strong correlation between the total counts and the total features even across very different cell types (Supplementary Figure 7). We therefore also measure the ratio between the two and treat cells strongly departing from this trend with suspicion.
 
-Reasoning that the cells we wish to exclude are the cells that would be misclassified, we measured the rate of misclassification of each cell in each dataset across a variety of clustering pipelines, correcting for the median misclassification rate of the subpopulation and then evaluated what properties could be predictive of misclassification (Supplementary Figures 8-10). We could not identify any property or simple combination thereof that would be consistently predictive of misclassification; the only feature that stood out across more than one dataset (the Zheng datasets) was that cells with very high read counts have a higher chance of being misclassified{\color{red}, although such a pattern was not observed in the other datasets.}
+Reasoning that the cells we wish to exclude are the cells that would be misclassified, we measured the rate of misclassification of each cell in each dataset across a variety of clustering pipelines, correcting for the median misclassification rate of the subpopulation and then evaluated what properties could be predictive of misclassification (Supplementary Figures 8-10). We could not identify any property or simple combination thereof that would be consistently predictive of misclassification; the only feature that consistently stood out across multiple datasets (the Zheng datasets) was that cells with very high read counts have a higher chance of being misclassified.
 
 We next investigated the impact of several filtering methods (see Methods for more details): four methods based on deviations to MADs with increasing levels of stringency (named \textit{lenient}, \textit{default}, \textit{stringent}, \textit{veryStringent}) and two methods based on \textit{scater}'s \textit{runPCA} using all (\textit{pca.all}) or selected covariates (\textit{pca.sel}). An important risk of excluding cells on the basis of their distance from the whole distribution of cells on some properties (e.g., library size) is that these properties tend to have different distributions across subpopulations. As a result, thresholds in terms of number of MADs from the whole distribution can lead to strong biases against certain subpopulations (Figure \ref{fig:filtering}A). We therefore examined the tradeoff between the increased accuracy of filtering and the maximum proportion of cells excluded per subpopulation (Figure \ref{fig:filtering}B and Supplementary Figure 11). Since filtering changes the relative abundance of the different subpopulations, global clustering accuracy metrics such as ARI are not appropriate here. We therefore calculated the per-subpopulation precision and recall using the Hungarian algorithm \cite{kuhnHungarianMethod1955} and monitored the mean F1 score across subpopulations. A first observation was that, although more stringent filtering tended to be associated with an increase in accuracy, it tended to plateau and could also become deleterious. Most of the benefits could be achieved without very stringent filtering and minimizing subpopulation bias (Figure \ref{fig:filtering}B). Applying the same filtering criteria on individual clusters of cells (identified through scran's \texttt{quickCluster} method) rather than on whole dataset resulted in nearly no cells being filtered out (Supplementary Figure 12A). This suggests that stringent filtering on the global population tends to discard cells of subpopulations with more extreme properties (e.g. high library size), rather than low-quality cells. In contrast, too lenient filtering (or lack thereof) can lead to misclassified cells, as was the case for the Zhengmix4 datasets (Figure \ref{fig:filtering}B). We found that a relatively mild filtering (\textit{default} - see methods) provided a good trade-off, often leading to high clustering performance (e.g. simMix and Zhengmix4 datasets) while retaining most of the cells in each subpopulation (e.g. Koh and Zhengmix8eq). PCA-based selection did not appear superior to feature-wise filters. We found very little overlap between the cells excluded by doublet removal and those excluded by MAD-based filtering (Supplementary Figure 12B). Of note, doublet removal in conjunction with filtering tended to improve accuracy not only in datasets that do include heterotypic doublets (mixology datasets), but also some others in which such doublets are unlikely given the experimental design (e.g. FACS-sorted datasets). Indeed, the datasets where doublet removal did not have a clear positive impact (e.g. Koh, Kumar, and the simulations) are those in which heterotypic doublets are not expected. Overall, we therefore recommend the use of doublet removal followed by our \textit{default} filtering (see Methods) or a similar approach.
 
@@ -281,12 +146,12 @@ Mitochondrial reads have been associated with cell degradation and there is evid
 
 \subsection*{Normalization and scaling}
 
-We next investigated the impact of different normalization strategies. Beside the standard log-normalization included in \textit{Seurat}, we tested \textit{scran}'s pooling-based normalization \cite{lunPooling2016}, \textit{sctransform}'s variance-stabilizing transformation \cite{hafemeisterSCtransform2019}, normalization based on stable genes \cite{linStableGenes2018, deekeStablyExpressed2018}, and \textit{SCnorm} \cite{bacherSCnorm2017} (\textit{scVI}-based normalization \cite{lopezDeep2018} was included separately{\color{red}, as it was not meant for this purpose and follows a slightly different flow}). In addition to log-normalization, the standard \textit{Seurat} clustering pipeline performs per-feature unit-variance scaling so that the PCA is not too strongly dominated by highly-expressed features. We therefore included versions of the different normalization procedures, with or without a subsequent scaling (\textit{sctransform}'s variance-stabilizing transformation involves an approach analogous to scaling). 
+We next investigated the impact of different normalization strategies. Beside the standard log-normalization included in \textit{Seurat}, we tested \textit{scran}'s pooling-based normalization \cite{lunPooling2016}, \textit{sctransform}'s variance-stabilizing transformation \cite{hafemeisterSCtransform2019}, normalization based on stable genes \cite{linStableGenes2018, deekeStablyExpressed2018}, and \textit{SCnorm} \cite{bacherSCnorm2017} (\textit{scVI} \cite{lopezDeep2018} was included separately on a subset of parameter combinations due to high running times). In addition to log-normalization, the standard \textit{Seurat} clustering pipeline performs per-feature unit-variance scaling so that the PCA is not too strongly dominated by highly-expressed features. We therefore included versions of the different normalization procedures, with or without a subsequent scaling (\textit{sctransform}'s variance-stabilizing transformation involves an approach analogous to scaling). 
 \textit{Seurat}'s scaling function (and \textit{sctransform}) also includes the option to regress out the effect of certain covariates. We tested its performance by using the proportion of mitochondrial counts and the number of detected features as covariates. Finally, it has been proposed that the use of stable genes, in particular cytosolic ribosomal genes, can be used to normalize scRNAseq \cite{deekeStablyExpressed2018}. We therefore evaluated a simple linear normalization based on the sum of these genes, as well as nuclear genes.
 
 An important motivation for the development of \textit{sctransform} was the observation that, even after normalization, the first principal components of various datasets tended to correlate with library size, suggesting an inadequate normalization \cite{hafemeisterSCtransform2019}. However, as library size tends to vary across subpopulations, part of this effect can simply reflect biological differences. We therefore assessed to what extent the first principal component still retained a correlation with the library size and the number of detected features, removing the confounding covariation with the subpopulations (Figure \ref{fig:norm}A and Supplementary Figure 14). Scaling tended to remove much of the correlation with these features, and while most methods were able to remove most of the effect, the correlation was lowest with \textit{sctransform}. Surprisingly, however, regressing out the covariates tended to increase the association with it.
 
-We further evaluated normalization methods by investigating their impact on the separability of the subpopulations. Since clustering accuracy metrics such as the ARI are very strongly influenced by the number of clusters, we complemented it with silhouette width \cite{RousseeuwSil1987} and mutual information (MI, Figure \ref{fig:norm}B-C). We found most methods (including no normalization at all) to perform fairly well in most of the subpopulations, and that some datasets (e.g. Zhengmix8eq and simMix1) and subpopulations were consistently more challenging across all methods. {\color{red}An exception was \textit{scVI}-based normalization, which performed similarly to other methods on some datasets (Kumar, simMix2, Zhengmix4eq, Zhengmix4uneq), but very poorly on others, in terms of both the subpopulation silhouette and clustering accuracy (Supplementary Figure 13; of note, these values were not meant to be used for clustering, and the usage of the \textit{scVI} latent space will be discussed below along with dimensionality reductions)}. Scaling (e.g. `seurat (no scale)' vs `seurat') tended to reduce the average silhouette width of some subpopulations and to increase that of some less distinguishable ones and was generally, but not always, beneficial on the accuracy of the final clustering. Regressing out covariates systematically gave equal or poorer performance on MI, ARI and ARI at true number of clusters, with a strongest negative impact among the Smart-seq datasets (Koh and Kumar). Regressing out covariates using \textit{sctransform} instead, tended to have a much milder effect, possibly owing to its regularization. In general, \textit{sctransform} systematically outperformed other methods and, even though it was developed to be applied to data with unique molecular identifiers (UMI), it also performed fairly well with the Smart-seq protocol (Koh and Kumar datasets).
+We further evaluated normalization methods by investigating their impact on the separability of the subpopulations. Since clustering accuracy metrics such as the ARI are very strongly influenced by the number of clusters, we complemented it with silhouette width \cite{RousseeuwSil1987} and mutual information (MI, Figure \ref{fig:norm}B-C). We found most methods (including no normalization at all) to perform fairly well in most of the subpopulations, and that some datasets (e.g. Zhengmix8eq and simMix1) and subpopulations were consistently more challenging across all methods. An exception was \textit{scVI}, which performed poorly on most datasets in terms of both the subpopulation silhouette and clustering accuracy (Supplementary Figure 13; \textit{scVI} was run on a reduced set of pipelines). Scaling (e.g. `seurat (no scale)' vs `seurat') tended to reduce the average silhouette width of some subpopulations and to increase that of some less distinguishable ones and was generally, but not always, beneficial on the accuracy of the final clustering. Regressing out covariates systematically gave equal or poorer performance on MI, ARI and ARI at true number of clusters, with a strongest negative impact among the Smart-seq datasets (Koh and Kumar). Regressing out covariates using \textit{sctransform} instead, tended to have a much milder effect, possibly owing to its regularization. In general, \textit{sctransform} systematically outperformed other methods and, even though it was developed to be applied to data with unique molecular identifiers (UMI), it also performed fairly well with the Smart-seq protocol (Koh and Kumar datasets).
 
 Finally, we monitored whether, under the same downstream clustering analysis, different normalization methods tended to lead to an over- or under-estimation of the number of clusters. Although some methods had a tendency to lead to a higher (e.g., \textit{sctransform}) or lower (e.g., stable genes) number of clusters, the effect was very mild and not entirely systematic (Supplementary Figure 16). We also confirmed that, especially in the UMI-based datasets, \textit{sctransform} did in fact successfully stabilize variance across mean counts (Supplementary Figure 17), at little apparent cost on computation time (Supplementary Figure 18).
 
@@ -302,19 +167,15 @@ We next evaluated how the use of different feature selection methods affected th
 
 Since the various PCA approaches and implementations were recently benchmarked in a similar context \cite{TsuyuzakiPCA2020}, we focused on widely used approaches that had not yet been compared: \textit{Seurat}'s PCA, \textit{scran}'s \texttt{denoisePCA}, and GLM-PCA \cite{townesGlmpca2019}. When relevant, we combined them with \textit{sctransform} normalization. Given that \textit{Seurat}'s default PCA weights the cell embeddings by the variance of each component, we also evaluated the impact of this weighting with each method.
 
-The impact of the dimensionality reduction methods tested was far greater than that of normalization or feature selection (Supplementary Figure 23). Overall, weighting the components by their explained variance tended to increase silhouette width (Supplementary Figure 23A) and, in most datasets, clustering accuracy (Supplementary Figure 23B). GLM-PCA tended to increase the average silhouette width of already well-defined subpopulations, but \textit{Seurat}'s PCA procedure however proved superior on all metrics. {\color{red} Like GLM-PCA, \textit{scVI}'s Linearly Decoded (LD) data \cite{SvenssonLDVAE2020} and latent space do not explicitly rely on normalized counts. Their performance was however worse than \textit{Seurat}'s PCA in view of the silhouette width (Supplementary Figure 15). In terms of clustering accuracy, \textit{scVI}'s latent space performed better that its LD but was nevertheless less accurate than PCA-based alternatives on the datasets with a very low amount of cells (Koh and Kumar) and harboring many subpopulations (simMix1 and Zhengmix8eq).}
+The impact of the choice of dimensionality reduction method was far greater than that of normalization or feature selection (Supplementary Figure 23). Overall, weighting the components by their explained variance tended to increase silhouette width (Supplementary Figure 23A) and, in most datasets, clustering accuracy (Supplementary Figure 23B). GLM-PCA tended to increase the average silhouette width of already well-defined subpopulations, but \textit{Seurat}'s PCA procedure however proved superior on all metrics. Like GLM-PCA, \textit{scVI}'s Linear Decoder (LD) does not explicitly rely on normalized counts. Its performance was however the worst both in terms of silhouette width and clustering accuracy (Supplementary Figure 15), and it only performed well in some of the least challenging datasets (mixology10x5cl and simMix2).
 
 \subsubsection*{Estimating the number of dimensions}
 
 A common step following dimension reduction is the selection of an appropriate number of dimensions to use for downstream analysis. Since Euclidean distance decreases as the number of non-discriminating dimensions increases, there is usually a trade-off between selecting enough dimensions to keep most information and excluding smaller dimensions that may represent technical noise or other unwanted sources of variation. Overall, increasing the number of dimensions robustly led to a decrease in the number of clusters (Supplementary Figures 16 and 24). This tended to affect the accuracy of the clustering (Supplementary Figure 25), although in both cases (number of clusters and ARI), \textit{Seurat}'s resolution parameter had a much stronger impact.
 
-Different approaches have been proposed to select the appropriate number of dimensions, from the visual identification of an inflexion point in the curve of the variance explained by each component (`elbow' method), to more complex algorithms. We evaluated the performance of dimensionality estimators implemented in the \textit{intrinsicDimension} package \cite{johnssonDimensionality2015}, as well as common procedures such as the `elbow` method, some scRNAseq-specific methods such as the JackStraw procedure \cite{ChungJackstraw2015} or \textit{scran}'s \texttt{denoisePCA} \cite{LunScran2016}, and the recent application of Fisher Separability analysis \cite{AlberganteSepar2019}. {\color{red} We also included a variation of the molecular cross-validation (MCVR, modified to be applied on normalized data - see methods) approach originally developed to select an calibrate denoising methods \cite{batsonMolecularCrossValidationSingleCell2019}, but which has also been applied to estimate dimensionality \citep{wagnerMonetOpensource2020}.}
+Different approaches have been proposed to select the appropriate number of dimensions, from the visual identification of an inflexion point in the curve of the variance explained by each component (`elbow' method), to more complex algorithms. We evaluated the performance of dimensionality estimators implemented in the \textit{intrinsicDimension} package \cite{johnssonDimensionality2015}, as well as common procedures such as the `elbow` method, some scRNAseq-specific methods such as the JackStraw procedure \cite{ChungJackstraw2015} or \textit{scran}'s \texttt{denoisePCA} \cite{LunScran2016}, and the recent application of Fisher Separability analysis \cite{AlberganteSepar2019}.
 
-We compared the various estimates in their ability to retrieve the intrinsic number of dimensions in a dataset, based on Seurat's weighted PCA space. As a first approximation of the true dimensionality, we computed the variance in each principal component (based on Seurat's weighted PCA space) that was explained by the subpopulations, which sharply decreased after the first few components in most datasets (Figure \ref{fig:dim}A). These truth-based estimates were then compared to those of the above dimensionality estimation methods (Figure \ref{fig:dim}B). Of note, the methods differ widely in compute time (Figure \ref{fig:dim}B) and we saw no relationship between the accuracy of the estimates and the complexity of the method. Reasoning that over-estimating the number of dimensions is less problematic than under-estimating it, we kept the former methods for a full analysis of their impact on clustering (Figure \ref{fig:dim}C-D), when combined with \textit{sctransform} or standard \textit{Seurat} normalization. 
-
-{\color{red} \textit{MCVR} and the global maximum likelihood based on translated Poisson Mixture Model (\textit{maxLikGlobal}) tended to produce clusterings with smaller deviations to the true number of subpopulations (Supplementary Figure 26). Although most methods performed well on the various clustering measures, \textit{maxLikGlobal} (using 10 or 20 nearest neighbors, although estimates were relatively stable across various values of \textit{k} -- see Supplementary Figure 27) provided the dimensionality estimate that best separated challenging subpopulations (Figure \ref{fig:dim}C) and tended to result in the best clustering accuracy (Figure \ref{fig:dim}D). \textit{MCVR} did not perform well for the datasets without UMIs (Koh and Kumar), which violates the assumptions of the method, and while it did increase the separability of some subpopulations (Figure \ref{fig:dim}C), it was detrimental to the classification of some others. We observed a strong negative correlation (\textit{r}=-0.995, p~1.6e-8) between the number of dimensions called by \textit{MCVR} and the log10 average library size of a dataset, which explained the former considerably better than the number of subpopulations.
-
-Of note, the optimal method in our evaluation (\textit{maxLikGlobal})} systematically selected many more components than were associated with the subpopulations in Figure \ref{fig:dim}A, suggesting that although these additional components appear individually uninformative, in combination they nevertheless contribute to classification. An important implication is that the commonly-used elbow method most likely underestimates dimensionality.
+We compared the various estimates in their ability to retrieve the intrinsic number of dimensions in a dataset, based on Seurat's weighted PCA space. As a first approximation of the true dimensionality, we computed the variance in each principal component (based on Seurat's weighted PCA space) that was explained by the subpopulations, which sharply decreased after the first few components in most datasets (Figure \ref{fig:dim}A). These truth-based estimates were then compared to those of the above dimensionality estimation methods (Figure \ref{fig:dim}B). Of note, the methods differ widely in compute time (Figure \ref{fig:dim}B) and we saw no relationship between the accuracy of the estimates and the complexity of the method. Reasoning that over-estimating the number of dimensions is less problematic than under-estimating it, we kept the former methods for a full analysis of their impact on clustering (Figure \ref{fig:dim}C-D), when combined with \textit{sctransform} or standard \textit{Seurat} normalization. Although most methods performed well on the various clustering measures, the global maximum likelihood based on translated Poisson Mixture Model \textit{maxLikGlobal}, using 10 or 20 nearest neighbors, although estimates were relatively stable across various values of \textit{k}; see Supplementary Figure 26) provided the dimensionality estimate that best separated challenging subpopulations (Figure \ref{fig:dim}C) and tended to result in the best clustering accuracy (Figure \ref{fig:dim}D). This method systematically selected many more components than were associated with the subpopulations in Figure \ref{fig:dim}A, suggesting that although these additional components appear individually uninformative, in combination they nevertheless contribute to classification. An important implication is that the commonly-used elbow method most likely underestimates dimensionality.
 
 
 \subsection*{Clustering}
@@ -323,29 +184,27 @@ The last step evaluated in our pipeline was clustering. Given previous work on t
 
 Since ARI is dominated by differences in the number of clusters (Supplementary Figures 2-3) and no single metric is perfect, we diversified them (Figure \ref{fig:clust}). MI has the virtue of not decreasing when a true subpopulation is split into two clusters, which is arguably less problematic (and might well reflect unknown biological subgroups), but as a consequence it can be biased towards methods producing higher resolution clustering (Supplementary Figure 3). Similarly, precision per true subpopulation is considerably more robust to differences in the number of clusters. We also tracked the mean F1 score and the ARI at the true number of clusters. 
 
-The MI score and minimum precision, which are largely independent of the estimated number of clusters, were overall higher for the \textit{walktrap} method (Figure \ref{fig:clust}), while the mean F1 score favored both \textit{scran} methods (\textit{walktrap} and \textit{fast greedy}) over \textit{Seurat}. Finally, the ARI score at the true number of clusters, when available, showed similar performances. However, because \textit{Seurat}'s resolution parameter had a large impact on the number of clusters identified (Supplementary Figures 2 and 24), \textit{Seurat} could always be coerced into producing the right number of clusters. Instead, the number of clusters found by \textit{scran} was considerably less influenced by the available parameters (number of nearest neighbors or steps in the random walk - see Supplementary Figure 28), and as a result \textit{scran}-based clustering sometimes never produced a partitioning with the right number of clusters. This observation, along with \textit{scran}'s higher MI score, suggest that \textit{scran} sometimes simply divides a real subpopulation into two clusters (possibly tracking some unknown biological differences) rather than committing misclassification errors. Overall, the \textit{walktrap} method appeared superior to the \textit{fast greedy} algorithm and was generally less prone to misclassification than \textit{Seurat} clustering, although the latter offered more control over the resolution. A major difference between \textit{walktrap}-based clustering and \textit{Seurat} is the computing time (Figure \ref{fig:clust}B). We found that using the Annoy approximation to the nearest neighbors somewhat reduced computing time at no apparent cost to accuracy. It nevertheless remained considerably slower than \textit{Seurat}. For all methods, some poorly distinguishable subpopulations from both the Zhengmix8eq and simMix1 datasets remained very inaccurately classified in regard to all metrics.
+The MI score and minimum precision, which are largely independent of the estimated number of clusters, were overall higher for the \textit{walktrap} method (Figure \ref{fig:clust}), while the mean F1 score favored both \textit{scran} methods (\textit{walktrap} and \textit{fast greedy}) over \textit{Seurat}. Finally, the ARI score at the true number of clusters, when available, showed similar performances. However, because \textit{Seurat}'s resolution parameter had a large impact on the number of clusters identified (Supplementary Figures 2 and 24), \textit{Seurat} could always be coerced into producing the right number of clusters. Instead, the number of clusters found by \textit{scran} was considerably less influenced by the available parameters (number of nearest neighbors or steps in the random walk - see Supplementary Figure 27), and as a result \textit{scran}-based clustering sometimes never produced a partitioning with the right number of clusters. This observation, along with \textit{scran}'s higher MI score, suggest that \textit{scran} sometimes simply divides a real subpopulation into two clusters (possibly tracking some unknown biological differences) rather than committing misclassification errors. Overall, the \textit{walktrap} method appeared superior to the \textit{fast greedy} algorithm and was generally less prone to misclassification than \textit{Seurat} clustering, although the latter offered more control over the resolution. A major difference between \textit{walktrap}-based clustering and \textit{Seurat} is the computing time (Figure \ref{fig:clust}B). We found that using the Annoy approximation to the nearest neighbors somewhat reduced computing time at no apparent cost to accuracy. It nevertheless remained considerably slower than \textit{Seurat}. For all methods, some poorly distinguishable subpopulations from both the Zhengmix8eq and simMix1 datasets remained very inaccurately classified in regard to all metrics.
 
 \subsection*{Overview of interactions between steps}
 
-We selected the most important alternatives for each parameter (see Methods) in order to explore their interactions. {\color{red}Unsupervised clustering on the evaluation metrics reveals general patterns in the results as well as the relative importance of the parameters (Figure \ref{fig:overall}), with the clustering method having the most important impact on the results. This is however chiefly due to number of clusters called: an ANOVA on all analyses after accounting, in the model, for baseline differences between datasets and the impact of \textit{Seurat}'s resolution parameter, attributed relatively little importance to the clustering method, and instead attributed the largest proportion of variance in the main cluster metrics to the number of dimensions used, followed by normalization (Supplementary Figure 29A). Because the choice of dimension reduction impacts the number of clusters, we repeated the analysis of variance in ARI among the combinations of parameters that yielded the true number of clusters (Supplementary Figure 29B). We observed that although normalization was the most important parameter among these analyses, the choice of dimensionality (as well as feature selection) came closely behind (Supplementary Figure 29B), suggesting that more attention should be paid to this relatively neglected step.
+We selected the most important alternatives for each parameter (see Methods) in order to explore their interactions. After accounting, in the model, for baseline differences between datasets and the impact of the resolution parameter, ANOVA attributed the largest proportion of variance in the main cluster metrics to the choice of dimensionality reduction, followed by normalization, and very little to filtering (Supplementary Figure 28A). Because the choice of dimension reduction impacts the number of clusters, we repeated the analysis of variance in ARI among the combinations of parameters that yielded the true number of clusters (Supplementary Figure 28B). We observed that although normalization was the most important parameter among these analyses, the choice of dimensionality came closely behind (Supplementary Figure 28B), suggesting that more attention should be paid to this relatively neglected step.
 
-The greater importance of normalization, dimensionality and feature selection over filtering steps is also visible in the clustering (Figure \ref{fig:overall}). The top methods (bottom of Figure \ref{fig:overall}) confirm the results of the previous sections, highlighting especially \textit{sctransform}, deviance-based feature selection, and \textit{maxLikGlobal} dimensionality estimates as top methods. Interestingly, while the combination of \textit{sctransform} with \textit{Seurat} clustering was particularly performant for most datasets, for the simulated `simMix1` dataset,  standard \textit{Seurat} normalization combined with \textit{scran}-based clustering proved superior.}
-
-We next investigated whether the benefits of some methods were conditional on the choices at other steps. Although analysis of variance identified many weak but significant interactions, we found that the benefits brought by performant methods were robust to differences in other parts of the pipeline (Supplementary Figures 30-31). For instance, we confirmed that doublet removal and \textit{sctransform} normalization were beneficial independently of other steps, and that, again independently of other steps, more stringent filtering did not yield any major improvement over lenient filtering (Supplementary Figure 30). Similarly, deviance-based feature selection outcompeted \textit{Seurat}'s default selection method independently of changes at other steps (Supplementary Figure 31). {\color{red} ANOVA did reveal some significant (negative) interactions: the top two-way interaction was between \textit{scran} normalization and the elbow method for selection the number of dimensions, and indeed that combination was involved in all of the 30 lowest-ranking pipelines. Furthermore, all significant interactions involved the elbow method, suggesting that some methods were less robust to underestimated dimensionality.}
+We next investigated whether the benefits of some methods were conditional on the choices at other steps. Although analysis of variance identified many weak but significant interactions, we found that the benefits brought by performant methods were robust to differences in other parts of the pipeline (Supplementary Figures 29-30). For instance, we confirmed that doublet removal and \textit{sctransform} normalization were beneficial independently of other steps, and that, again independendently of other steps, more stringent filtering did not yield any major improvement over lenient filtering (Supplementary Figure 29). Similarly, deviance-based feature selection outcompeted \textit{Seurat}'s default selection method independently of changes at other steps (Supplementary Figure 30).
 
 \subsection*{Further extensions to the pipeline: imputation/denoising}
 
-The basic pipeline presented here can be extended with additional analysis steps while keeping the same evaluation metrics. To demonstrate this, we evaluated various imputation or denoising techniques based on their impact on classification. Since preliminary analysis showed that all methods performed equally well or better on normalized data, we applied them after filtering and normalization, but before scaling and reduction. Although some of the methods (e.g., \textit{DRImpute\_process} and \textit{alra\_norm}) did improve the separability of some more elusive subpopulations, no method had a systematically positive impact on the average silhouette width across all subpopulations (Supplementary Figure 32A). When restricting ourselves to clustering analyses that yielded the `right' number of clusters, all tested methods improved classification  compared to a scenario with no imputation step (`none' label, Supplementary Figure 32B). However, the situation was not so straightforward with alternative metrics, where some methods (e.g., \textit{ENHANCE}) consistently underperformed. 10X datasets, which are typically characterized by a lower per-cell coverage and feature detection rate, benefited more from imputation and, in this context, \textit{DrImpute} and \textit{DCA} tended to show the best performance. On the contrary, imputing on normalized counts originating from Smart-seq technology was instead rather deleterious to the clustering accuracy. 
+The basic pipeline presented here can be extended with additional analysis steps while keeping the same evaluation metrics. To demonstrate this, we evaluated various imputation or denoising techniques based on their impact on classification. Since preliminary analysis showed that all methods performed equally well or better on normalized data, we applied them after filtering and normalization, but before scaling and reduction. Although some of the methods (e.g., \textit{DRImpute\_process} and \textit{alra\_norm}) did improve the separability of some more elusive subpopulations, no method had a systematically positive impact on the average silhouette width across all subpopulations (Supplementary Figure 31A). When restricting ourselves to clustering analyses that yielded the `right' number of clusters, all tested methods improved classification  compared to a scenario with no imputation step (`none' label, Supplementary Figure 31B). However, the situation was not so straightforward with alternative metrics, where some methods (e.g., \textit{ENHANCE}) consistently underperformed. 10X datasets, which are typically characterized by a lower per-cell coverage and feature detection rate, benefited more from imputation and, in this context, \textit{DrImpute} and \textit{DCA} tended to show the best performance. On the contrary, imputing on normalized counts originating from Smart-seq technology was instead rather deleterious to the clustering accuracy. 
 
 \subsection*{Application of \textit{pipeComp} to a different context}
 
-To illustrate the applicability of \textit{pipeComp} to a completely different problem, we benchmarked the impact of surrogate variable analysis (SVA)-based methods on bulk RNAseq differential expression analysis (DEA). The rationale behind such approaches is that the identification of factors determining genome-wide variation (i.e. surrogate variables) and their inclusion in the DEA's generalized linear model might improve DEA, especially in the presence of sources of variation unrelated to the experimental variables. \textit{sva} \citep{leekCapturingHeterogeneityGene2007,leekSvaPackageRemoving2012} and \textit{RUVseq} \citep{rissoNormalizationRNAseq2014a} are two popular packages each implementing different methods to infer these variables. We therefore created a \texttt{PipelineDefinition} with three steps: 1) feature filtering, 2) removal of unwanted variation (i.e. SVA), and 3) DEA using the most established methods  \citep{germainRNAontheBENCHComputationalEmpirical2016}. The package's `pipeComp\_dea' vignette details the creation process. We developed 3 benchmark datasets: 1) the \texttt{ipsc} data is a random selection of 10 vs 10 samples from \citep{carcamoOriveAnalysisTranscriptional2017}, which are very heterogeneous, and foldchanges were manually added to 300 genes; 2) the \texttt{seqc} dataset contains 5 vs 5 samples of two mixtures of the SEQC consortium with different ERCC spike-in mixes \citep{ComprehensiveAssessment2014}, and includes a partially correlated batch effect; 3) A \texttt{simulation} of 8 vs 8 samples with two technical vectors of variation (see Methods for more details). As previously reported \citep{ComprehensiveAssessment2014}, we found that more stringent filtering improved DEA (Supplementary Figure 33A) and that the different DEA methods had similar performances (Figure \ref{fig:svadea}A and Supplementary Figure 33A). Including a SVA-based step increased sensitivity across all datasets, particularly in datasets with technical vectors of variation (\textit{seqc} and \textit{simulation}), and benefited all DEA methods in a similar fashion (Figure \ref{fig:svadea}A,C and Supplementary Figures 33-34). With the exception of the \texttt{RUVr} method, which led to a high False Discovery Rate (FDR), all other methods showed comparable gains in sensitivity while maintaining a decent error control (if a little above the nominal FDR), even when increasing the number of surrogate variables used (Figure \ref{fig:svadea}B-C). While the FDR did increase in the \textit{ipsc} dataset, we suspect that much of the effect could be due to spurious differences \citep{germainTamingHumanGenetic2017} between the groups which we wrongly assume to be false positives. Nevertheless, the FDR remained acceptable with up to three variables. These results therefore suggest that these methods are robust and can be widely applied.
+To illustrate the applicability of \textit{pipeComp} to a completely different problem, we benchmarked the impact of surrogate variable analysis (SVA)-based methods on bulk RNAseq differential expression analysis (DEA). The rationale behind such approaches is that the identification of factors determining genome-wide variation (i.e. surrogate variables) and their inclusion in the DEA's generalized linear model might improve DEA, especially in the presence of sources of variation unrelated to the experimental variables. \textit{sva} \cite{leekCapturingHeterogeneityGene2007,leekSvaPackageRemoving2012} and \textit{RUVseq} \cite{rissoNormalizationRNAseq2014a} are two popular packages each implementing different methods to infer these variables. We therefore created a \texttt{PipelineDefinition} with three steps: 1) feature filtering, 2) removal of unwanted variation (i.e. SVA), and 3) DEA using the most established methods  \cite{germainRNAontheBENCHComputationalEmpirical2016}. The package's `pipeComp\_dea' vignette details the creation process. We developed 3 benchmark datasets: 1) the \texttt{ipsc} data is a random selection of 10 vs 10 samples from \cite{carcamoOriveAnalysisTranscriptional2017}, which are very heterogeneous, and foldchanges were manually added to 300 genes; 2) the \texttt{seqc} dataset contains 5 vs 5 samples of two mixtures of the SEQC consortium with different ERCC spike-in mixes \cite{ComprehensiveAssessment2014}, and includes a partially correlated batch effect; 3) A \texttt{simulation} of 8 vs 8 samples with two technical vectors of variation (see Methods for more details). As previously reported \cite{ComprehensiveAssessment2014}, we found that more stringent filtering improved DEA (Supplementary Figure 32A) and that the different DEA methods had similar performances (Figure \ref{fig:svadea}A and Supplementary Figure 32A). Including a SVA-based step increased sensitivity across all datasets, particularly in datasets with technical vectors of variation (\textit{seqc} and \textit{simulation}), and benefited all DEA methods in a similar fashion (Figure \ref{fig:svadea}A,C and Supplementary Figures 32-33). With the exception of the \texttt{RUVr} method, which led to a high False Discovery Rate (FDR), all other methods showed comparable gains in sensitivity while maintaining a decent error control (if a little above the nominal FDR), even when increasing the number of surrogate variables used (Figure \ref{fig:svadea}B-C). While the FDR did increase in the \textit{ipsc} dataset, we suspect that much of the effect could be due to spurious differences \cite{germainTamingHumanGenetic2017} between the groups which we wrongly assume to be false positives. Nevertheless, the FDR remained acceptable with up to three variables. These results therefore suggest that these methods are robust and can be widely applied.
 
 \section*{Discussion}
 
 \subsection*{Practical recommendations}
 
-On the basis of our findings, we can make a number of practical analysis recommendations, also summarized in Supplementary Figure 35:
+On the basis of our findings, we can make a number of practical analysis recommendations, also summarized in Supplementary Figure 34:
 
 \begin{enumerate}
    \item Filtering
@@ -388,26 +247,23 @@ In this study, we evaluated tools commonly used for the processing of scRNAseq w
 
 Among all tested pipelines, performance varied greatly across datasets. The ZhengMix8eq and simMix1 datasets were the most challenging datasets across all preprocessing steps that we tested. The average silhouette width of half of their subpopulations was systematically lower than the other subpopulations/ datasets and the ARI score at true number of clusters, if ever achieved, was always poor. It is likely that these two datasets are challenging due to their combined sparsity and complexity (see Supplementary Figure 1). The challenge of distinguishing subpopulations of T-cells in the Zhengmix8eq dataset was previously discussed \cite{duoClustering2018}. In contrast, while the Koh dataset harbors as many populations, they originate from more distinct groups (from hESC in different differentiation stages), while the Kumar and mixology datasets harbor a very low subpopulation complexity and most methods applied on them performed well.
 
-Our recommendations are in line with the results of several other benchmarking studies. For instance, \textit{Seurat} and \textit{scran} methods were already shown to yield good clustering performance \cite{freytagComparison2018} and \textit{DrImpute} to improve the quality of downstream analyses \cite{ZhangImput2018}. A previous systematic comparison \cite{viethSystematic2019} instead found that the use of \textit{SAVERX} for denoising data and \textit{scran} for clustering yielded better performance on the ability to recover differentially-expressed genes, whereas we focused on the ability to recover cell populations. Another disagreement with the present recommendations come from the study of Hou et al. \cite{HouImput2020} that recommends \textit{SAVERX} and discourage the use of \textit{DCA} for better clustering, whereas our study found opposite results for these tools. Several differences in the design of our study could explain this contrast, such as the use of different metrics (ARI at true number of clusters, mean precision/ recall), of different datasets (Koh, Kumar, simMix simulations) and the use of different filtering and normalization strategies. \textit{ALRA} however yielded good results in both studies and may be the most conservative option. The study from Hou et al. also highlighted the usefulness of \textit{ALRA} when followed by differential and trajectory analysis both in UMI and Fluidigm technologies.
-
-{\color{red} The performance of \textit{scVI} in our evaluation was lower than in the original publication presenting the method \cite{lopezDeep2018}. Our results are however in line with other studies comparing silhouette score \cite{Aparicio2020} and clustering accuracy \cite{HouImput2020} of \textit{scVI}'s latent space. These studies, like ours, used datasets with relatively few cells (i.e. fewer than genes), for which \textit{scVI} was reported by its authors to be less adapted. We think that further work will be required to assess its performance on larger datasets.}
+Our recommendations are in line with the results of several other benchmarking studies. For instance, \textit{Seurat} and \textit{scran} methods were already shown to yield good clustering performance \cite{freytagComparison2018} and \textit{DrImpute} to improve the quality of downstream analyses \cite{ZhangImput2018}. A previous systematic comparison \cite{viethSystematic2019} instead found that the use of \textit{SAVERX} for denoising data and \textit{scran} for clustering yielded better performance on the ability to recover differentially-expressed genes, whereas we focused on the ability to recover cell populations. Another disagreement with the present recommendations come from the study of Hou et al. \cite{HouImput2020} that recommends \textit{SAVERX} and discourage the use of \textit{DCA} for better clustering, whereas our study found opposite results for these tools. Several differences in the design of our study could explain this contrast, such as the use of different metrics (ARI at true number of clusters, mean precision/ recall), of different datasets (Koh, Kumar, simMix simulations) and the use of different filtering and normalization strategies. \textit{ALRA} however yielded good results in both studies and may be the most conservative option. The study from Hou et al. also highlighted the usefulness of \textit{ALRA} when followed by differential and trajectory analysis both in UMI and Fluidigm technologies. 
 
 Here, we chose to concentrate on what could be learned from datasets with known cell labels (as opposed to labels inferred from the data, as in \cite{MereuCellAtlas2019}). In contrast to Tian et al. \cite{tianMixology2018}, who used RNA mixtures of known proportions, we chose to rely chiefly on real cells and their representative form of variability. Given the limited availability of such well-described datasets however, several aspects of single-cell analysis could not be compared, such as batch effect correction or multi-dataset integration. For these aspects of scRNAseq processing that are critical in some experimental designs, we refer the reader to previous evaluations \cite{TranBatch2020, StuartIntegration2019}. In addition, a focus on the identification of the subpopulations might fail to reveal methods that are instead best performing for tasks other than clustering, such as differential expression analysis or trajectory inference. Several informative benchmarks have already been performed on some of these topics \cite{CrowellMuscat2019, DalMolinDE2017, JaakkolaDE2017, SaelensTraject2019, SonesonDE2018, WangDE2019}. Yet, such evaluations could benefit from considering methods not in isolation, but as parts of a connected workflow, as we have done here. We believe that the \textit{pipeComp} framework is modular and flexible enough to integrate new steps in the pipeline, as shown by an example with imputation/denoising methods.
 
-We developed \textit{pipeComp} to address the need of a framework that can simultaneously evaluate the interaction of multiple tools. The work of Vieth and colleagues\cite{viethSystematic2019} already offered an important precedent in this respect, evaluating the interaction of various steps in the context of scRNAseq differential expression analysis, but did not offer a platform for doing so. Instead, the \textit{CellBench} package was recently proposed to address a similar need \cite{suCellbench}, offering an elegant piping syntax to combine alternative methods at successive steps. A key additional feature of \textit{pipeComp} is its ability to perform evaluation in parallel to the pipeline and offering on-the-fly evaluation at multiple steps. This avoids the need to store potentially large intermediate data for all possible permutations and thus allowing a combinatorial benchmark. This, along with the set-up simplicity (demonstrated here by our separate SVA-DEA benchmark), also distinguishes \textit{pipeComp} from general workflow frameworks such as \textit{drake} \citep{landauDrakePackage2018}; indeed we estimate that the benchmarks discussed here would have taken approximately 16TB of storage had all non-redundant intermediates been saved (see the Supplementary methods for more detailed explanations of the framework and comparison to \textit{CellBench} and \textit{drake}). In addition, the fact that benchmark functions are stored in the \texttt{PipelineDefinition} makes the benchmark more smoothly portable, making it easy to modify, extend with further methods, or apply to other datasets.
+We developed \textit{pipeComp} to address the need of a framework that can simultaneously evaluate the interaction of multiple tools. The work of Vieth and colleagues\cite{viethSystematic2019} already offered an important precedent in this respect, evaluating the interaction of various steps in the context of scRNAseq differential expression analysis, but did not offer a platform for doing so. Instead, the \textit{CellBench} package was recently proposed to address a similar need \cite{suCellbench}, offering an elegant piping syntax to combine alternative methods at successive steps. A key additional feature of \textit{pipeComp} is its ability to perform evaluation in parallel to the pipeline and offering on-the-fly evaluation at multiple steps. This avoids the need to store potentially large intermediate data for all possible permutations and thus allowing a combinatorial benchmark. This, along with the set-up simplicity (demonstrated here by our separate SVA-DEA benchmark), also distinguishes \textit{pipeComp} from general workflow frameworks such as \textit{drake} \cite{landauDrakePackage2018}; indeed we estimate that the benchmarks discussed here would have taken approximately 16TB of storage had all non-redundant intermediates been saved (see the Supplementary methods for more detailed explanations of the framework and comparison to \textit{CellBench} and \textit{drake}). In addition, the fact that benchmark functions are stored in the \texttt{PipelineDefinition} makes the benchmark more smoothly portable, making it easy to modify, extend with further methods, or apply to other datasets.
 
 With respect to the methods themselves, we believe there is still space for improvement in some of the steps. Concerning cell filtering, we noticed that the current approach based on whole-population characteristic (e.g., MAD cut-off) can be biased against certain subpopulations, suggesting that more refined methods expecting multimodal distributions should be used rather than relying on whole-population characteristics. In addition, most common filtering approaches do not harness the relationship between cell QC properties. Finally, imputation had a varied impact on the clustering analysis and seemed to be linked to the technology that was used to generate the data. Also, the good performance of \textit{DrImpute} is in line with a previous study focused on the preservation of data structure in trajectory inference from scRNAseq \cite{ZhangImput2018} (\textit{ALRA} was however not included in this previous benchmark). Our results also align with the hypothesis of this study on the respective strengths of linear and non-linear models and their use to different types of data, such as the highest performance of non-linear methods in developmental studies. 
 
 \section*{Conclusions}
 
-\textit{pipeComp} is a flexible R framework for evaluating methods and parameter combinations in a complex pipeline, computing on-the-fly multilevel evaluation metrics. Applying this framework to scRNAseq clustering enabled us to make 
-clear recommendations on the steps of filtering, normalization, feature selection, denoising, dimensionality reduction and clustering (Supplementary Figure 35). We demonstrate how a diversity of multilevel metrics can be more robust, more sensitive, and more nuanced than simply evaluating the final clustering performance. We further showed that the \textit{pipeComp} framework can be applied to extend the current field of benchmarking, as well as to investigate pipelines other domains with multi-step computational analyses.
+\textit{pipeComp} is a flexible R framework for evaluating methods and parameter combinations in a complex pipeline, computing on-the-fly multilevel evaluation metrics. Applying this framework to scRNAseq clustering enabled us to make clear recommendations on the steps of filtering, normalization, feature selection, denoising, dimensionality reduction and clustering (Supplementary Figure 34). We demonstrate how a diversity of multilevel metrics can be more robust, more sensitive, and more nuanced than simply evaluating the final clustering performance. We further showed that the \textit{pipeComp} framework can be applied to extend the current field of benchmarking, as well as to investigate pipelines other domains with multi-step computational analyses.
 
 \section*{Methods}
 
 \subsection*{Code and data availability}
 
-All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation. {\color{red}All wrappers for methods used in the study can be found in the external data of the \textit{pipeComp} package (\url{https://github.com/plger/pipeComp/tree/master/inst/extdata}).}
+All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation.
 
 The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \url{https://doi.org/10.6084/m9.figshare.11787210.v1}.
 
@@ -436,8 +292,6 @@ Most imputation/denoising methods were run with the default parameters with the 
 
 For the methods that produce local dimensionality estimates, we used the maximum. For the elbow method, we implemented an automatic procedure by taking the farthest point from a line drawn between the variance explained by the first and last (i.e. 50th) components calculated. For the \texttt{JackStraw} method, since the \textit{Seurat} documentation advises not to use a p-value threshold (which would typically yield a very large number of dimensions) but rather look for a drop in significance, we applied the same farthest point algorithm on the log10(p-values), which in our hands reproduced manual threshold selection.
 
-{\color{red} For the molecular cross-validation approach, we relied on a R implementation by Matthew Young (\url{https://github.com/constantAmateur/MCVR}), with minor modifications (see wrapper in the \textit{pipeComp} package). Briefly, since there is no \textit{a priori} relationship between the dimensionality of the count data and that of the PCA based on the normalized data, MCVR does not use the original approach based Poisson loss, but the mean squared error of the normalized data, and uses balanced 50-50 splits. Because of the 50\% split, dimensionality may be underestimated, and titration did suggest that was the case for some of our datasets.}
-
 \subsection*{Filter sets}
 The \textit{default} set of filters excludes cells that are outliers according to at least two of the following thresholds: log10\_total\_counts $>$2.5 MADs or $<$5 MADs, log10\_total\_features $>$2.5 MADs or $<$5 MADs, pct\_counts\_in\_top\_20\_features $>$ or $<$ 5 MADs, featcount\_dist (distance to expected ratio of log10 counts and features) $>$ or $<$ 5 MADs, pct\_counts\_Mt $>$ 2.5 MADs and $>$ 0.08.
 
@@ -459,15 +313,11 @@ To estimate the correlation between the principal components and covariates such
 
 \subsection*{\textit{scVI} normalization and LD}
 
-The evaluation of \textit{scVI} algorithm was performed separate to the other pipeline combinations since the model training on our reference datasets was especially resource-consuming {\color{red} and follows a different workflow from the other pipelines. In particular, for datasets with fewer cells than genes, \textit{scVI} requires a feature selection to be performed prior to the normalization step; furthermore, its dimensional reduction steps rely directly on raw counts. We therefore evaluated it separately and compared it to a representative subset of pipelines using \textit{sctransform} normalization and \textit{Seurat}'s PCA dimension reduction method. The resulting evaluation is available in the Supplementary Figure 13.
-
-Using \textit{scVI}, we considered as normalized values the normalized mean of the negative binomial distribution modeling the counts (accessed through the \textit{get\_sample\_scale} method). Following \textit{scVI}'s online documentation, we used the \textit{VAE} model, using a train size of 1, a training on 400 epochs and a learning rate of 0.001. As a major limitation of \textit{scVI} is the training on dataset with low gene to cell ratio, the features were subsampled to 2000 using the \textit{subsample\_genes} function, which resembles the \textit{Seurat} V3 VST gene selection method. All other parameters were left unmodified.  . 
-
-Two models of the \textit{scVI} package computing a dimension reduction on the data were tested. First, we evaluated the mean of the posterior distribution for the latent space, still based on the \textit{VAE} model (accessed through the \textit{get\_latent} function). All other parameters were set as described above or left as default. The second model that we evaluated was the linearly decoded VAE of \textit{scVI} (\textit{LDVAE} model). It was trained on 250 epochs, a learning rate of 0.001 and computed 50 dimensions. For some smaller datasets, the training phase aborted. In such cases, we followed the recommendations of the package and reduced the learning rate by a factor 10 until the model could properly converge. Given that the other methods that we evaluated returned PCs ordered by their variance explained, we applied to the same reordering to the latent space returned by \textit{scVI}. For both models. we relied on the feature selections results from the pipeline and not on the \textit{subsample\_genes} function. All other parameters were left unmodified. }
+The evaluation of \textit{scVI} algorithm was performed separate to the other pipeline combinations as the model training on our reference datasets was especially resource-consuming. As it was not practically feasible to perform the training step on many combination of parameters as it was done with other tools, we evaluated it on a representative subset of pipelines using \textit{sctransform} normalization and \textit{Seurat}'s PCA dimension reduction method. The resulting evaluation is available in the Supplementary Figure 13. 
 
 \subsection*{Overall run for interactions across steps}
 
-The set of alternatives found for the overall run (Supplementary Figures 29-31) can be found in the \href{https://github.com/markrobinsonuzh/scRNA_pipelines_paper/blob/master/data/overall_run.Rmd}{paper's repository}. The analysis of variance was performed with the following model:
+The set of alternatives found for the overall run (Supplementary Figures 28-30) can be found in the \href{https://github.com/markrobinsonuzh/scRNA_pipelines_paper/blob/master/data/overall_run.Rmd}{paper's repository}. The analysis of variance was performed with the following model:
 
 \texttt{metric$\sim$ dataset*resolution+doubletmethod+filt+norm+clustmethod+dims}
 
@@ -477,12 +327,12 @@ The full process of creating the SVA-DEA \texttt{PipelineDefinition} is describe
 
 The three benchmark datasets are available in \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper/blob/master/svadea/datasets/}, along with all code used to generate and prepare them. Briefly:
 \begin{itemize}
-    \item For the \textit{ipsc} dataset, we took the quantification of the GSE79636 dataset (fairly heterogeneous) from the \textit{iPSCpower} package \citep{germainTamingHumanGenetic2017}, and selected two random sets of 10 samples. No further variation was added, and log-foldchanges ranging from 0.25 to 1.25 were added to the counts of 300 random genes. All other genes were assumed to be negatives.
-    \item For the \textit{seqc} dataset, we used data from the \textit{seqc} package \citep{ComprehensiveAssessment2014}. For both groups (mixtures C and D, which also contain two different spike-in mixes), we selected samples from the \texttt{ILM\_refseq\_gene\_AGR} and \texttt{ILM\_refseq\_gene\_CNL} batches, which have clear technical differences; we selected 5 samples per group with a weak correlation with the batch (3:2 vs 2:3). Since the true differences between mixtures are not entirely known, the analysis was performed on all genes but only the spike-ins were considered for benchmarking.
-    \item For the \textit{simulation}, we simulated counts using the \textit{polyester} package \citep{frazeePolyesterSimulating2015} and the means/dispersions from the GSE79636 dataset (restricted to a single batch and biological group), with 500 DEGs (log-foldchanges ranging from 0.5 to 2) and two batch effects: 1) a technical batch partially correlated with the group (6:2) and affecting 1/3 of the genes, and 2) a linear vector of variation uncorrelated with the groups and affecting 1/3 of the genes.
+    \item For the \textit{ipsc} dataset, we took the quantification of the GSE79636 dataset (fairly heterogeneous) from the \textit{iPSCpower} package \cite{germainTamingHumanGenetic2017}, and selected two random sets of 10 samples. No further variation was added, and log-foldchanges ranging from 0.25 to 1.25 were added to the counts of 300 random genes. All other genes were assumed to be negatives.
+    \item For the \textit{seqc} dataset, we used data from the \textit{seqc} package \cite{ComprehensiveAssessment2014}. For both groups (mixtures C and D, which also contain two different spike-in mixes), we selected samples from the \texttt{ILM\_refseq\_gene\_AGR} and \texttt{ILM\_refseq\_gene\_CNL} batches, which have clear technical differences; we selected 5 samples per group with a weak correlation with the batch (3:2 vs 2:3). Since the true differences between mixtures are not entirely known, the analysis was performed on all genes but only the spike-ins were considered for benchmarking.
+    \item For the \textit{simulation}, we simulated counts using the \textit{polyester} package \cite{frazeePolyesterSimulating2015} and the means/dispersions from the GSE79636 dataset (restricted to a single batch and biological group), with 500 DEGs (log-foldchanges ranging from 0.5 to 2) and two batch effects: 1) a technical batch partially correlated with the group (6:2) and affecting 1/3 of the genes, and 2) a linear vector of variation uncorrelated with the groups and affecting 1/3 of the genes.
 \end{itemize}
 
-Filtering was performed with edgeR's \texttt{filterByExpr} function, changing the \texttt{min.count} argument. For \textit{vstsva}, we first applied the variance-stabilizing transformation from \textit{DESeq2} \citep{loveModeratedEstimation2014} before applying \texttt{sva::sva}. \textit{edgeR.QLF} refers to the quasi-likelihood version \citep{lundDetectingDifferential2012} of \textit{edgeR}'s fit. The exact wrappers used can be found in the package at \url{https://github.com/plger/pipeComp/blob/master/inst/extdata/dea\_wrappers.R}.
+Filtering was performed with edgeR's \texttt{filterByExpr} function, changing the \texttt{min.count} argument. For \textit{vstsva}, we first applied the variance-stabilizing transformation from \textit{DESeq2}\cite{loveModeratedEstimation2014} before applying \texttt{sva::sva}. \textit{edgeR.QLF} refers to the quasi-likelihood version \cite{lundDetectingDifferential2012} of \textit{edgeR}'s fit. The exact wrappers used can be found in the package at \url{https://github.com/plger/pipeComp/blob/master/inst/extdata/dea\_wrappers.R}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
@@ -501,55 +351,37 @@ PLG developed the \textit{pipeComp} framework, and PLG and MDR designed the benc
 \section*{Acknowledgements}
 This work was supported by the Swiss National Science Foundation (grants 310030\_175841, CRSII5\_177208) as well as the Chan Zuckerberg Initiative DAF (grant number 2018-182828), an advised fund of Silicon Valley Community Foundation. MDR acknowledges support from the University Research Priority Program Evolution in Action at the University of Zurich.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                  The Bibliography                       %%
-%%                                                         %%
-%%  Bmc_mathpys.bst  will be used to                       %%
-%%  create a .BBL file for submission.                     %%
-%%  After submission of the .TEX file,                     %%
-%%  you will be prompted to submit your .BBL file.         %%
-%%                                                         %%
-%%                                                         %%
-%%  Note that the displayed Bibliography will not          %%
-%%  necessarily be rendered by Latex exactly as specified  %%
-%%  in the online Instructions for Authors.                %%
-%%                                                         %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Tables}
 
-% if your bibliography is in bibtex format, use those commands:
-\bibliographystyle{bmc-mathphys} % Style BST file (bmc-mathphys, vancouver, spbasic).
-\bibliography{bmc_article}      % Bibliography file (usually '*.bib' )
-% for author-year bibliography (bmc-mathphys or spbasic)
-% a) write to bib file (bmc-mathphys only)
-% @settings{label, options="nameyear"}
-% b) uncomment next line
-%\nocite{label}
+\begin{table}[H]
+\caption{\textbf{Overview of the benchmark datasets.} `\# features' indicates the number of features detected in at least 10 cells.}
+\label{tab:table1}
+\begin{tabular}{rlrrl}
+  \hline
+dataset & \# features & \# cells & protocol & description \\ 
+  \hline
+Koh & 33922 & 531 & SMARTer & 9 FACS purified differentiation stages \\ 
+  Kumar & 41930 & 246 & SMARTer & Mouse ESC cultured in 3 conditions \\ 
+  Zhengmix4eq & 10434 & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix4uneq & 11369 & 6498 & 10x & Mixtures of FACS purified PBMCs \\ 
+  Zhengmix8eq & 10600 & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
+  mixology10x3cl & 16208 & 902 & 10x & Mixture of 3  cancer lines from CellBench \\ 
+  mixology10x5cl & 11786 & 3918 & 10x & Mixture of 5 cancer lines from CellBench \\ 
+  simMix1 & 3696 & 2500 & 10x-based & Simulation of 10 human subpopulations \\
+  simMix2 & 8893 & 3000 & 10x-based & Simulation of 9 mouse subpopulations \\
+   \hline
+\end{tabular}
+\end{table}
 
-% or include bibliography directly:
-% \begin{thebibliography}
-% \bibitem{b1}
-% \end{thebibliography}
+\vspace{20mm}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                               %%
-%% Figures                       %%
-%%                               %%
-%% NB: this is for captions and  %%
-%% Titles. All graphics must be  %%
-%% submitted separately and NOT  %%
-%% included in the Tex document  %%
-%%                               %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%
-%% Do not use \listoffigures as most will included as separate files
 
 \section*{Figures}
 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{pipeline_explanation.pdf}
+    \includegraphics[width=\textwidth, keepaspectratio]{main_figures/pipeline_explanation.pdf}
     \caption{\textbf{Overview of the \textit{pipeComp} framework and its application to a scRNAseq clustering pipeline. A:} The package is built around a \texttt{PipelineDefinition} class which defines a set of functions to be executed consecutively, as well as optional evaluation functions for each step. Each step can accept a number of parameters whose alternative values are provided as a list. All (or subsets of) combinations of parameters can then be simultaneously ran and evaluated using the \texttt{runPipeline} function (see Supplementary Methods for more details). \textbf{B:} Scheme representing the application of \textit{pipeComp} to evaluate a range of methods that are commonly used in scRNAseq studies and some of the metrics monitored at various steps.}
     \label{fig:explanation}
 \end{figure}
@@ -557,7 +389,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{doublets.pdf}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/doublets.pdf}}
     \caption{\textbf{Identification of doublet cells. A:} Receiver operating characteristic (ROC) curves of the tested doublet detection methods for three datasets with SNP-identified doublets. Dots indicate threshold determined by the true number of doublets. \textbf{B:} Running time of the different methods (\textit{DoubletFinder} failed on one of the datasets). \textbf{C:} Rate of misclassification of the cells identified by \textit{scDblFinder} as doublets (DBL) or singlets (SNG), across a large range of clustering analysis. Even in datasets which should not have neotypic doublets, the cells identified as such tend to be misclassified.    \label{fig:doublets}}
 \end{figure}
 
@@ -565,7 +397,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{filtering.pdf}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/filtering.pdf}}
     \caption{\textbf{Effect of filtering on cell subpopulation structure and clustering. A:} Filtering on the basis of distance to the whole distribution can lead to strong bias against certain subpopulations. The dashed line indicates a threshold of 2.5 median absolute deviations (MADs) from the median of the overall population. \textbf{B:} Relationship between the maximum subpopulation exclusion rate and the average clustering accuracy per subpopulation across various filtering strategies. Of note, doublet removal appears to be desirable even when, due to the design, there are no heterotypic doublets in the data. The PCA methods refer to multivariate outlier detected as implemented in \textit{scater} (see Methods for details).}
     \label{fig:filtering}
 \end{figure}
@@ -574,8 +406,8 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{normalization.pdf}}
-    \caption{\textbf{Evaluation of normalization procedures. A:} Variance in PC1 explained by library size (left) and detection rate (right) after accounting for subpopulation differences. \textbf{B:} Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. \textbf{C:} Clustering accuracy (\textit{Seurat} clustering), measured by mutual information (MI), Adjusted Rand Index (ARI) and ARI at the true number of cluster. {\color{red}Grey squares indicate that the true number of clusters could not be reached with the corresponding method, dataset and parameter set.} `feat\_regress', `mt\_regress' and `feat\_mt\_regress' respectively stand for the regressing out of the number of features, the proportion of mitochondrial reads, or both during scaling. {\color{red}Throughout this paper, silhouette plots (panel \textbf{B}) square-root transform values for color mapping. Other evaluation metric heatmaps (e.g. panel \textbf{C} here) map colors to the signed square-root of the number of (matrix-wise) Median Absolute Deviations from the (column-wise) median. Using this mapping, \textit{differences} in color have the same meaning across datasets, and the color-scale is not primarily capturing outliers or baseline differences between datasets. The numbers printed in the cells represent the raw (i.e. unscaled) metric values, and are printed in white or black depending on whether they are above or below the median.}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/normalization.pdf}}
+    \caption{\textbf{Evaluation of normalization procedures. A:} Variance in PC1 explained by library size (left) and detection rate (right) after accounting for subpopulation differences. \textbf{B:} Average silhouette width per true subpopulation, where higher silhouette width means a higher separability. \textbf{C:} Clustering accuracy (\textit{Seurat} clustering), measured by mutual information (MI), Adjusted Rand Index (ARI) and ARI at the true number of cluster. Grey squares indicate that the true number of clusters could not be reached with the corresponding method, dataset and parameter set. `feat\_regress', `mt\_regress' and `feat\_mt\_regress' respectively stand for the regressing out of the number of features, the proportion of mitochondrial reads, or both during scaling. Throughout this paper, silhouette plots (panel \textbf{B}) square-root transform values for color mapping. Other evaluation metric heatmaps (e.g. panel \textbf{C} here) map colors to the signed square-root of the number of (matrix-wise) Median Absolute Deviations from the (column-wise) median. Using this mapping, \textit{differences} in color have the same meaning across datasets, and the color-scale is not primarily capturing outliers or baseline differences between datasets. The numbers printed in the cells represent the raw (i.e. unscaled) metric values, and are printed in white or black depending on whether they are above or below the median.}
     \label{fig:norm}
 \end{figure}
 
@@ -583,7 +415,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{{selection.pdf}}
+    \includegraphics[width=\textwidth]{{main_figures/selection.pdf}}
     \caption{\textbf{Evaluation of feature selection methods. A:} Ability of different feature ranking methods to capture genes with a high proportion of variance (left) or deviance (right) explained by real subpopulations. The asterisk denotes the default Seurat method. \textbf{B:} Accuracy of clusterings (at the true number of clusters) when selecting 1000 genes using the given methods. Based on standard \textit{Seurat} normalization (left) or \textit{sctransform} (right). The  \textit{vst.varExp} and \textit{devianceExplained} methods correspond to the estimates used in \textbf{A} to evaluate the selection methods and were included here only for validation purpose.}
     \label{fig:selection}
 \end{figure}
@@ -595,8 +427,8 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{dimensionality.pdf}}
-    \caption{\textbf{Estimating dimensionality. A:} Estimated dimensionality using the proportion of variance in each component explained by the true subpopulations. \textbf{B:} Difference between `real' dimensionality (from \textbf{A}) and dimensionality estimation methods, along with computing time. \textbf{C:} Average silhouette width per subpopulation across a selection of methods, combined with \textit{sctransform} or standard \textit{Seurat} normalization. \textbf{D:} Clustering accuracy across the normalization/dimensionality estimation methods. {\color{red}The color-mapping scheme is the same as in Figure \ref{fig:norm}C}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/dimensionality.pdf}}
+    \caption{\textbf{Estimating dimensionality. A:} Estimated dimensionality using the proportion of variance in each component explained by the true subpopulations. \textbf{B:} Difference between `real' dimensionality (from \textbf{A}) and dimensionality estimation methods, along with computing time. \textbf{C:} Average silhouette width per subpopulation across a selection of methods, combined with \textit{sctransform} or standard \textit{Seurat} normalization. \textbf{D:} Clustering accuracy across the normalization/dimensionality estimation methods. The color-mapping scheme is the same as in Figure \ref{fig:norm}C}
     \label{fig:dim}
 \end{figure}
 
@@ -604,71 +436,34 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{clustering.pdf}}
-    \caption{\textbf{Evaluation of clustering methods.} Clustering accuracy (\textbf{A}) and run time (\textbf{B}) of \textit{scran}- and \textit{Seurat}-based clustering tools in combination with \textit{sctransform} and standard \textit{Seurat}'s normalization. {\color{red} The color-mapping scheme in panel \textbf{A} and the left of panel \textbf{B} is the same as in Figure \ref{fig:norm}C.}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/clustering.pdf}}
+    \caption{\textbf{Evaluation of clustering methods.} Clustering accuracy (\textbf{A}) and run time (\textbf{B}) of \textit{scran}- and \textit{Seurat}-based clustering tools in combination with \textit{sctransform} and standard \textit{Seurat}'s normalization. The color-mapping scheme in panel \textbf{A} and the left of panel \textbf{B} is the same as in Figure \ref{fig:norm}C.}
     \label{fig:clust}
 \end{figure}
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{overall.pdf}}
-    \caption{\textbf{Overview of the combination of main alternative parameters.} Unsupervised clustering of the results (above) and top results (below). The color-mapping schemes are the same as described in the previous figures.}
-    \label{fig:overall}
-\end{figure}
 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{svadea.pdf}}
-    \caption{{\color{red}\textbf{Evaluation of the impact of surrogate variable analysis (SVA) on (bulk) RNAseq differential expression analysis using \textit{pipeComp}.} \textit{RUVr} and \textit{RUVs} refer to the two \textit{RUVSeq} functions by the same name; \textit{svaseq} refers to the function of the same name in \textit{sva}, while \textit{vstsva} refers to the original \textit{sva} method applied no variance-stabilized data. \textbf{A:} True positive rates (TPR) and False discovery rates (FDR) of various combinations of SVA-based methods (using a single surrogate variable) and DEA methods. \textbf{B:} TPR and FDR of the different SVA-based methods (averaged across the different DEA methods) using increasing numbers of variables (`be' and `leek` refer to the two methods implemented in the \textit{sva} package for estimating the number of surrogate variables). In \textbf{A-B}, the x-axis is square-root transformed to improve readability, and three dots for each combination of methods refer to the nominal FDR thresholds of 0.01, 0.05, and 0.1. \textbf{C:} Correlation of estimated logFC with expected ones, as well as TPR and FDR (at nominal FDR threshold of 0.05) of the different methods with increasing numbers of variables. As in \ref{fig:norm}C, the color mapping tracks the number of (matrix-wise) Median Absolute Deviations from the (column-wise) median, while the printed numbers represent the raw metric values.}}
+    \includegraphics[width=\textwidth, keepaspectratio]{{main_figures/svadea.pdf}}
+    \caption{\textbf{Evaluation of the impact of surrogate variable analysis (SVA) on (bulk) RNAseq differential expression analysis using \textit{pipeComp}.} \textit{RUVr} and \textit{RUVs} refer to the two \textit{RUVSeq} functions by the same name; \textit{svaseq} refers to the function of the same name in \textit{sva}, while \textit{vstsva} refers to the original \textit{sva} method applied no variance-stabilized data. \textbf{A:} True positive rates (TPR) and False discovery rates (FDR) of various combinations of SVA-based methods (using a single surrogate variable) and DEA methods. \textbf{B:} TPR and FDR of the different SVA-based methods (averaged across the different DEA methods) using increasing numbers of variables (`be' and `leek` refer to the two methods implemented in the \textit{sva} package for estimating the number of surrogate variables). In \textbf{A-B}, the x-axis is square-root transformed to improve readability, and three dots for each combination of methods refer to the nominal FDR thresholds of 0.01, 0.05, and 0.1. \textbf{C:} Correlation of estimated logFC with expected ones, as well as TPR and FDR (at nominal FDR threshold of 0.05) of the different methods with increasing numbers of variables. As in \ref{fig:norm}C, the color mapping tracks the number of (matrix-wise) Median Absolute Deviations from the (column-wise) median, while the printed numbers represent the raw metric values.}
     \label{fig:svadea}
 \end{figure}
 
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                               %%
-%% Tables                        %%
-%%                               %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Use of \listoftables is discouraged.
-%%
-\section*{Tables}
-
-\begin{table}[h!]
-\caption{\textbf{Overview of the benchmark datasets.} {\color{red}`\# features' indicates the number of features detected in at least 10 cells.}}
-\label{tab:table1}
-\begin{tabular}{rlrrl}
-  \hline
-dataset & {\color{red}\# features} & \# cells & protocol & description \\ 
-  \hline
-Koh & 33922 & 531 & SMARTer & 9 FACS purified differentiation stages \\ 
-  Kumar & 41930 & 246 & SMARTer & Mouse ESC cultured in 3 different conditions \\ 
-  Zhengmix4eq & 10434 & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix4uneq & 11369 & 6498 & 10x & Mixtures of FACS purified PBMCs \\ 
-  Zhengmix8eq & 10600 & 3994 & 10x & Mixtures of FACS purified PBMCs \\ 
-  mixology10x3cl & 16208 & 902 & 10x & Mixture of 3  cancer cell lines from CellBench \\ 
-  mixology10x5cl & 11786 & 3918 & 10x & Mixture of 5 cancer cell lines from CellBench \\ 
-  simMix1 & 3696 & 2500 & 10x-based & Simulation of 10 human cell subpopulations \\
-  simMix2 & 8893 & 3000 & 10x-based & Simulation of 9 mouse cell subpopulations \\
-   \hline
-\end{tabular}
-\end{table}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                               %%
-%% Additional Files              %%
-%%                               %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Additional Files}
-  \subsection*{\textbf{Additional file 1: Supplementary figures}}
-  Additional results of evaluations across datasets among various metrics. (PDF 16 MB)
-  \subsection*{\textcolor{red}{\textbf{Additional file 2: Supplementary methods}}}
-  \textcolor{red}{More detailed description of \textit{pipeComp} and comparison with other tools. (PDF 0.5 MB)}
 \end{backmatter}
+
+\clearpage
+\singlespacing
+\nolinenumbers
+\printbibliography
+
+\newpage
+\pagenumbering{arabic}
+
+
+% \includepdf[pages=-]{supplementary_figures/supp_figures.pdf}
+
 \end{document}
