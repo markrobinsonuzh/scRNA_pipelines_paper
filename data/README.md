@@ -69,8 +69,8 @@ norm.seurat.noscale <- function(x){
 }
 
 norm.stableG <- function(x, type="CytosolicRibosome", ag="median", topN=50, vars=NULL, noscale=FALSE){
-  gl <- readRDS("~/pipComp/stable_genes.rds")
-  g2 <- unlist(lapply(gl[[type]], FUN=function(g){
+  data("stableG", package="pipeComp")
+  g2 <- unlist(lapply(stableG[[type]], FUN=function(g){
           grep(paste0(g,"\\.|",g,"$"),row.names(x),value=TRUE)
         }))
   if(length(g2)==0){
