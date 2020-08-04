@@ -316,9 +316,9 @@ Of note, the optimal method in our evaluation (\textit{maxLikGlobal})} systemati
 
 The last step evaluated in our pipeline was clustering. Given previous work on the topic \cite{duoClustering2018,freytagComparison2018} and the success of graph-based clustering methods for scRNAseq, we restricted our evaluation to Seurat's method and variations of \textit{scran}'s graph-based clustering using random walks (\textit{walktrap} method) or the optimization of the modularity score (\textit{fast\_greedy}) on various underlying graphs. Specifically, we compared rank-based graphs (\textit{scran}'s default) with graphs using the components' values directly, SNN vs KNN graphs, and the exact nearest neighbors to the Annoy approximation. Again, the tested methods were combined with \textit{Seurat}'s standard normalization and \textit{sctransform}, otherwise using the parameters found optimal in the previous steps. 
 
-Since ARI is dominated by differences in the number of clusters (Additional File 1: Fig S2-3) and no single metric is perfect, we diversified them (Figure \ref{fig:clust}). MI has the virtue of not decreasing when a true subpopulation is split into two clusters, which is arguably less problematic (and might well reflect unknown biological subgroups), but as a consequence it can be biased towards methods producing higher resolution clustering (Additional File 1: Fig S3). Similarly, precision per true subpopulation is considerably more robust to differences in the number of clusters. We also tracked the mean F1 score and the ARI at the true number of clusters. 
+Since ARI is dominated by differences in the number of clusters (Additional File 1: Fig S2-3) and no single metric is perfect, we diversified them (Figure \ref{fig:clust}). MI has the virtue of not decreasing when a true subpopulation is split into two clusters, which is arguably less problematic (and might well reflect unknown biological subgroups), but as a consequence it can be biased towards methods producing higher resolution clustering (Additional File 1: Fig S3). Similarly, precision per true subpopulation is considerably more robust to differences in the number of clusters, and we also tracked the ARI at the true number of clusters. 
 
-The MI score and minimum precision, which are largely independent of the estimated number of clusters, were overall higher for the \textit{walktrap} method (Figure \ref{fig:clust}), while the mean F1 score favored both \textit{scran} methods (\textit{walktrap} and \textit{fast greedy}) over \textit{Seurat}. Finally, the ARI score at the true number of clusters, when available, showed similar performances. However, because \textit{Seurat}'s resolution parameter had a large impact on the number of clusters identified (Additional File 1: Fig S2 and 24), \textit{Seurat} could always be coerced into producing the right number of clusters. Instead, the number of clusters found by \textit{scran} was considerably less influenced by the available parameters (number of nearest neighbors or steps in the random walk - see Additional File 1: Fig S28), and as a result \textit{scran}-based clustering sometimes never produced a partitioning with the right number of clusters. This observation, along with \textit{scran}'s higher MI score, suggest that \textit{scran} sometimes simply divides a real subpopulation into two clusters (possibly tracking some unknown biological differences) rather than committing misclassification errors. Overall, the \textit{walktrap} method appeared superior to the \textit{fast greedy} algorithm and was generally less prone to misclassification than \textit{Seurat} clustering, although the latter offered more control over the resolution. A major difference between \textit{walktrap}-based clustering and \textit{Seurat} is the computing time (Figure \ref{fig:clust}B). We found that using the Annoy approximation to the nearest neighbors somewhat reduced computing time at no apparent cost to accuracy. It nevertheless remained considerably slower than \textit{Seurat}. For all methods, some poorly distinguishable subpopulations from both the Zhengmix8eq and simMix1 datasets remained very inaccurately classified in regard to all metrics.
+The MI score and minimum precision, which are largely independent of the estimated number of clusters, were overall higher for the \textit{walktrap} method (Figure \ref{fig:clust}A, left) over \textit{Seurat}, although when used in combination with some networks it sometimes yielded a lower ARI or minimum precision. The ARI score at the true number of clusters, when available, showed similar performances, especially when using \textit{sctransform}. Because \textit{Seurat}'s resolution parameter had a large impact on the number of clusters identified (Additional File 1: Fig S2 and 24), \textit{Seurat} could always be coerced into producing the right number of clusters. Instead, the number of clusters found by \textit{scran} was considerably less influenced by the available parameters (number of nearest neighbors or steps in the random walk - see Additional File 1: Fig S28), and as a result \textit{scran}-based clustering sometimes never produced a partitioning with the right number of clusters. This observation, along with \textit{scran}'s higher MI score, suggest that \textit{scran} sometimes simply divides a real subpopulation into two clusters (possibly tracking some unknown biological differences) rather than committing misclassification errors. Overall, the \textit{walktrap} method appeared superior to the \textit{fast greedy} algorithm and was generally comparable to \textit{Seurat} clustering, although the latter offered more control over the resolution. A major difference between \textit{walktrap}-based clustering and \textit{Seurat} is the computing time (Figure \ref{fig:clust}B). We found that using the Annoy approximation to the nearest neighbors somewhat reduced computing time at no apparent cost to accuracy. It nevertheless remained considerably slower than \textit{Seurat}. For all methods, some poorly distinguishable subpopulations from both the Zhengmix8eq and simMix1 datasets remained very inaccurately classified in regard to all metrics.
 
 \subsection*{Overview of interactions between steps}
 
@@ -372,8 +372,7 @@ On the basis of our findings, we can make a number of practical analysis recomme
    \end{itemize}
    \item Clustering
    \begin{itemize}
-    \item We found \textit{scran}-based \textit{walktrap} clustering to show good performances, at however increased computational costs which might be prohibitive with large datasets.
-    \item In cases where prior knowledge can guide the choice of a resolution, \textit{Seurat} can be useful in affording manual control of it while, in the absence of such knowledge, \textit{scran}-based \textit{walktrap} clustering provided reasonable estimates.
+    \item In cases where prior knowledge can guide the choice of a resolution, \textit{Seurat} can be useful in affording manual control of it while, in the absence of such knowledge, \textit{scran}-based \textit{walktrap} clustering provided reasonable estimates, although at greater computational costs. 
    \end{itemize}
 \end{enumerate}
 
@@ -477,9 +476,9 @@ Analyses were performed in R 3.6.0 (Bioconductor 3.9) and the following packages
 
 \section*{Availability of Data and Materials}
 
-All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation. All wrappers for methods used in the study can be found in the external data of the \textit{pipeComp} package (\url{https://github.com/plger/pipeComp/tree/master/inst/extdata}).
+All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation. All wrappers for methods used in the study can be found in the external data of the \textit{pipeComp} package (\url{https://github.com/plger/pipeComp/tree/master/inst/extdata}). In addition, both the package and attending code are archived on \cite{figshare_code}.
 
-The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \url{https://doi.org/10.6084/m9.figshare.11787210.v1}.
+The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \cite{figshare_sce}.
 
 All data and code are released under a GNU General Public License.
 
@@ -615,7 +614,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{anova.pdf}}
+    \includegraphics[width=0.55\textwidth, keepaspectratio]{{anova.pdf}}
     \caption{\textbf{Variance in clustering metrics explained by the parameters.} See methods for more detail.}
     \label{fig:overall}
 \end{figure}
@@ -646,7 +645,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 \label{tab:table1}
 \begin{tabular}{rlrrl}
   \hline
-dataset & {\color{red}\# features} & \# cells & protocol & description \\ 
+dataset & \# features & \# cells & protocol & description \\ 
   \hline
 Koh & 33922 & 531 & SMARTer & 9 FACS purified differentiation stages \\ 
   Kumar & 41930 & 246 & SMARTer & Mouse ESC cultured in 3 different conditions \\ 
@@ -670,7 +669,7 @@ Koh & 33922 & 531 & SMARTer & 9 FACS purified differentiation stages \\
 
 \section*{Additional Files}
   \subsection*{\textbf{Additional file 1}}
-  Additional File 1: Fig S(PDF 16 MB)
+  Supplementary Figures (PDF 16 MB)
   \subsection*{\textbf{Additional file 2}}
   More detailed description of \textit{pipeComp} and comparison with other tools. (PDF 0.5 MB)
 \end{backmatter}
