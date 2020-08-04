@@ -177,11 +177,7 @@
 
 \begin{abstract}
 
-\parttitle{Background} Despite the massive growth of single-cell RNA-sequencing (scRNAseq) and corresponding computational methods, sufficient and up-to-date benchmarks to guide analytical choices are still lacking. Numerous benchmark studies already exist and cover most of scRNAseq processing and analytical methods but only a few give advice on a comprehensive pipeline. Moreover, current studies often focused on isolated steps of the process and do not address the impact of a tool on both the intermediate and the final steps of the analysis. 
-
-\parttitle{Results} Here, we present a flexible R framework for pipeline comparison with multi-level evaluation metrics. We apply it to the benchmark of scRNAseq analysis pipelines using simulated and real datasets with known cell identities, covering common methods of filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. We evaluate the choice of these tools with multi-purpose metrics to assess their ability to reveal cell population structure and lead to efficient clustering. 
-
-\parttitle{Conclusion} On the basis of our systematic evaluations of analysis pipelines, we make a number of practical recommendations about current analysis choices and for a comprehensive pipeline. The evaluation framework that we developed, \textit{pipeComp} (\url{https://github.com/plger/pipeComp}), has been implemented so as to easily integrate any other step, tool, or evaluation metric allowing extensible benchmarks and easy applications to other fields of research in Bioinformatics, as we demonstrate through a study of the impact of removal of unwanted variation on differential expression analysis.
+We present \textit{pipeComp} (\url{https://github.com/plger/pipeComp}), a flexible R framework for pipeline comparison handling interactions between analysis steps and relying on multi-level evaluation metrics. We apply it to the benchmark of single-cell RNA-sequencing analysis pipelines using simulated and real datasets with known cell identities, covering common methods of filtering, doublet detection, normalization, feature selection, denoising, dimensionality reduction and clustering. \textit{pipeComp} can easily integrate any other step, tool, or evaluation metric, allowing extensible benchmarks and easy applications to other fields, as we demonstrate through a study of the impact of removal of unwanted variation on differential expression analysis.
 
 \end{abstract}
 
@@ -198,7 +194,6 @@
 \kwd{pipeline}
 \kwd{clustering}
 \kwd{normalization}
-\kwd{dimensionality reduction}
 \kwd{filtering}
 \kwd{benchmark}
 \end{keyword}
@@ -327,11 +322,11 @@ The MI score and minimum precision, which are largely independent of the estimat
 
 \subsection*{Overview of interactions between steps}
 
-We selected the most important alternatives for each parameter (see Methods) in order to explore their interactions. {\color{red}Unsupervised clustering on the evaluation metrics reveals general patterns in the results as well as the relative importance of the parameters (Figure \ref{fig:overall}), with the clustering method having the most important impact on the results. This is however chiefly due to number of clusters called: an ANOVA on all analyses after accounting, in the model, for baseline differences between datasets and the impact of \textit{Seurat}'s resolution parameter, attributed relatively little importance to the clustering method, and instead attributed the largest proportion of variance in the main cluster metrics to the number of dimensions used, followed by normalization (Supplementary Figure 29A). Because the choice of dimension reduction impacts the number of clusters, we repeated the analysis of variance in ARI among the combinations of parameters that yielded the true number of clusters (Supplementary Figure 29B). We observed that although normalization was the most important parameter among these analyses, the choice of dimensionality (as well as feature selection) came closely behind (Supplementary Figure 29B), suggesting that more attention should be paid to this relatively neglected step.
+We selected the most important alternatives for each parameter (see Methods) in order to explore their interactions. Unsupervised clustering on the evaluation metrics reveals general patterns in the results as well as the relative importance of the parameters (Supplementary Figure 29), with the clustering method having the most important impact on the results. This is however chiefly due to number of clusters called: an ANOVA on all analyses after accounting, in the model, for baseline differences between datasets and the impact of \textit{Seurat}'s resolution parameter, attributed relatively little importance to the clustering method, and instead attributed the largest proportion of variance in the main cluster metrics to the normalization method and the number of dimensions used (Figure \ref{fig:overall}). Part of the impact of the estimated dimensionality depended on its effect on the number of clusters detected, and it indeed explained less variance in ARI at the true number of clusters (Figure \ref{fig:overall}). Nevertheless, the choice of dimensionality (as well as feature selection) came closely behind normalization, suggesting that more attention should be paid to this relatively neglected step.
 
-The greater importance of normalization, dimensionality and feature selection over filtering steps is also visible in the clustering (Figure \ref{fig:overall}). The top methods (bottom of Figure \ref{fig:overall}) confirm the results of the previous sections, highlighting especially \textit{sctransform}, deviance-based feature selection, and \textit{maxLikGlobal} dimensionality estimates as top methods. Interestingly, while the combination of \textit{sctransform} with \textit{Seurat} clustering was particularly performant for most datasets, for the simulated `simMix1` dataset,  standard \textit{Seurat} normalization combined with \textit{scran}-based clustering proved superior.}
+The greater importance of normalization, dimensionality and feature selection over filtering steps is also visible in the clustering (Supplementary Figure 29). The top methods (bottom of Supplementary Figure 29) confirm the results of the previous sections, highlighting especially \textit{sctransform}, deviance-based feature selection, and \textit{maxLikGlobal} dimensionality estimates as top methods. Interestingly, while the combination of \textit{sctransform} with \textit{Seurat} clustering was particularly performant for most datasets, for the simulated `simMix1` dataset,  standard \textit{Seurat} normalization combined with \textit{scran}-based clustering proved superior.
 
-We next investigated whether the benefits of some methods were conditional on the choices at other steps. Although analysis of variance identified many weak but significant interactions, we found that the benefits brought by performant methods were robust to differences in other parts of the pipeline (Supplementary Figures 30-31). For instance, we confirmed that doublet removal and \textit{sctransform} normalization were beneficial independently of other steps, and that, again independently of other steps, more stringent filtering did not yield any major improvement over lenient filtering (Supplementary Figure 30). Similarly, deviance-based feature selection outcompeted \textit{Seurat}'s default selection method independently of changes at other steps (Supplementary Figure 31). {\color{red} ANOVA did reveal some significant (negative) interactions: the top two-way interaction was between \textit{scran} normalization and the elbow method for selection the number of dimensions, and indeed that combination was involved in all of the 30 lowest-ranking pipelines. Furthermore, all significant interactions involved the elbow method, suggesting that some methods were less robust to underestimated dimensionality.}
+We next investigated whether the benefits of some methods were conditional on the choices at other steps. Although analysis of variance identified some significant interactions (Supplementary Figure 30), we found that the benefits brought by performant methods were robust to differences in other parts of the pipeline (e.g. Supplementary Figure 31). For instance, we confirmed that doublet removal and \textit{sctransform} normalization were beneficial independently of other steps, and that deviance-based feature selection outcompeted \textit{Seurat}'s default selection method independently of changes at other steps (Supplementary Figure 31). ANOVA did reveal some significant (negative) interactions (Supplementary Figure 30): the top two-way interaction was between \textit{scran} normalization and the elbow method for selection the number of dimensions, and indeed that combination was involved in all of the 30 lowest-ranking pipelines. Furthermore, all significant interactions involved the elbow method, suggesting that some methods were less robust to underestimated dimensionality.
 
 \subsection*{Further extensions to the pipeline: imputation/denoising}
 
@@ -405,15 +400,6 @@ clear recommendations on the steps of filtering, normalization, feature selectio
 
 \section*{Methods}
 
-\subsection*{Code and data availability}
-
-All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation. {\color{red}All wrappers for methods used in the study can be found in the external data of the \textit{pipeComp} package (\url{https://github.com/plger/pipeComp/tree/master/inst/extdata}).}
-
-The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \url{https://doi.org/10.6084/m9.figshare.11787210.v1}.
-
-\subsection*{Software and package versions}
-Analyses were performed in R 3.6.0 (Bioconductor 3.9) and the following packages were installed from GitHub repositories: \textit{Seurat} (version 3.0.0), \textit{sctransform} (0.2.0), \textit{DoubletFinder} (2.0.1), \textit{scDblFinder} (1.1.4), \textit{scds} (1.0.0), \textit{SAVERX} (1.0.0), \textit{scImpute} (0.0.9), \textit{ALRA} (commit 7636de8), \textit{DCA} (0.2.2), \textit{DrImpute} (1.2), \textit{ENHANCE} (R version, commit 1571696), \textit{SAVERX} (1.0.0). The glmPCA was performed using the \textit{glmpca} package, while the code for deviance calculation was obtained from \url{https://github.com/willtownes/scrna2019} (commit 1ddcc30ebb95d083a685f12fe81d35dd1b0cb1b2).
-
 \subsection*{Simulated datasets}
 The simMix1 dataset was based on the human PBMC CITE-seq data deposited under accession code GSE100866 of the Gene Expression Omnibus (GEO) website. Both RNA and ADT count data were downloaded from GEO and processed independently using \textit{Seurat}. We then considered cells that were in the same cluster both in the RNA-based and ADT-based analyses to be real subpopulations and focused on the 4 most abundant ones. We then performed 3 sampling-based simulations with various degrees of separation using \textit{muscat} \cite{CrowellMuscat2019} and merged the three simulations. The simMix2 dataset was generated from the mouse brain data published in \cite{CrowellMuscat2019} in a similar fashion. The specific code is available on \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper}.
 
@@ -467,7 +453,7 @@ Two models of the \textit{scVI} package computing a dimension reduction on the d
 
 \subsection*{Overall run for interactions across steps}
 
-The set of alternatives found for the overall run (Supplementary Figures 29-31) can be found in the \href{https://github.com/markrobinsonuzh/scRNA_pipelines_paper/blob/master/data/overall_run.Rmd}{paper's repository}. The analysis of variance was performed with the following model:
+The set of alternatives found for the overall run (Figure 8 and Supplementary Figures 29-31) can be found in the \href{https://github.com/markrobinsonuzh/scRNA_pipelines_paper/blob/master/data/overall_run.Rmd}{paper's repository}. The analysis of variance was performed with the following model:
 
 \texttt{metric$\sim$ dataset*resolution+doubletmethod+filt+norm+clustmethod+dims}
 
@@ -484,6 +470,19 @@ The three benchmark datasets are available in \url{https://github.com/markrobins
 
 Filtering was performed with edgeR's \texttt{filterByExpr} function, changing the \texttt{min.count} argument. For \textit{vstsva}, we first applied the variance-stabilizing transformation from \textit{DESeq2} \citep{loveModeratedEstimation2014} before applying \texttt{sva::sva}. \textit{edgeR.QLF} refers to the quasi-likelihood version \citep{lundDetectingDifferential2012} of \textit{edgeR}'s fit. The exact wrappers used can be found in the package at \url{https://github.com/plger/pipeComp/blob/master/inst/extdata/dea\_wrappers.R}.
 
+
+\subsection*{Software and package versions}
+
+Analyses were performed in R 3.6.0 (Bioconductor 3.9) and the following packages were installed from GitHub repositories: \textit{Seurat} (version 3.0.0), \textit{sctransform} (0.2.0), \textit{DoubletFinder} (2.0.1), \textit{scDblFinder} (1.1.4), \textit{scds} (1.0.0), \textit{SAVERX} (1.0.0), \textit{scImpute} (0.0.9), \textit{ALRA} (commit 7636de8), \textit{DCA} (0.2.2), \textit{DrImpute} (1.2), \textit{ENHANCE} (R version, commit 1571696), \textit{SAVERX} (1.0.0). The glmPCA was performed using the \textit{glmpca} package, while the code for deviance calculation was obtained from \url{https://github.com/willtownes/scrna2019} (commit 1ddcc30ebb95d083a685f12fe81d35dd1b0cb1b2).
+
+\section*{Availability of Data and Materials}
+
+All analyses were performed through the \href{https://github.com/plger/pipeComp}{pipeComp} R package, which implements the pipeline framework described here. scVI results and results of the clustering section were produced with \textit{pipeComp} 0.99.4, while all other results were produced with version 0.99.2 (\textit{biorxiv}) branch of the repository). All code to reproduce the simulations and figures is available in the \url{https://github.com/markrobinsonuzh/scRNA\_pipelines\_paper} repository, which also includes the basic datasets with a standardized annotation. All wrappers for methods used in the study can be found in the external data of the \textit{pipeComp} package (\url{https://github.com/plger/pipeComp/tree/master/inst/extdata}).
+
+The gene counts for the two mixology datasets were downloaded from the  \href{https://github.com/LuyiTian/CellBench_data/data/sincell_with_class.RData}{CellBench repository}, commit 74fe79e. For the other datasets, we used the unfiltered counts from \cite{duoClustering2018}, available on the corresponding repository \url{https://github.com/markrobinsonuzh/scRNAseq\_clustering\_comparison}. For simplicity, all starting \textit{SingleCellExperiment} objects with standardized metadata are available on \url{https://doi.org/10.6084/m9.figshare.11787210.v1}.
+
+All data and code are released under a GNU General Public License.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
 %% Backmatter begins here                   %%
@@ -492,13 +491,17 @@ Filtering was performed with edgeR's \texttt{filterByExpr} function, changing th
 
 \begin{backmatter}
 
+\section*{Ethics approval}
+Not applicable.
+
 \section*{Competing interests}
 As developers of the \textit{scDblFinder} package, the authors have an interest in it performing well. The authors declare no further competing interests.
 
 \section*{Author's contributions}
 PLG developed the \textit{pipeComp} framework, and PLG and MDR designed the benchmark. PLG and AS prepared the pipelines, methods wrappers and performed the analyses. AS performed all denoising/imputation analyses. PLG, AS and MDR wrote the manuscript.
 
-\section*{Acknowledgements}
+\section*{Funding}
+
 This work was supported by the Swiss National Science Foundation (grants 310030\_175841, CRSII5\_177208) as well as the Chan Zuckerberg Initiative DAF (grant number 2018-182828), an advised fund of Silicon Valley Community Foundation. MDR acknowledges support from the University Research Priority Program Evolution in Action at the University of Zurich.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -612,8 +615,8 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{{overall.pdf}}
-    \caption{\textbf{Overview of the combination of main alternative parameters.} Unsupervised clustering of the results (above) and top results (below). The color-mapping schemes are the same as described in the previous figures.}
+    \includegraphics[width=\textwidth, keepaspectratio]{{anova.pdf}}
+    \caption{\textbf{Variance in clustering metrics explained by the parameters.} See methods for more detail.}
     \label{fig:overall}
 \end{figure}
 
@@ -639,7 +642,7 @@ This work was supported by the Swiss National Science Foundation (grants 310030\
 \section*{Tables}
 
 \begin{table}[h!]
-\caption{\textbf{Overview of the benchmark datasets.} {\color{red}`\# features' indicates the number of features detected in at least 10 cells.}}
+\caption{\textbf{Table S1: Overview of the benchmark datasets.} \# features' indicates the number of features detected in at least 10 cells.}
 \label{tab:table1}
 \begin{tabular}{rlrrl}
   \hline
@@ -666,9 +669,9 @@ Koh & 33922 & 531 & SMARTer & 9 FACS purified differentiation stages \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{Additional Files}
-  \subsection*{\textbf{Additional file 1: Supplementary figures}}
-  Additional results of evaluations across datasets among various metrics. (PDF 16 MB)
-  \subsection*{\textcolor{red}{\textbf{Additional file 2: Supplementary methods}}}
-  \textcolor{red}{More detailed description of \textit{pipeComp} and comparison with other tools. (PDF 0.5 MB)}
+  \subsection*{\textbf{Additional file 1}}
+  Supplementary Figures (PDF 16 MB)
+  \subsection*{\textbf{Additional file 2}}
+  More detailed description of \textit{pipeComp} and comparison with other tools. (PDF 0.5 MB)
 \end{backmatter}
 \end{document}
