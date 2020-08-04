@@ -34,7 +34,7 @@ SCEs <- lapply(lf, readRDS)
 ```
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r mixology_doublet_featcount, fig.height=4}
 theme_set(theme_cowplot(font_size = 13))
@@ -58,13 +58,13 @@ plot_grid(plotlist=pl, labels=LETTERS[1:2])
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 The total counts and total features per cell of doublets (red) versus other cells. We used the demuxlet annotation of doublets (based on SNPs) made available through CellBench. The lines indicate, respectively, 2, 2.5, and 3 median absolute deviations. While doublets tend to have a higher total count and especially number of detected features, these features alone are not always sufficient for their identification.
 
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r dist_cell_properties, fig.width=8.5, fig.height=8.5}
 theme_set(theme_cowplot(font_size = 12))
@@ -82,13 +82,13 @@ plot_grid(plotlist=lapply(1:length(vars), FUN=function(x){
 }), nrow=1)
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Distribution across cells of various control properties in the different datasets. The 
 lines indicate respectively 2 and 5 median absolute deviations (MADs).
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r cellprops_cor, fig.width=7, fig.height=8}
 d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
@@ -104,12 +104,12 @@ plot_grid( ggplot(d, aes(x=pct_top_50, y=pct_counts_Mt)) + geom_point() + facet_
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship between selected cell-level QC metrics.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r featcount_ratio}
 d <- data.frame( dataset=rep(names(SCEs),sapply(SCEs,ncol)), 
@@ -121,13 +121,13 @@ ggplot(d, aes(x=log10_features, y=log10_counts, colour=featcount_dist)) + geom_p
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 There is a tight relationship, in 10x datasets (i.e. not the `Koh` and `Kumar` datasets), between the total counts of a cell and its number of detected features. We therefore include, among control variables, deviation from this ratio.
 
 \newpage
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r misclass, fig.height=4}
 theme_set(theme_cowplot(font_size = 10))
@@ -145,12 +145,12 @@ pdb(3, labels=c("B",rep("",6)))
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship between various cellular properties and the frequency of cluster mis-assignment for the mixology10x3cl (A) and mixology10x5cl (B) datasets. The percentage of misclassification refers to the frequency with which a given cell is assigned the wrong cluster (using the Hungarian algorithm for cluster matching) across several hundred clustering runs with varying parameters. Since some subpopulations tend to be more misclassified than others, the adjusted rate of misclassification (`adj_mis`) is substracted for the subpopulation median misclassification rate.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.height=4}
 pdb(4, labels=c("A",rep("",6)))
@@ -162,12 +162,12 @@ pdb(5, labels=c("B",rep("",6)))
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship between various cellular properties and the frequency of cluster mis-assignment for the Zheng equal (A) or unequal (B) mixtures of four cell types. See Supplementary Figure `r getFigNb()-1` for more information. The only clear pattern is that cells with a high number of reads or features tend to have a higher misclassification rate.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.height=4}
 pdb(6)
@@ -175,7 +175,7 @@ pdb(6)
 
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship between various cellular properties and the frequency of cluster mis-assignment for the Zheng mixture of 8 cell types. See Supplementary Figure `r getFigNb()-2` for more information.
 
 \newpage

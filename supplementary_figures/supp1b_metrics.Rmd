@@ -29,7 +29,7 @@ source("../misc_functions.R")
 ```
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 res <- readRDS("../data/results_clustering.rds")
@@ -48,11 +48,11 @@ p
 ```
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 The number of clusters called has a much bigger impact on the Adjusted Rand Index (ARI) than differences between methods. The dashed line indicates the true number of clusters.
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=8, fig.height=5}
 res <- readRDS("../data/results_clustering.rds")
@@ -78,7 +78,7 @@ Heatmap( sp, column_title = "Spearman correlation", col=cs, name="cor",
           cluster_columns=FALSE, cluster_rows=FALSE, show_heatmap_legend=FALSE)
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship of various metrics of clustering accuracy between each other and with variations in the number of clusters called (`nbClust.diff` and `nbClust.absDiff`). Correlations were calculated for each dataset separately across various clustering runs and averaged (the `mixology10x3cl` dataset was excluded due to insufficient variation among the results). Information distance metrics (ID, NID, VI, NVI) are highly correlated with the absolute difference between the true and called number of clusters, while the Adjusted Rand Index (ARI) and similar metrics were strongly anticorrelated to it. Precision (mean_pr) and recall (mean_re) were slightly less correlated with discrepancies in the number of clusters. Mutual information (MI) was not at all correlated with the absolute difference in number of clusters (`nbClust.absDiff`), but positively correlated with the difference (`nbClust.diff`), i.e. favouring clusterings calling a higher number of clusters. We therefore recommend using complementary metrics such as ARI and MI, and potentially mean F1 per subpopulation.
 
 \newpage

@@ -28,7 +28,7 @@ if(!exists('FIG_NB')){
 }
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 res <- readRDS("../data/results_imputation.rds")
@@ -95,5 +95,5 @@ plot_grid( p1, p2, nrow=2, labels=LETTERS[1:2], rel_heights = c(4,6))
 ```
 
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 **Evaluation of imputation/denoising methods.** Average silhouette width (**A**) and clustering accuracy (**B**) with or without (indicated as _none_) application of a denoising/imputation method.

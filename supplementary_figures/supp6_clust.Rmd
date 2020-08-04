@@ -28,7 +28,7 @@ theme_set(theme_cowplot(font_size = 12))
 source("../misc_functions.R")
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 res <- readRDS("../data/results_clustering2.rds")
@@ -65,7 +65,7 @@ p1 /
     plot_layout(heights = c(10,6,2,1))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Difference between the number of detected clusters and the number of real subpopulations according to different clustering paramters.
 
 \newpage

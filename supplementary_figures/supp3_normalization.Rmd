@@ -40,19 +40,19 @@ classifyNorms <- function(x){
 
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r covar, fig.width=8, fig.height=4.5}
 res <- readRDS("../data/results_norm.rds")
 renameNorm(evalHeatmap(res, step="dimreduction", c("log10_total_counts","log10_total_features"), what2="meanAbsCorr.covariate2", agg.by="norm", anno_legend=FALSE, scale=FALSE, row_split=classifyNorms(norm)))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Mean per-subpopulation absolute correlation of the first 5 components with library size (left) and the number of detected features (right) across normalization procedures.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r}
 res <- readRDS("../data/scVI.rds")
@@ -73,14 +73,14 @@ H2 <- evalHeatmap(res, step="clustering", what=c("MI"), agg.by=c("norm","dr"), a
 plot_grid(grid.grabExpr(draw(H)), grid.grabExpr(draw(H2, heatmap_legend_side="bottom")), ncol=1, labels = LETTERS[1:2], rel_heights=c(3,4))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 **scVI evaluation. A:** Average silhouette width per subpopulation using either sctransform, scran or scVI normalization followed by Seurat PCA, or the scVI latent space (latent) or imputed values (LD) of the linear decoder. **B:** Clustering accuracy across the same methods followed by Seurat clustering.
 
 \newpage
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r norm_nbClusters, fig.width=8, fig.height=8.5}
 res <- readRDS("../data/results_norm.rds")
@@ -112,23 +112,23 @@ mod <- summary(lm(n_clus~dataset+norm+dims+resolution, data=res2))
 plot_grid(plotlist = ll[-2], nrow=6, rel_heights=c(1,1,1,1,1,1.5))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Mean difference between the number of detected clusters and the number of real subpopulations, depending on the normalization method, the resolution and the number of dimensions used. The Kumar dataset is not shown here due to a lack of variation in the number of clusters detected. A rough ANOVA on `nbClusters~dataset+norm+dims+resolution` suggests that seuratvst (sctransform) is associated with a higher number of clusters (p~`r round(mod$coefficients["normnorm.sctransform",4],3)`).
 
 \newpage 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r VST, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("vst.png")
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Relationship of the variance with mean count after `sctranform`'s variance stabilizing transformation.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=7.5, fig.height=6}
 res <- readRDS("../data/results_norm.rds")
@@ -140,5 +140,5 @@ ggplot(ag, aes(norm, elapsed)) + geom_boxplot() + geom_point(aes(colour=dataset)
   coord_flip() + scale_colour_manual(values=cols) + xlab("") + ylab("Time (s)")
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Running time of the normalization methods.

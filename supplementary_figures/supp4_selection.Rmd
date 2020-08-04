@@ -23,7 +23,7 @@ suppressPackageStartupMessages({
 source("../misc_functions.R")
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=8, fig.height=8}
 gi <- readRDS("../data/GI.rds")
@@ -41,14 +41,14 @@ diffplot(gi$mixology10x3cl, "C. Difference between the estimates\n(mixology10x3c
 diffplot(gi$Zhengmix4eq, "D. Difference between the estimates\n(Zhengmix4eq)")
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 **A:** Comparison of the gene-wise proportion of variance explained by real subpopulations based on Seurat's standard log normalization and on `sctransform` variance-stabilizing transformation. Across 10x datasets, there is a good agreement between the two, the correlation ranging between 0.92 and 0.97.
 **B:** There is also a good agreement between _variance_ and _deviance_ explained, with some genes having a higher deviance explained.
 **C-D:** Relationship between mean expression and the difference between the proportion of deviance explained and the proportion of variance explained in two datasets. Genes that have a higher proportion of the deviance explained than of the variance explained are generally the lowly-expressed ones.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
@@ -62,13 +62,13 @@ ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
 suppressWarnings(plot_grid(plotlist=ll, ncol=2))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Proportion of the cumulative _variance_ explained by real subpulations that is retrieved through the selection. For each gene, we compute the proportion of the variance explained by real subpopulations. For each rank X, we sum this proportion for the X genes selected by a given method, and divide it by the sum when selecting the X genes with the highest variance explained. An ideal selection would therefore be a horizontal line at 1.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE}
 ll <- lapply(names(gi), FUN=function(x){
@@ -81,13 +81,13 @@ ll$legend <- get_legend(ll[[1]] + theme(legend.position="right"))
 suppressWarnings(plot_grid(plotlist=ll, ncol=2))
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Proportion of the cumulative _deviance_ explained by real subpulations that is retrieved through the selection. For each gene, we compute the proportion of the variance explained by real subpopulations. As for Supplementary Figure `r getFigNb()-1`, except using deviance explained.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=8, fig.height=9}
 res <- readRDS("../data/results_selection.rds")
@@ -125,7 +125,7 @@ plot_grid(
 )
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Clustering accuracy according to the number of genes selected using various ranking/selection methods. **A:** Based on sctransform, **B:** Based on standard Seurat normalization.
 

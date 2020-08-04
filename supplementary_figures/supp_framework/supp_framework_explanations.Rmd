@@ -1,5 +1,5 @@
 ---
-title: "pipeComp - Supplementary Methods"
+title: "pipeComp - Additional file 2: Supplementary Methods"
 author: Pierre-Luc Germain, Anthony Sonrel, Mark D. Robinson
 output:
   pdf_document:
@@ -95,7 +95,7 @@ The function's processing is illustrated in Figure \ref{fig:figure1}B. First, a 
 
 The same branching pattern could in principle be done with `r CRANpkg("drake")`, however in a much more cumbersome fashion. Indeed, planning a static or dynamic `r CRANpkg("drake")` branching on all combinations would result in a target for each (and hence many duplicated computation) unless it was planned for each step separately, requiring considerably more scripting than when implemented in `r Rpackage("pipeComp")`. In addition, it would mean that all intermediate targets need to be stored, which is not practicable for combinatorial explorations with large datasets (for our scRNAseq comparison, we estimate this to be approximately 16 TB).
 
-On the other hand, a `r CRANpkg("drake")`-based workflow has several advantages, in particular the capacity, upon failure of a pipeline (or changes made to a step), to recover and restart from the very next upstream target. We are currently working on an `bptry`-based approach to error handling and selective recomputation, but for the moment users requiring smooth error recovery should rather rely on `r CRANpkg("drake")`.
+On the other hand, a `r CRANpkg("drake")`-based workflow has several advantages, in particular the capacity, upon failure of a pipeline (or changes made to a step), to smoothly recover and restart from the very next upstream target. Starting from version 0.99.45, `r Rpackage("pipeComp")` also supports some error handling, allowing users to use results from those pipelines that ran successfully and selectively recompute (e.g. after fixing the error) those that encountered errors (see the package's vignettes for more information). However, due to the non-persistent nature of `r Rpackage("pipeComp")`'s storage, for those parameter combinations that failed, all steps will have to be recomputed.
 
 ## _CellBench_
 

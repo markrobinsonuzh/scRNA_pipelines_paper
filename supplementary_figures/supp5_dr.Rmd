@@ -29,7 +29,7 @@ theme_set(theme_cowplot(font_size = 13))
 source("../misc_functions.R")
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r dimred, fig.width=10.5, fig.height=6}
 res <- readRDS("../data/results_dimred2.rds")
@@ -51,12 +51,12 @@ p2 <- grid.grabExpr(draw(p2))
 plot_grid(p1,p2, nrow=2, labels=LETTERS[1:2])
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 **Evaluation of common dimensionality reduction methods. A:** Minimum (left) and average (right) silhouette width per subpopulation resulting from combinations of normalization and dimension reductions. **B:** Clustering accuracy, measured by mutual information (MI), minimum subpopulation precision, and adjusted Rand index (ARI) at the true number of clusters.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 
 ```{r, fig.width=8, fig.height=8.5}
@@ -75,12 +75,12 @@ for(i in names(ll)) ll[[i]] <- ll[[i]] + ggtitle(i)
 plot_grid(plotlist = ll, nrow=3)
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Mean difference between the number of detected clusters and the number of real subpopulations, depending on the resolution and number of dimensions used. Based on sctransform and seurat PCA. Increasing the number of dimensions tends to decrease the number of identified clusters, especially at resolutions around the default value.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=8, fig.height=8.5}
 res3 <- aggregate(res2[,"ARI",drop=FALSE], by=res2[,c("dataset","dims","resolution")], FUN=mean)
@@ -93,14 +93,14 @@ for(i in names(ll)) ll[[i]] <- ll[[i]] + ggtitle(i)
 plot_grid(plotlist = ll, nrow=3)
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Adjusted Rand Index of clustering depending on the resolution and number of dimensions used. Based on sctransform
 and seurat PCA.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 
 ```{r, fig.width=7.5, fig.height=8.5}
@@ -119,13 +119,13 @@ ggplot(cl, aes(x=dims, y=delta.nbClust, fill=dims)) + geom_violin() +
   ylab("Deviation from true number of clusters")
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Deviation from the true number of clusters using different number of principal components (based the indicated dimensionality estimates) of the same Seurat-based PCA. Default pipeline parameters were used for the other steps, and the distributions represent the different resolutions of Seurat clustering. Across datasets, MCVR and maxLikGlobal appear to depart less from the true number of clusters.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, include=FALSE, eval=FALSE}
 source(system.file("extdata", "scrna_alternatives.R", package="pipeComp"))
@@ -183,6 +183,6 @@ ggplot(res, aes(k, ndims, colour=dataset)) + geom_point() + geom_line() +
   ggtitle("intrinsicDimension::maxLikGlobalDimEst")
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Estimates of dimensionality by the `intrinsicDimension::maxLikGlobalDimEst` method using various 'reasonable' numbers of nearest neighbors (`k` parameter).
 

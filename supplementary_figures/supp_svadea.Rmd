@@ -32,7 +32,7 @@ res2$evaluation$dea <- lapply(res2$evaluation$dea, FUN=function(x){
 ```
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 
 ```{r, fig.width=8.5, fig.height=8.5}
@@ -44,13 +44,13 @@ plot_grid(
 )
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Accuracy of the differential expression analysis across combinations of: **A:** filters and DEA methods (using max 1 variable), **B:** filters and SVA methods (using max 1 variable), **C:** SVA methods (using 2 variables). In **C**, filled points indicate a nominal FDR below the observed FDR.
 
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.width=8, fig.height=8.5}
 plot_grid(
@@ -64,7 +64,7 @@ plot_grid(
 )
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 **A:** Accuracy of the estimated logFC (correlation and median absolute deviation from expected logFCs) and of the differential expression analysis (TPR stands for True Positive Rate, and FDR for False Discovery Rate) across the different combinations of SVA and DEA methods (using max 1 dimension). **B:** Running times of the different methods.
 
 \newpage

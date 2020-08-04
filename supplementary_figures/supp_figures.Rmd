@@ -1,6 +1,6 @@
 ---
 title: \vspace{2cm}\Large{pipeComp, a general framework for the evaluation of computational pipelines, reveals performant single-cell RNA-seq preprocessing tools}
-subtitle: \vspace{2cm}\LARGE{Supplementary Figures}\vspace{2cm}
+subtitle: \vspace{2cm}\LARGE{Additional File 1 - Supplementary Figures}\vspace{2cm}
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author:
 - "Pierre-Luc Germain"
@@ -15,8 +15,6 @@ output:
 bibliography: ../bmc_article.bib
 ---
 
-\renewcommand{\thepage}{S\arabic{page}}
-
 ```{r setup, include=FALSE}
 # comment this out to print code
 knitr::opts_chunk$set(echo=FALSE)
@@ -27,32 +25,32 @@ getFigNb <- function(increment=FALSE){
 }
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.align="center", echo=FALSE, out.height="0.9\\textheight"}
 knitr::include_graphics("dataset_description.pdf")
 ```
 
-### Supplementary Figure `r getFigNb()`: Overview of the benchmark datasets
+### Fig S`r getFigNb()`: Overview of the benchmark datasets
 
 \newpage
 
-```{r child='supp1b_metrics.Rmd'}
+```{r child='supp1b_metrics.Rmd', cache=TRUE}
 ```
 
-```{r child='supp1_dataset_description.Rmd'}
+```{r child='supp1_dataset_description.Rmd', cache=TRUE}
 ```
 
-```{r child='supp2_filtering.Rmd'}
+```{r child='supp2_filtering.Rmd', cache=TRUE}
 ```
 
-```{r child='supp3_normalization.Rmd'}
+```{r child='supp3_normalization.Rmd', cache=TRUE}
 ```
 
-```{r child='supp4_selection.Rmd'}
+```{r child='supp4_selection.Rmd', cache=TRUE}
 ```
 
-```{r child='supp5_dr.Rmd'}
+```{r child='supp5_dr.Rmd', cache=TRUE}
 ```
 
 ```{r child='supp6_clust.Rmd'}
@@ -68,13 +66,13 @@ knitr::include_graphics("dataset_description.pdf")
 ```
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r, fig.align="center", echo=FALSE, out.height="0.8\\textheight"}
 knitr::include_graphics("../main_figures/pipeComp_summary.pdf")
 ```
 
-### Supplementary Figure `r getFigNb()`: Summary of the recommendations.
+### Fig S`r getFigNb()`: Summary of the recommendations.
 
 
 

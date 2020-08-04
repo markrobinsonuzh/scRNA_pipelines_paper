@@ -30,7 +30,7 @@ suppressPackageStartupMessages({
 source("../misc_functions.R")
 ```
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 ```{r filt_more, fig.width=8.5, fig.height=5}
 res <- readRDS("../data/results_filtering.rds")
@@ -56,12 +56,12 @@ renameHrows(evalHeatmap(ag, what=c("maxLost","medianLost"), agg.by=c("doubletmet
 )
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 Mean clustering F1 score per subpopulation, mean F1 at true number of clusters, as well as maximum and median proportion of excluded cells per subpopulation across various filtering strategies. Doublet removal generally improves clustering accuracy with relatively mild increases exclusion rates, even in datasets that do not have heterotypic doublets. Stringent distribution-based filtering creates large cell type biases.
 
 \newpage
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 
 ```{r, fig.height=8.5, fig.width=7}
@@ -106,14 +106,14 @@ plot_grid( grid.grabExpr(draw(H,merge_legend=TRUE)), grid.grabExpr(draw(h2)),
            nrow=2, rel_heights=c(6,4), labels=LETTERS[1:2])
 ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 **A:** Proportion of cells filtered out by subpopulation. Applying the same filters in a cluster-wise fashion (using `scran::quickCluster`, and desginated here with `clustFilter*`) leads to virtually no cell exclusion. The color-mapping is square-root transformed to improve the visibility of differences at low proportions. **B:** Overlap between cells excluded by doublet removal (`scDblFinder`) and those excluded by MAD-based filters (without doublet removal; the filters are described in the methods), expressed as a proportion of the dataset. The cells excluded as doublets do not tend to be excluded by (even stringent) MAD-based filtering.
 
 \newpage
 
 
-# Supplementary Figure `r getFigNb(TRUE)`
+# Fig S`r getFigNb(TRUE)`
 
 
 ```{r, fig.width=8, fig.height=6.5}
@@ -135,7 +135,7 @@ draw(renameHrows(
   rnfn), annotation_legend_list=pipeComp:::.scaledLegend(), merge_legend=TRUE, heatmap_legend_side="bottom")
     ```
 
-### Supplementary Figure `r getFigNb()`
+### Fig S`r getFigNb()`
 
 Impact of restricting the type of features used on the Mutual Information (MI, left) and Adjusted Rand Index (ARI, right) of the clustering. `all` indicates that all features were used, `-Mt` stands for the exclusion of mitochondrial genes, `-ribo` the exclusion of ribosomal genes, and `coding-only` a restriction to protein-coding genes. The features were filtered out prior to normalization.
 
