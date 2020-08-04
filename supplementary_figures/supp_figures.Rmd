@@ -53,7 +53,7 @@ knitr::include_graphics("dataset_description.pdf")
 ```{r child='supp5_dr.Rmd', cache=TRUE}
 ```
 
-```{r child='supp6_clust.Rmd'}
+```{r child='supp6_clust.Rmd', cache=TRUE}
 ```
 
 ```{r child='supp_overall.Rmd'}
