@@ -1,0 +1,33 @@
+---
+title: "datasets overview"
+author: "Pierre-Luc Germain"
+date: "10/23/2019"
+output: html_document
+---
+
+```{r}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(cowplot)
+  library(pipeComp)
+})
+theme_set(theme_cowplot())
+ds <- list.files("datasets/", full.names=TRUE)
+names(ds) <- gsub("\\.SCE\\.rds","",basename(ds))
+
+sces <- lapply(ds, FUN=function(x){
+  library(scran)
+  library(scater)
+  sce <- readRDS(x)
+  sce <- logNormCounts(sce)
+  var.stats <- modelGeneVar(sce)
+  sce <- denoisePCA(sce, technical=var.stats)
+  reducedDim(sce, "tSNE") <- Rtsne::Rtsne(reducedDim(sce))$Y
+  reducedDim(sce, "umap") <- uwot::umap(reducedDim(sce))
+  sce
+})
+```
+
+```{r, fig.width=8.5, fig.height=12}
+describeDatasets(sces, pt.size = 0.4, alpha=0.7)
+```
